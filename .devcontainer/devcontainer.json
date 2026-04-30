@@ -1,0 +1,23 @@
+{
+  "name": "firefly",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "forwardPorts": [8080, 5005],
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "postCreateCommand": "./mvnw dependency:go-offline -q",
+  "remoteUser": "dev",
+  "customizations": {
+    "jetbrains": {
+      "backend": "IntelliJIdea"
+    },
+    "vscode": {
+      "extensions": ["vscjava.vscode-java-pack"]
+    }
+  }
+}
