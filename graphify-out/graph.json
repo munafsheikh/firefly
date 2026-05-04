@@ -53,6 +53,33 @@
   },
   "nodes": [
     {
+      "label": "ActuatorPluginAutoConfiguration.java",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/actuator-plugin/src/main/java/ai/firefly/plugin/actuator/ActuatorPluginAutoConfiguration.java",
+      "source_location": "L1",
+      "id": "home_m_code_github_munafsheikh_firefly_plugins_actuator_plugin_src_main_java_ai_firefly_plugin_actuator_actuatorpluginautoconfiguration_java",
+      "community": 16,
+      "norm_label": "actuatorpluginautoconfiguration.java"
+    },
+    {
+      "label": "ActuatorPluginAutoConfiguration",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/actuator-plugin/src/main/java/ai/firefly/plugin/actuator/ActuatorPluginAutoConfiguration.java",
+      "source_location": "L8",
+      "id": "actuatorpluginautoconfiguration_actuatorpluginautoconfiguration",
+      "community": 16,
+      "norm_label": "actuatorpluginautoconfiguration"
+    },
+    {
+      "label": ".ActuatorPluginAutoConfiguration()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/actuator-plugin/src/main/java/ai/firefly/plugin/actuator/ActuatorPluginAutoConfiguration.java",
+      "source_location": "L14",
+      "id": "actuatorpluginautoconfiguration_actuatorpluginautoconfiguration_actuatorpluginautoconfiguration",
+      "community": 16,
+      "norm_label": ".actuatorpluginautoconfiguration()"
+    },
+    {
       "label": "AdoPluginController.java",
       "file_type": "code",
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginController.java",
@@ -193,7 +220,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginProperties.java",
       "source_location": "L1",
       "id": "home_m_code_github_munafsheikh_firefly_plugins_ado_plugin_src_main_java_ai_firefly_plugin_ado_adopluginproperties_java",
-      "community": 20,
+      "community": 22,
       "norm_label": "adopluginproperties.java"
     },
     {
@@ -202,7 +229,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginProperties.java",
       "source_location": "L5",
       "id": "adopluginproperties_adopluginproperties",
-      "community": 20,
+      "community": 22,
       "norm_label": "adopluginproperties"
     },
     {
@@ -211,7 +238,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginAutoConfiguration.java",
       "source_location": "L1",
       "id": "home_m_code_github_munafsheikh_firefly_plugins_ado_plugin_src_main_java_ai_firefly_plugin_ado_adopluginautoconfiguration_java",
-      "community": 7,
+      "community": 8,
       "norm_label": "adopluginautoconfiguration.java"
     },
     {
@@ -220,7 +247,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginAutoConfiguration.java",
       "source_location": "L9",
       "id": "adopluginautoconfiguration_adopluginautoconfiguration",
-      "community": 7,
+      "community": 8,
       "norm_label": "adopluginautoconfiguration"
     },
     {
@@ -229,7 +256,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginAutoConfiguration.java",
       "source_location": "L14",
       "id": "adopluginautoconfiguration_adopluginautoconfiguration_adopluginautoconfiguration",
-      "community": 7,
+      "community": 8,
       "norm_label": ".adopluginautoconfiguration()"
     },
     {
@@ -238,7 +265,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginAutoConfiguration.java",
       "source_location": "L18",
       "id": "adopluginautoconfiguration_adopluginautoconfiguration_adopluginproperties",
-      "community": 7,
+      "community": 8,
       "norm_label": ".adopluginproperties()"
     },
     {
@@ -247,7 +274,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginAutoConfiguration.java",
       "source_location": "L24",
       "id": "adopluginautoconfiguration_adopluginautoconfiguration_adopluginmetadata",
-      "community": 7,
+      "community": 8,
       "norm_label": ".adopluginmetadata()"
     },
     {
@@ -256,7 +283,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginAutoConfiguration.java",
       "source_location": "L29",
       "id": "adopluginautoconfiguration_adopluginautoconfiguration_adorestclient",
-      "community": 7,
+      "community": 8,
       "norm_label": ".adorestclient()"
     },
     {
@@ -265,7 +292,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginAutoConfiguration.java",
       "source_location": "L34",
       "id": "adopluginautoconfiguration_adopluginautoconfiguration_adoworkitemservice",
-      "community": 7,
+      "community": 8,
       "norm_label": ".adoworkitemservice()"
     },
     {
@@ -274,7 +301,7 @@
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoPluginAutoConfiguration.java",
       "source_location": "L39",
       "id": "adopluginautoconfiguration_adopluginautoconfiguration_adoplugincontroller",
-      "community": 7,
+      "community": 8,
       "norm_label": ".adoplugincontroller()"
     },
     {
@@ -620,12 +647,66 @@
       "norm_label": ".getauthor()"
     },
     {
+      "label": "FireflyCommand.java",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L1",
+      "id": "home_m_code_github_munafsheikh_firefly_plugins_cli_plugin_src_main_java_ai_firefly_plugin_cli_fireflycommand_java",
+      "community": 10,
+      "norm_label": "fireflycommand.java"
+    },
+    {
+      "label": "FireflyCommand",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L13",
+      "id": "fireflycommand_fireflycommand",
+      "community": 10,
+      "norm_label": "fireflycommand"
+    },
+    {
+      "label": ".runTui()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L16",
+      "id": "fireflycommand_fireflycommand_runtui",
+      "community": 10,
+      "norm_label": ".runtui()"
+    },
+    {
+      "label": ".handleEvent()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L21",
+      "id": "fireflycommand_fireflycommand_handleevent",
+      "community": 10,
+      "norm_label": ".handleevent()"
+    },
+    {
+      "label": ".render()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L29",
+      "id": "fireflycommand_fireflycommand_render",
+      "community": 10,
+      "norm_label": ".render()"
+    },
+    {
+      "label": ".main()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L36",
+      "id": "fireflycommand_fireflycommand_main",
+      "community": 10,
+      "norm_label": ".main()"
+    },
+    {
       "label": "TestcontainersConfiguration.java",
       "file_type": "code",
       "source_file": "src/test/java/ai/firefly/TestcontainersConfiguration.java",
       "source_location": "L1",
       "id": "src_test_java_ai_firefly_testcontainersconfiguration_java",
-      "community": 21,
+      "community": 23,
       "norm_label": "testcontainersconfiguration.java"
     },
     {
@@ -634,7 +715,7 @@
       "source_file": "src/test/java/ai/firefly/TestcontainersConfiguration.java",
       "source_location": "L5",
       "id": "testcontainersconfiguration_testcontainersconfiguration",
-      "community": 21,
+      "community": 23,
       "norm_label": "testcontainersconfiguration"
     },
     {
@@ -643,7 +724,7 @@
       "source_file": "src/test/java/ai/firefly/TestFireflyApplication.java",
       "source_location": "L1",
       "id": "src_test_java_ai_firefly_testfireflyapplication_java",
-      "community": 15,
+      "community": 17,
       "norm_label": "testfireflyapplication.java"
     },
     {
@@ -652,7 +733,7 @@
       "source_file": "src/test/java/ai/firefly/TestFireflyApplication.java",
       "source_location": "L5",
       "id": "testfireflyapplication_testfireflyapplication",
-      "community": 15,
+      "community": 17,
       "norm_label": "testfireflyapplication"
     },
     {
@@ -661,7 +742,7 @@
       "source_file": "src/test/java/ai/firefly/TestFireflyApplication.java",
       "source_location": "L7",
       "id": "testfireflyapplication_testfireflyapplication_main",
-      "community": 15,
+      "community": 17,
       "norm_label": ".main()"
     },
     {
@@ -670,7 +751,7 @@
       "source_file": "src/test/java/ai/firefly/FireflyApplicationTests.java",
       "source_location": "L1",
       "id": "src_test_java_ai_firefly_fireflyapplicationtests_java",
-      "community": 16,
+      "community": 18,
       "norm_label": "fireflyapplicationtests.java"
     },
     {
@@ -679,7 +760,7 @@
       "source_file": "src/test/java/ai/firefly/FireflyApplicationTests.java",
       "source_location": "L7",
       "id": "fireflyapplicationtests_fireflyapplicationtests",
-      "community": 16,
+      "community": 18,
       "norm_label": "fireflyapplicationtests"
     },
     {
@@ -688,7 +769,7 @@
       "source_file": "src/test/java/ai/firefly/FireflyApplicationTests.java",
       "source_location": "L11",
       "id": "fireflyapplicationtests_fireflyapplicationtests_contextloads",
-      "community": 16,
+      "community": 18,
       "norm_label": ".contextloads()"
     },
     {
@@ -697,7 +778,7 @@
       "source_file": "src/main/java/ai/firefly/FireflyApplication.java",
       "source_location": "L1",
       "id": "src_main_java_ai_firefly_fireflyapplication_java",
-      "community": 17,
+      "community": 19,
       "norm_label": "fireflyapplication.java"
     },
     {
@@ -706,7 +787,7 @@
       "source_file": "src/main/java/ai/firefly/FireflyApplication.java",
       "source_location": "L6",
       "id": "fireflyapplication_fireflyapplication",
-      "community": 17,
+      "community": 19,
       "norm_label": "fireflyapplication"
     },
     {
@@ -715,61 +796,7 @@
       "source_file": "src/main/java/ai/firefly/FireflyApplication.java",
       "source_location": "L9",
       "id": "fireflyapplication_fireflyapplication_main",
-      "community": 17,
-      "norm_label": ".main()"
-    },
-    {
-      "label": "FireflyCommand.java",
-      "file_type": "code",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L1",
-      "id": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_cli_fireflycommand_java",
-      "community": 9,
-      "norm_label": "fireflycommand.java"
-    },
-    {
-      "label": "FireflyCommand",
-      "file_type": "code",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L13",
-      "id": "fireflycommand_fireflycommand",
-      "community": 9,
-      "norm_label": "fireflycommand"
-    },
-    {
-      "label": ".runTui()",
-      "file_type": "code",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L16",
-      "id": "fireflycommand_fireflycommand_runtui",
-      "community": 9,
-      "norm_label": ".runtui()"
-    },
-    {
-      "label": ".handleEvent()",
-      "file_type": "code",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L21",
-      "id": "fireflycommand_fireflycommand_handleevent",
-      "community": 9,
-      "norm_label": ".handleevent()"
-    },
-    {
-      "label": ".render()",
-      "file_type": "code",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L29",
-      "id": "fireflycommand_fireflycommand_render",
-      "community": 9,
-      "norm_label": ".render()"
-    },
-    {
-      "label": ".main()",
-      "file_type": "code",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L36",
-      "id": "fireflycommand_fireflycommand_main",
-      "community": 9,
+      "community": 19,
       "norm_label": ".main()"
     },
     {
@@ -778,7 +805,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalAutoConfiguration.java",
       "source_location": "L1",
       "id": "src_main_java_ai_firefly_terminal_terminalautoconfiguration_java",
-      "community": 8,
+      "community": 9,
       "norm_label": "terminalautoconfiguration.java"
     },
     {
@@ -787,7 +814,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalAutoConfiguration.java",
       "source_location": "L17",
       "id": "terminalautoconfiguration_terminalautoconfiguration",
-      "community": 8,
+      "community": 9,
       "norm_label": "terminalautoconfiguration"
     },
     {
@@ -796,7 +823,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalAutoConfiguration.java",
       "source_location": "L27",
       "id": "terminalautoconfiguration_terminalautoconfiguration_terminalautoconfiguration",
-      "community": 8,
+      "community": 9,
       "norm_label": ".terminalautoconfiguration()"
     },
     {
@@ -805,7 +832,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalAutoConfiguration.java",
       "source_location": "L31",
       "id": "terminalautoconfiguration_terminalautoconfiguration_terminalservice",
-      "community": 8,
+      "community": 9,
       "norm_label": ".terminalservice()"
     },
     {
@@ -814,7 +841,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalAutoConfiguration.java",
       "source_location": "L37",
       "id": "terminalautoconfiguration_terminalautoconfiguration_terminalwebsockethandler",
-      "community": 8,
+      "community": 9,
       "norm_label": ".terminalwebsockethandler()"
     },
     {
@@ -823,7 +850,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalAutoConfiguration.java",
       "source_location": "L43",
       "id": "terminalautoconfiguration_terminalautoconfiguration_terminalcontroller",
-      "community": 8,
+      "community": 9,
       "norm_label": ".terminalcontroller()"
     },
     {
@@ -832,22 +859,22 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalAutoConfiguration.java",
       "source_location": "L49",
       "id": "terminalautoconfiguration_terminalautoconfiguration_registerwebsockethandlers",
-      "community": 8,
+      "community": 9,
       "norm_label": ".registerwebsockethandlers()"
     },
     {
       "label": "TerminalService.java",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L1",
-      "id": "src_main_java_ai_firefly_terminal_terminalservice_java",
+      "id": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_terminal_terminalservice_java",
       "community": 1,
       "norm_label": "terminalservice.java"
     },
     {
       "label": "TerminalService",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L14",
       "id": "terminalservice_terminalservice",
       "community": 1,
@@ -856,7 +883,7 @@
     {
       "label": ".TerminalService()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L20",
       "id": "terminalservice_terminalservice_terminalservice",
       "community": 1,
@@ -865,7 +892,7 @@
     {
       "label": ".createSession()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L24",
       "id": "terminalservice_terminalservice_createsession",
       "community": 1,
@@ -874,17 +901,26 @@
     {
       "label": ".buildCommand()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L44",
       "id": "terminalservice_terminalservice_buildcommand",
       "community": 1,
       "norm_label": ".buildcommand()"
     },
     {
+      "label": ".findCliPluginJar()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L63",
+      "id": "terminalservice_terminalservice_findclipluginjar",
+      "community": 1,
+      "norm_label": ".findclipluginjar()"
+    },
+    {
       "label": "PtySession",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L57",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L87",
       "id": "terminalservice_ptysession",
       "community": 1,
       "norm_label": "ptysession"
@@ -892,8 +928,8 @@
     {
       "label": ".PtySession()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L63",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L93",
       "id": "terminalservice_ptysession_ptysession",
       "community": 1,
       "norm_label": ".ptysession()"
@@ -901,8 +937,8 @@
     {
       "label": ".startReaders()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L68",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L98",
       "id": "terminalservice_ptysession_startreaders",
       "community": 1,
       "norm_label": ".startreaders()"
@@ -910,8 +946,8 @@
     {
       "label": ".write()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L86",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L116",
       "id": "terminalservice_ptysession_write",
       "community": 1,
       "norm_label": ".write()"
@@ -919,8 +955,8 @@
     {
       "label": ".resize()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L93",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L123",
       "id": "terminalservice_ptysession_resize",
       "community": 1,
       "norm_label": ".resize()"
@@ -928,8 +964,8 @@
     {
       "label": ".close()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L99",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L129",
       "id": "terminalservice_ptysession_close",
       "community": 1,
       "norm_label": ".close()"
@@ -937,8 +973,8 @@
     {
       "label": ".isAlive()",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L106",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L136",
       "id": "terminalservice_ptysession_isalive",
       "community": 1,
       "norm_label": ".isalive()"
@@ -1003,7 +1039,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalController.java",
       "source_location": "L1",
       "id": "src_main_java_ai_firefly_terminal_terminalcontroller_java",
-      "community": 12,
+      "community": 13,
       "norm_label": "terminalcontroller.java"
     },
     {
@@ -1012,7 +1048,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalController.java",
       "source_location": "L6",
       "id": "terminalcontroller_terminalcontroller",
-      "community": 12,
+      "community": 13,
       "norm_label": "terminalcontroller"
     },
     {
@@ -1021,7 +1057,7 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalController.java",
       "source_location": "L11",
       "id": "terminalcontroller_terminalcontroller_terminalcontroller",
-      "community": 12,
+      "community": 13,
       "norm_label": ".terminalcontroller()"
     },
     {
@@ -1030,26 +1066,116 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalController.java",
       "source_location": "L15",
       "id": "terminalcontroller_terminalcontroller_terminalpage",
-      "community": 12,
+      "community": 13,
       "norm_label": ".terminalpage()"
     },
     {
       "label": "TerminalProperties.java",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalProperties.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalProperties.java",
       "source_location": "L1",
-      "id": "src_main_java_ai_firefly_terminal_terminalproperties_java",
-      "community": 22,
+      "id": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_terminal_terminalproperties_java",
+      "community": 24,
       "norm_label": "terminalproperties.java"
     },
     {
       "label": "TerminalProperties",
       "file_type": "code",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalProperties.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalProperties.java",
       "source_location": "L6",
       "id": "terminalproperties_terminalproperties",
-      "community": 22,
+      "community": 24,
       "norm_label": "terminalproperties"
+    },
+    {
+      "label": "PluginInfo.java",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/PluginInfo.java",
+      "source_location": "L1",
+      "id": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_dashboard_plugininfo_java",
+      "community": 28,
+      "norm_label": "plugininfo.java"
+    },
+    {
+      "label": "DashboardService.java",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L1",
+      "id": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_dashboard_dashboardservice_java",
+      "community": 6,
+      "norm_label": "dashboardservice.java"
+    },
+    {
+      "label": "DashboardService",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L20",
+      "id": "dashboardservice_dashboardservice",
+      "community": 6,
+      "norm_label": "dashboardservice"
+    },
+    {
+      "label": ".getInstalledPlugins()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L32",
+      "id": "dashboardservice_dashboardservice_getinstalledplugins",
+      "community": 6,
+      "norm_label": ".getinstalledplugins()"
+    },
+    {
+      "label": ".readPluginMetadata()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L55",
+      "id": "dashboardservice_dashboardservice_readpluginmetadata",
+      "community": 6,
+      "norm_label": ".readpluginmetadata()"
+    },
+    {
+      "label": ".isActuatorAvailable()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L86",
+      "id": "dashboardservice_dashboardservice_isactuatoravailable",
+      "community": 6,
+      "norm_label": ".isactuatoravailable()"
+    },
+    {
+      "label": ".getActuatorEndpoints()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L98",
+      "id": "dashboardservice_dashboardservice_getactuatorendpoints",
+      "community": 6,
+      "norm_label": ".getactuatorendpoints()"
+    },
+    {
+      "label": "DashboardController.java",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardController.java",
+      "source_location": "L1",
+      "id": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_dashboard_dashboardcontroller_java",
+      "community": 6,
+      "norm_label": "dashboardcontroller.java"
+    },
+    {
+      "label": "DashboardController",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardController.java",
+      "source_location": "L10",
+      "id": "dashboardcontroller_dashboardcontroller",
+      "community": 6,
+      "norm_label": "dashboardcontroller"
+    },
+    {
+      "label": ".dashboard()",
+      "file_type": "code",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardController.java",
+      "source_location": "L16",
+      "id": "dashboardcontroller_dashboardcontroller_dashboard",
+      "community": 6,
+      "norm_label": ".dashboard()"
     },
     {
       "label": "Firefly Project",
@@ -1203,7 +1329,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 25,
       "norm_label": "ssh integration",
       "id": "claude_ssh"
     },
@@ -1216,7 +1342,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 23,
+      "community": 25,
       "norm_label": "sshservice",
       "id": "claude_sshservice"
     },
@@ -1229,7 +1355,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 20,
       "norm_label": "rabbitmq",
       "id": "claude_rabbitmq"
     },
@@ -1242,7 +1368,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 20,
       "norm_label": "rabbitconfig",
       "id": "claude_rabbitconfig"
     },
@@ -1255,7 +1381,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 20,
       "norm_label": "rabbittemplate",
       "id": "claude_rabbittemplate"
     },
@@ -1294,7 +1420,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 14,
       "norm_label": "oracle db",
       "id": "claude_oracle_db"
     },
@@ -1307,7 +1433,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 14,
       "norm_label": "spring data jpa",
       "id": "claude_spring_data_jpa"
     },
@@ -1320,7 +1446,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 14,
       "norm_label": "liquibase",
       "id": "claude_liquibase"
     },
@@ -1333,7 +1459,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 24,
+      "community": 26,
       "norm_label": "thymeleaf",
       "id": "claude_thymeleaf"
     },
@@ -1346,7 +1472,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 24,
+      "community": 26,
       "norm_label": "thymeleaf templates",
       "id": "claude_templates"
     },
@@ -1359,7 +1485,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 11,
       "norm_label": "container-first development",
       "id": "claude_container_first_development"
     },
@@ -1372,7 +1498,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 11,
       "norm_label": "compose.yaml",
       "id": "claude_compose_yaml"
     },
@@ -1385,7 +1511,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 11,
       "norm_label": "testcontainersconfiguration",
       "id": "claude_testcontainersconfiguration"
     },
@@ -1398,7 +1524,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "graalvm native image",
       "id": "claude_graalvm_native"
     },
@@ -1411,7 +1537,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "native-maven-plugin",
       "id": "claude_native_maven_plugin"
     },
@@ -1424,7 +1550,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 19,
+      "community": 21,
       "norm_label": "testing approach",
       "id": "claude_testing"
     },
@@ -1437,7 +1563,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 19,
+      "community": 21,
       "norm_label": "rationale: favor integration tests",
       "id": "claude_rationale_integration_tests"
     },
@@ -1450,7 +1576,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 19,
+      "community": 21,
       "norm_label": "rationale: no mockito for infrastructure",
       "id": "claude_rationale_no_mockito_infra"
     },
@@ -1463,7 +1589,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 11,
       "norm_label": "rationale: container-first development",
       "id": "claude_rationale_container_first"
     },
@@ -1476,7 +1602,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 14,
       "norm_label": "rationale: never use ddl-auto=update",
       "id": "claude_rationale_never_ddl_auto_update"
     },
@@ -1489,7 +1615,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "java 26",
       "id": "claude_java_26"
     },
@@ -1502,7 +1628,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 25,
+      "community": 27,
       "norm_label": "spring boot 4.0.6",
       "id": "claude_spring_boot_4_0_6"
     },
@@ -1554,7 +1680,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "java 25",
       "id": "agents_java_25"
     },
@@ -1567,7 +1693,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 25,
+      "community": 27,
       "norm_label": "spring boot 4.0.6",
       "id": "agents_spring_boot_4_0_6"
     },
@@ -1619,7 +1745,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "graalvm native image",
       "id": "agents_graalvm_native_image"
     },
@@ -1632,7 +1758,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "graalvm ce 25.0.2",
       "id": "agents_graalvm_ce_25_0_2"
     },
@@ -1645,7 +1771,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "native-maven-plugin",
       "id": "agents_native_maven_plugin"
     },
@@ -1658,7 +1784,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 15,
       "norm_label": "web terminal integration",
       "id": "agents_web_terminal_integration"
     },
@@ -1671,7 +1797,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 15,
       "norm_label": "xterm.js",
       "id": "agents_xterm_js"
     },
@@ -1684,7 +1810,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 15,
       "norm_label": "pty4j",
       "id": "agents_pty4j"
     },
@@ -1697,7 +1823,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 15,
       "norm_label": "websocket",
       "id": "agents_websocket"
     },
@@ -1710,7 +1836,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 26,
+      "community": 29,
       "norm_label": "jediterm evaluation",
       "id": "agents_jediterm_evaluation"
     },
@@ -1736,7 +1862,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 12,
       "norm_label": "terminalautoconfiguration",
       "id": "agents_terminal_auto_configuration"
     },
@@ -1749,7 +1875,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 12,
       "norm_label": "terminalcontroller",
       "id": "agents_terminalcontroller"
     },
@@ -1762,7 +1888,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 12,
       "norm_label": "terminalproperties",
       "id": "agents_terminalproperties"
     },
@@ -1775,7 +1901,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 12,
       "norm_label": "terminalservice",
       "id": "agents_terminalservice"
     },
@@ -1788,7 +1914,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 12,
       "norm_label": "terminalwebsockethandler",
       "id": "agents_terminalwebsockethandler"
     },
@@ -1801,7 +1927,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "rationale: java 25 downgrade for graalvm",
       "id": "agents_rationale_java_25_downgrade"
     },
@@ -1827,7 +1953,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 11,
       "norm_label": "docker compose support",
       "id": "help_docker_compose_support"
     },
@@ -1840,7 +1966,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 7,
       "norm_label": "graalvm native support",
       "id": "help_graalvm_native_support"
     },
@@ -1853,12 +1979,36 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 11,
       "norm_label": "testcontainers support",
       "id": "help_testcontainers_support"
     }
   ],
   "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/actuator-plugin/src/main/java/ai/firefly/plugin/actuator/ActuatorPluginAutoConfiguration.java",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "home_m_code_github_munafsheikh_firefly_plugins_actuator_plugin_src_main_java_ai_firefly_plugin_actuator_actuatorpluginautoconfiguration_java",
+      "_tgt": "actuatorpluginautoconfiguration_actuatorpluginautoconfiguration",
+      "source": "home_m_code_github_munafsheikh_firefly_plugins_actuator_plugin_src_main_java_ai_firefly_plugin_actuator_actuatorpluginautoconfiguration_java",
+      "target": "actuatorpluginautoconfiguration_actuatorpluginautoconfiguration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/actuator-plugin/src/main/java/ai/firefly/plugin/actuator/ActuatorPluginAutoConfiguration.java",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "actuatorpluginautoconfiguration_actuatorpluginautoconfiguration",
+      "_tgt": "actuatorpluginautoconfiguration_actuatorpluginautoconfiguration_actuatorpluginautoconfiguration",
+      "source": "actuatorpluginautoconfiguration_actuatorpluginautoconfiguration",
+      "target": "actuatorpluginautoconfiguration_actuatorpluginautoconfiguration_actuatorpluginautoconfiguration",
+      "confidence_score": 1.0
+    },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
@@ -2713,6 +2863,18 @@
     },
     {
       "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L104",
+      "weight": 1.0,
+      "_src": "dashboardservice_dashboardservice_getactuatorendpoints",
+      "_tgt": "adorestclient_adorestclient_baseurl",
+      "source": "adorestclient_adorestclient_baseurl",
+      "target": "dashboardservice_dashboardservice_getactuatorendpoints"
+    },
+    {
+      "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/ado-plugin/src/main/java/ai/firefly/plugin/ado/AdoRestClient.java",
       "source_location": "L47",
@@ -2943,6 +3105,18 @@
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_src": "dashboardservice_dashboardservice_readpluginmetadata",
+      "_tgt": "adopluginmetadata_adopluginmetadata_load",
+      "source": "adopluginmetadata_adopluginmetadata_load",
+      "target": "dashboardservice_dashboardservice_readpluginmetadata"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "src/main/java/ai/firefly/terminal/TerminalWebSocketHandler.java",
       "source_location": "L26",
       "weight": 1.0,
@@ -2974,6 +3148,66 @@
       "_tgt": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionclosed",
       "source": "adopluginmetadata_adopluginmetadata_getid",
       "target": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionclosed"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "home_m_code_github_munafsheikh_firefly_plugins_cli_plugin_src_main_java_ai_firefly_plugin_cli_fireflycommand_java",
+      "_tgt": "fireflycommand_fireflycommand",
+      "source": "home_m_code_github_munafsheikh_firefly_plugins_cli_plugin_src_main_java_ai_firefly_plugin_cli_fireflycommand_java",
+      "target": "fireflycommand_fireflycommand",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "fireflycommand_fireflycommand",
+      "_tgt": "fireflycommand_fireflycommand_runtui",
+      "source": "fireflycommand_fireflycommand",
+      "target": "fireflycommand_fireflycommand_runtui",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "fireflycommand_fireflycommand",
+      "_tgt": "fireflycommand_fireflycommand_handleevent",
+      "source": "fireflycommand_fireflycommand",
+      "target": "fireflycommand_fireflycommand_handleevent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "fireflycommand_fireflycommand",
+      "_tgt": "fireflycommand_fireflycommand_render",
+      "source": "fireflycommand_fireflycommand",
+      "target": "fireflycommand_fireflycommand_render",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/plugins/cli-plugin/src/main/java/ai/firefly/plugin/cli/FireflyCommand.java",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_src": "fireflycommand_fireflycommand",
+      "_tgt": "fireflycommand_fireflycommand_main",
+      "source": "fireflycommand_fireflycommand",
+      "target": "fireflycommand_fireflycommand_main",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -3057,66 +3291,6 @@
       "_tgt": "fireflyapplication_fireflyapplication_main",
       "source": "fireflyapplication_fireflyapplication",
       "target": "fireflyapplication_fireflyapplication_main",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L13",
-      "weight": 1.0,
-      "_src": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_cli_fireflycommand_java",
-      "_tgt": "fireflycommand_fireflycommand",
-      "source": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_cli_fireflycommand_java",
-      "target": "fireflycommand_fireflycommand",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L16",
-      "weight": 1.0,
-      "_src": "fireflycommand_fireflycommand",
-      "_tgt": "fireflycommand_fireflycommand_runtui",
-      "source": "fireflycommand_fireflycommand",
-      "target": "fireflycommand_fireflycommand_runtui",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L21",
-      "weight": 1.0,
-      "_src": "fireflycommand_fireflycommand",
-      "_tgt": "fireflycommand_fireflycommand_handleevent",
-      "source": "fireflycommand_fireflycommand",
-      "target": "fireflycommand_fireflycommand_handleevent",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L29",
-      "weight": 1.0,
-      "_src": "fireflycommand_fireflycommand",
-      "_tgt": "fireflycommand_fireflycommand_render",
-      "source": "fireflycommand_fireflycommand",
-      "target": "fireflycommand_fireflycommand_render",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/cli/FireflyCommand.java",
-      "source_location": "L36",
-      "weight": 1.0,
-      "_src": "fireflycommand_fireflycommand",
-      "_tgt": "fireflycommand_fireflycommand_main",
-      "source": "fireflycommand_fireflycommand",
-      "target": "fireflycommand_fireflycommand_main",
       "confidence_score": 1.0
     },
     {
@@ -3218,31 +3392,31 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L14",
       "weight": 1.0,
-      "_src": "src_main_java_ai_firefly_terminal_terminalservice_java",
+      "_src": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_terminal_terminalservice_java",
       "_tgt": "terminalservice_terminalservice",
-      "source": "src_main_java_ai_firefly_terminal_terminalservice_java",
+      "source": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_terminal_terminalservice_java",
       "target": "terminalservice_terminalservice",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L57",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L87",
       "weight": 1.0,
-      "_src": "src_main_java_ai_firefly_terminal_terminalservice_java",
+      "_src": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_terminal_terminalservice_java",
       "_tgt": "terminalservice_ptysession",
-      "source": "src_main_java_ai_firefly_terminal_terminalservice_java",
+      "source": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_terminal_terminalservice_java",
       "target": "terminalservice_ptysession",
       "confidence_score": 1.0
     },
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L20",
       "weight": 1.0,
       "_src": "terminalservice_terminalservice",
@@ -3254,7 +3428,7 @@
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L24",
       "weight": 1.0,
       "_src": "terminalservice_terminalservice",
@@ -3266,7 +3440,7 @@
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L44",
       "weight": 1.0,
       "_src": "terminalservice_terminalservice",
@@ -3276,9 +3450,21 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_src": "terminalservice_terminalservice",
+      "_tgt": "terminalservice_terminalservice_findclipluginjar",
+      "source": "terminalservice_terminalservice",
+      "target": "terminalservice_terminalservice_findclipluginjar",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L25",
       "weight": 1.0,
       "_src": "terminalservice_terminalservice_createsession",
@@ -3290,7 +3476,7 @@
     {
       "relation": "calls",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
       "source_location": "L38",
       "weight": 1.0,
       "_src": "terminalservice_terminalservice_createsession",
@@ -3312,10 +3498,22 @@
       "target": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionestablished"
     },
     {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_src": "terminalservice_terminalservice_buildcommand",
+      "_tgt": "terminalservice_terminalservice_findclipluginjar",
+      "source": "terminalservice_terminalservice_buildcommand",
+      "target": "terminalservice_terminalservice_findclipluginjar",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L63",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L93",
       "weight": 1.0,
       "_src": "terminalservice_ptysession",
       "_tgt": "terminalservice_ptysession_ptysession",
@@ -3326,8 +3524,8 @@
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L68",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L98",
       "weight": 1.0,
       "_src": "terminalservice_ptysession",
       "_tgt": "terminalservice_ptysession_startreaders",
@@ -3338,8 +3536,8 @@
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L86",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L116",
       "weight": 1.0,
       "_src": "terminalservice_ptysession",
       "_tgt": "terminalservice_ptysession_write",
@@ -3350,8 +3548,8 @@
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L93",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L123",
       "weight": 1.0,
       "_src": "terminalservice_ptysession",
       "_tgt": "terminalservice_ptysession_resize",
@@ -3362,8 +3560,8 @@
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L99",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L129",
       "weight": 1.0,
       "_src": "terminalservice_ptysession",
       "_tgt": "terminalservice_ptysession_close",
@@ -3374,8 +3572,8 @@
     {
       "relation": "method",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L106",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L136",
       "weight": 1.0,
       "_src": "terminalservice_ptysession",
       "_tgt": "terminalservice_ptysession_isalive",
@@ -3386,8 +3584,8 @@
     {
       "relation": "calls",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L78",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L108",
       "weight": 1.0,
       "_src": "terminalservice_ptysession_startreaders",
       "_tgt": "terminalservice_ptysession_isalive",
@@ -3398,8 +3596,8 @@
     {
       "relation": "calls",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L87",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L117",
       "weight": 1.0,
       "_src": "terminalservice_ptysession_write",
       "_tgt": "terminalservice_ptysession_isalive",
@@ -3422,8 +3620,8 @@
     {
       "relation": "calls",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalService.java",
-      "source_location": "L94",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalService.java",
+      "source_location": "L124",
       "weight": 1.0,
       "_src": "terminalservice_ptysession_resize",
       "_tgt": "terminalservice_ptysession_isalive",
@@ -3554,13 +3752,157 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "src/main/java/ai/firefly/terminal/TerminalProperties.java",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/terminal/TerminalProperties.java",
       "source_location": "L6",
       "weight": 1.0,
-      "_src": "src_main_java_ai_firefly_terminal_terminalproperties_java",
+      "_src": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_terminal_terminalproperties_java",
       "_tgt": "terminalproperties_terminalproperties",
-      "source": "src_main_java_ai_firefly_terminal_terminalproperties_java",
+      "source": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_terminal_terminalproperties_java",
       "target": "terminalproperties_terminalproperties",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_src": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_dashboard_dashboardservice_java",
+      "_tgt": "dashboardservice_dashboardservice",
+      "source": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_dashboard_dashboardservice_java",
+      "target": "dashboardservice_dashboardservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_src": "dashboardservice_dashboardservice",
+      "_tgt": "dashboardservice_dashboardservice_getinstalledplugins",
+      "source": "dashboardservice_dashboardservice",
+      "target": "dashboardservice_dashboardservice_getinstalledplugins",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "dashboardservice_dashboardservice",
+      "_tgt": "dashboardservice_dashboardservice_readpluginmetadata",
+      "source": "dashboardservice_dashboardservice",
+      "target": "dashboardservice_dashboardservice_readpluginmetadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_src": "dashboardservice_dashboardservice",
+      "_tgt": "dashboardservice_dashboardservice_isactuatoravailable",
+      "source": "dashboardservice_dashboardservice",
+      "target": "dashboardservice_dashboardservice_isactuatoravailable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L98",
+      "weight": 1.0,
+      "_src": "dashboardservice_dashboardservice",
+      "_tgt": "dashboardservice_dashboardservice_getactuatorendpoints",
+      "source": "dashboardservice_dashboardservice",
+      "target": "dashboardservice_dashboardservice_getactuatorendpoints",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_src": "dashboardservice_dashboardservice_getinstalledplugins",
+      "_tgt": "dashboardservice_dashboardservice_readpluginmetadata",
+      "source": "dashboardservice_dashboardservice_getinstalledplugins",
+      "target": "dashboardservice_dashboardservice_readpluginmetadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardController.java",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_src": "dashboardcontroller_dashboardcontroller_dashboard",
+      "_tgt": "dashboardservice_dashboardservice_getinstalledplugins",
+      "source": "dashboardservice_dashboardservice_getinstalledplugins",
+      "target": "dashboardcontroller_dashboardcontroller_dashboard"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardService.java",
+      "source_location": "L100",
+      "weight": 1.0,
+      "_src": "dashboardservice_dashboardservice_getactuatorendpoints",
+      "_tgt": "dashboardservice_dashboardservice_isactuatoravailable",
+      "source": "dashboardservice_dashboardservice_isactuatoravailable",
+      "target": "dashboardservice_dashboardservice_getactuatorendpoints",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardController.java",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "dashboardcontroller_dashboardcontroller_dashboard",
+      "_tgt": "dashboardservice_dashboardservice_isactuatoravailable",
+      "source": "dashboardservice_dashboardservice_isactuatoravailable",
+      "target": "dashboardcontroller_dashboardcontroller_dashboard"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardController.java",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "dashboardcontroller_dashboardcontroller_dashboard",
+      "_tgt": "dashboardservice_dashboardservice_getactuatorendpoints",
+      "source": "dashboardservice_dashboardservice_getactuatorendpoints",
+      "target": "dashboardcontroller_dashboardcontroller_dashboard"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardController.java",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_dashboard_dashboardcontroller_java",
+      "_tgt": "dashboardcontroller_dashboardcontroller",
+      "source": "home_m_code_github_munafsheikh_firefly_src_main_java_ai_firefly_dashboard_dashboardcontroller_java",
+      "target": "dashboardcontroller_dashboardcontroller",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "/home/m/code/github/munafsheikh/firefly/src/main/java/ai/firefly/dashboard/DashboardController.java",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "dashboardcontroller_dashboardcontroller",
+      "_tgt": "dashboardcontroller_dashboardcontroller_dashboard",
+      "source": "dashboardcontroller_dashboardcontroller",
+      "target": "dashboardcontroller_dashboardcontroller_dashboard",
       "confidence_score": 1.0
     },
     {
