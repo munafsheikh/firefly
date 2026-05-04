@@ -18,7 +18,8 @@ WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 
 # Plugins directory for Spring Boot PropertiesLauncher plugin loading
-RUN mkdir -p /app/plugins
+# Pre-built plugin JARs are baked into the image for self-contained deployment
+COPY plugins/*.jar /app/plugins/
 ENV LOADER_PATH=/app/plugins
 
 EXPOSE 17922

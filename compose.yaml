@@ -15,6 +15,61 @@ services:
       - ./plugins:/app/plugins:ro
 
   # ------------------------------------------------------------------
+  # Self-contained: All plugins baked into the image (no host mount)
+  # Usage: docker compose --profile showcase up app-all-plugins showcase --build
+  # Dashboard: http://localhost:17922
+  # ------------------------------------------------------------------
+  app-all-plugins:
+    build:
+      context: .
+      dockerfile: .docker/java/Dockerfile
+    ports:
+      - "17922:17922"
+    environment:
+      - SERVER_PORT=17922
+
+  # ------------------------------------------------------------------
+  # Profile: showcase
+  # Verifies all plugins work collectively and the dashboard loads
+  # Usage: docker compose --profile showcase up app-all-plugins showcase --build
+  # ------------------------------------------------------------------
+  showcase:
+    profiles: [showcase]
+    image: curlimages/curl:latest
+    depends_on:
+      - app-all-plugins
+    command: >
+      sh -c "
+        echo '' &&
+        echo '========================================' &&
+        echo '   🔥 Firefly Collective Showcase 🔥   ' &&
+        echo '========================================' &&
+        echo '' &&
+        echo 'Waiting for services to be ready...' &&
+        for i in $$(seq 1 60); do
+          if curl -sf http://app-all-plugins:17922/ | grep -q 'Firefly Dashboard'; then
+            echo '✅ Dashboard is reachable at http://localhost:17922/' &&
+            break
+          fi
+          sleep 1
+        done &&
+        curl -sf http://app-all-plugins:17922/v3/api-docs | grep -q 'openapi' && echo '✅ Swagger / OpenAPI docs available at /swagger-ui.html' &&
+        curl -sf http://app-all-plugins:17922/actuator/health | grep -q '\"status\":\"UP\"' && echo '✅ Actuator Plugin active (/actuator/health, /actuator/info, /actuator/metrics)' &&
+        curl -sf http://app-all-plugins:17922/api/ado/health | grep -q '\"plugin\":\"ado\"' && echo '✅ ADO Plugin active (/api/ado/health)' &&
+        curl -sf http://app-all-plugins:17922/ | grep -q 'Firefly CLI Plugin' && echo '✅ CLI Plugin detected on dashboard (Terminal ready)' &&
+        echo '' &&
+        echo '🌐 Open your browser to: http://localhost:17922/' &&
+        echo '   - Dashboard with all plugins listed' &&
+        echo '   - Terminal at /terminal' &&
+        echo '   - Swagger UI at /swagger-ui.html' &&
+        echo '   - Actuator at /actuator' &&
+        echo '' &&
+        echo '✨ All plugins working collectively!' &&
+        echo '========================================'
+      "
+    restart: "no"
+
+  # ------------------------------------------------------------------
   # Profile: build
   # Mirrors CI 'Build App' stage locally.
   # Usage: docker compose --profile build run --rm app-build

@@ -62,10 +62,13 @@ The `compose.yaml` mirrors the GitHub Actions pipeline stages so they can be run
 | Build Plugins | `build-plugins.yml` | `docker compose --profile build run --rm plugin-build` |
 | Run App | `run-app.yml` | `docker compose --profile verify up app verify` |
 | Run App with Plugin | `run-app-with-plugin.yml` | `docker compose --profile plugin up app verify-plugin` |
+| Showcase All Plugins | — | `docker compose --profile showcase up app-all-plugins showcase --build` |
 
 **Notes:**
 - Use `--abort-on-container-exit` with `up` to auto-stop services after verification completes.
 - The `app` service builds the JAR inside Docker; `app-build` builds against the host-mounted source.
+- The `app-all-plugins` service bakes all plugin JARs into the image (no host volume mount).
+- The `showcase` service verifies the dashboard, Swagger, Actuator, ADO, and CLI plugins collectively.
 - Maven dependencies are cached in a `maven-cache` volume for faster rebuilds.
 
 ---
