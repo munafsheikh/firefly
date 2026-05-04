@@ -1,0 +1,33 @@
+name: Build Plugins
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build ADO Plugin
+        working-directory: plugins/ado-plugin
+        run: mvn clean package -B -V
+
+      - name: Upload Plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ado-plugin-jar
+          path: plugins/ado-plugin/target/ado-plugin-*.jar
+          retention-days: 1

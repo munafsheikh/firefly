@@ -1,0 +1,58 @@
+name: Run App
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Build App
+        run: ./mvnw clean package -DskipTests -B -V
+
+      - name: Start Firefly
+        env:
+          SPRING_DOCKER_COMPOSE_ENABLED: false
+        run: |
+          java -jar target/firefly-*.jar > app.log 2>&1 &
+          echo "APP_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for app to be healthy
+        run: |
+          for i in {1..60}; do
+            if curl -sf http://localhost:17922/actuator/health | grep -q '"status":"UP"'; then
+              echo "✅ App is up and healthy"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "❌ App failed to start"
+          cat app.log || true
+          exit 1
+
+      - name: Verify OpenAPI docs
+        run: |
+          curl -sf http://localhost:17922/v3/api-docs | grep -q "openapi" && echo "✅ OpenAPI docs available"
+
+      - name: Stop Firefly
+        if: always()
+        run: |
+          kill "$APP_PID" 2>/dev/null || true
+          sleep 2

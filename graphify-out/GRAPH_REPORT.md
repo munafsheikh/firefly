@@ -1,54 +1,60 @@
-# Graph Report - .  (2026-04-30)
+# Graph Report - /home/m/code/github/munafsheikh/firefly  (2026-05-04)
 
 ## Corpus Check
-- Corpus is ~3,153 words - fits in a single context window. You may not need a graph.
+- 16 files · ~13,886 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 115 nodes · 111 edges · 22 communities detected
-- Extraction: 83% EXTRACTED · 16% INFERRED · 1% AMBIGUOUS · INFERRED: 18 edges (avg confidence: 0.87)
+- 173 nodes · 195 edges · 27 communities detected
+- Extraction: 83% EXTRACTED · 17% INFERRED · 1% AMBIGUOUS · INFERRED: 33 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Terminal Service Implementation|Terminal Service Implementation]]
-- [[_COMMUNITY_TUI CLI Core|TUI CLI Core]]
-- [[_COMMUNITY_Azure DevOps AI|Azure DevOps AI]]
-- [[_COMMUNITY_GraalVM Native Image|GraalVM Native Image]]
-- [[_COMMUNITY_Web Terminal Frontend|Web Terminal Frontend]]
-- [[_COMMUNITY_Terminal Auto-Config Java|Terminal Auto-Config Java]]
-- [[_COMMUNITY_FireflyCommand TUI|FireflyCommand TUI]]
-- [[_COMMUNITY_Container-First Development|Container-First Development]]
-- [[_COMMUNITY_Terminal Component Architecture|Terminal Component Architecture]]
-- [[_COMMUNITY_Terminal Controller|Terminal Controller]]
-- [[_COMMUNITY_Database Persistence|Database Persistence]]
-- [[_COMMUNITY_Test Application|Test Application]]
-- [[_COMMUNITY_Application Tests|Application Tests]]
-- [[_COMMUNITY_Main Application|Main Application]]
-- [[_COMMUNITY_RabbitMQ Messaging|RabbitMQ Messaging]]
-- [[_COMMUNITY_Testing Strategy|Testing Strategy]]
-- [[_COMMUNITY_Testcontainers Config|Testcontainers Config]]
-- [[_COMMUNITY_Terminal Properties|Terminal Properties]]
-- [[_COMMUNITY_SSH Integration|SSH Integration]]
-- [[_COMMUNITY_Thymeleaf Templates|Thymeleaf Templates]]
-- [[_COMMUNITY_Spring Boot Framework|Spring Boot Framework]]
-- [[_COMMUNITY_Jediterm Evaluation|Jediterm Evaluation]]
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `PtySession` - 7 edges
-2. `TerminalAutoConfiguration` - 6 edges
-3. `FireflyCommand` - 5 edges
-4. `TerminalWebSocketHandler` - 5 edges
-5. `TUI/CLI` - 5 edges
-6. `TerminalService` - 4 edges
-7. `Firefly Project` - 4 edges
-8. `Firefly Project` - 4 edges
-9. `GraalVM Native Image` - 4 edges
-10. `Web Terminal Integration` - 4 edges
+1. `AdoWorkItemService` - 16 edges
+2. `AdoPluginController` - 14 edges
+3. `AdoRestClient` - 11 edges
+4. `AdoPluginMetadata` - 8 edges
+5. `AdoPluginAutoConfiguration` - 7 edges
+6. `PtySession` - 7 edges
+7. `TerminalAutoConfiguration` - 6 edges
+8. `FireflyCommand` - 5 edges
+9. `TerminalWebSocketHandler` - 5 edges
+10. `TUI/CLI` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Firefly Project` --semantically_similar_to--> `Firefly Project`  [INFERRED] [semantically similar]
   CLAUDE.md → AGENTS.md
-- `Firefly` --semantically_similar_to--> `Firefly Project`  [INFERRED] [semantically similar]
-  README.md → CLAUDE.md
+- `Firefly Project` --semantically_similar_to--> `Firefly`  [INFERRED] [semantically similar]
+  CLAUDE.md → README.md
 - `Command Pattern` --semantically_similar_to--> `FireflyCommand CLI`  [INFERRED] [semantically similar]
   CLAUDE.md → AGENTS.md
 - `TamboUI` --semantically_similar_to--> `TamboUI`  [INFERRED] [semantically similar]
@@ -63,91 +69,111 @@
 
 ## Communities
 
-### Community 0 - "Terminal Service Implementation"
+### Community 0 - "Community 0"
+Cohesion: 0.09
+Nodes (2): AdoPluginController, AdoWorkItemService
+
+### Community 1 - "Community 1"
 Cohesion: 0.16
 Nodes (3): PtySession, TerminalService, TerminalWebSocketHandler
 
-### Community 1 - "TUI CLI Core"
+### Community 2 - "Community 2"
+Cohesion: 0.35
+Nodes (1): AdoRestClient
+
+### Community 3 - "Community 3"
 Cohesion: 0.24
 Nodes (11): Firefly Project, FireflyCommand CLI, jline3, picocli, TamboUI, TUI/CLI, Command Pattern, CommandRegistry (+3 more)
 
-### Community 2 - "Azure DevOps AI"
+### Community 4 - "Community 4"
+Cohesion: 0.24
+Nodes (1): AdoPluginMetadata
+
+### Community 5 - "Community 5"
 Cohesion: 0.2
 Nodes (10): Web API, AI Integration, AiService, Azure DevOps Integration, AzureDevOpsClient, Prompts Directory, Redis, RedisTemplate (+2 more)
 
-### Community 3 - "GraalVM Native Image"
+### Community 6 - "Community 6"
 Cohesion: 0.22
 Nodes (9): GraalVM CE 25.0.2, GraalVM Native Image, Java 25, native-maven-plugin, Rationale: Java 25 Downgrade for GraalVM, GraalVM Native Image, Java 26, native-maven-plugin (+1 more)
 
-### Community 4 - "Web Terminal Frontend"
-Cohesion: 0.33
-Nodes (8): pty4j, Web Terminal Integration, WebSocket, xterm.js, FitAddon, sendResize, WebSocket Terminal Connection, xterm.js
+### Community 7 - "Community 7"
+Cohesion: 0.25
+Nodes (1): AdoPluginAutoConfiguration
 
-### Community 5 - "Terminal Auto-Config Java"
+### Community 8 - "Community 8"
 Cohesion: 0.38
 Nodes (1): TerminalAutoConfiguration
 
-### Community 6 - "FireflyCommand TUI"
+### Community 9 - "Community 9"
 Cohesion: 0.33
 Nodes (1): FireflyCommand
 
-### Community 7 - "Container-First Development"
+### Community 10 - "Community 10"
 Cohesion: 0.33
 Nodes (6): compose.yaml, Container-First Development, Rationale: Container-First Development, TestcontainersConfiguration, Docker Compose Support, Testcontainers Support
 
-### Community 8 - "Terminal Component Architecture"
+### Community 11 - "Community 11"
 Cohesion: 0.4
 Nodes (5): TerminalAutoConfiguration, TerminalController, TerminalProperties, TerminalService, TerminalWebSocketHandler
 
-### Community 9 - "Terminal Controller"
+### Community 12 - "Community 12"
 Cohesion: 0.5
 Nodes (1): TerminalController
 
-### Community 10 - "Database Persistence"
+### Community 13 - "Community 13"
 Cohesion: 0.5
 Nodes (4): Liquibase, Oracle DB, Rationale: Never Use ddl-auto=update, Spring Data JPA
 
-### Community 11 - "Test Application"
+### Community 14 - "Community 14"
+Cohesion: 0.5
+Nodes (4): pty4j, Web Terminal Integration, WebSocket, xterm.js
+
+### Community 15 - "Community 15"
 Cohesion: 0.67
 Nodes (1): TestFireflyApplication
 
-### Community 12 - "Application Tests"
+### Community 16 - "Community 16"
 Cohesion: 0.67
 Nodes (1): FireflyApplicationTests
 
-### Community 13 - "Main Application"
+### Community 17 - "Community 17"
 Cohesion: 0.67
 Nodes (1): FireflyApplication
 
-### Community 14 - "RabbitMQ Messaging"
+### Community 18 - "Community 18"
 Cohesion: 0.67
 Nodes (3): RabbitConfig, RabbitMQ, RabbitTemplate
 
-### Community 15 - "Testing Strategy"
+### Community 19 - "Community 19"
 Cohesion: 0.67
 Nodes (3): Rationale: Favor Integration Tests, Rationale: No Mockito for Infrastructure, Testing Approach
 
-### Community 16 - "Testcontainers Config"
+### Community 20 - "Community 20"
+Cohesion: 1.0
+Nodes (1): AdoPluginProperties
+
+### Community 21 - "Community 21"
 Cohesion: 1.0
 Nodes (1): TestcontainersConfiguration
 
-### Community 17 - "Terminal Properties"
+### Community 22 - "Community 22"
 Cohesion: 1.0
 Nodes (1): TerminalProperties
 
-### Community 18 - "SSH Integration"
+### Community 23 - "Community 23"
 Cohesion: 1.0
 Nodes (2): SSH Integration, SshService
 
-### Community 19 - "Thymeleaf Templates"
+### Community 24 - "Community 24"
 Cohesion: 1.0
 Nodes (2): Thymeleaf Templates, Thymeleaf
 
-### Community 20 - "Spring Boot Framework"
+### Community 25 - "Community 25"
 Cohesion: 1.0
 Nodes (2): Spring Boot 4.0.6, Spring Boot 4.0.6
 
-### Community 21 - "Jediterm Evaluation"
+### Community 26 - "Community 26"
 Cohesion: 1.0
 Nodes (1): Jediterm Evaluation
 
@@ -156,19 +182,21 @@ Nodes (1): Jediterm Evaluation
   CLAUDE.md · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **35 isolated node(s):** `TestcontainersConfiguration`, `TerminalProperties`, `CommandRegistry`, `WorkItem`, `AiService` (+30 more)
+- **39 isolated node(s):** `AdoPluginProperties`, `TestcontainersConfiguration`, `TerminalProperties`, `CommandRegistry`, `WorkItem` (+34 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Testcontainers Config`** (2 nodes): `TestcontainersConfiguration.java`, `TestcontainersConfiguration`
+- **Thin community `Community 20`** (2 nodes): `AdoPluginProperties`, `AdoPluginProperties.java`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Terminal Properties`** (2 nodes): `TerminalProperties.java`, `TerminalProperties`
+- **Thin community `Community 21`** (2 nodes): `TestcontainersConfiguration.java`, `TestcontainersConfiguration`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `SSH Integration`** (2 nodes): `SSH Integration`, `SshService`
+- **Thin community `Community 22`** (2 nodes): `TerminalProperties.java`, `TerminalProperties`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Thymeleaf Templates`** (2 nodes): `Thymeleaf Templates`, `Thymeleaf`
+- **Thin community `Community 23`** (2 nodes): `SSH Integration`, `SshService`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Spring Boot Framework`** (2 nodes): `Spring Boot 4.0.6`, `Spring Boot 4.0.6`
+- **Thin community `Community 24`** (2 nodes): `Thymeleaf Templates`, `Thymeleaf`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Jediterm Evaluation`** (1 nodes): `Jediterm Evaluation`
+- **Thin community `Community 25`** (2 nodes): `Spring Boot 4.0.6`, `Spring Boot 4.0.6`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 26`** (1 nodes): `Jediterm Evaluation`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
@@ -176,9 +204,11 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `Java 26` and `Java 25`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `Firefly Project` connect `TUI CLI Core` to `Azure DevOps AI`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Why does `Web API` connect `Azure DevOps AI` to `TUI CLI Core`?**
-  _High betweenness centrality (0.015) - this node is a cross-community bridge._
-- **What connects `TestcontainersConfiguration`, `TerminalProperties`, `CommandRegistry` to the rest of the system?**
-  _35 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `AdoPluginMetadata` connect `Community 4` to `Community 1`?**
+  _High betweenness centrality (0.082) - this node is a cross-community bridge._
+- **Why does `AdoWorkItemService` connect `Community 0` to `Community 4`?**
+  _High betweenness centrality (0.076) - this node is a cross-community bridge._
+- **What connects `AdoPluginProperties`, `TestcontainersConfiguration`, `TerminalProperties` to the rest of the system?**
+  _39 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.09 - nodes in this community are weakly interconnected._

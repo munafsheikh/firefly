@@ -1,0 +1,71 @@
+name: Run App with Plugin
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  run-with-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Build App
+        run: ./mvnw clean package -DskipTests -B -V
+
+      - name: Build ADO Plugin
+        working-directory: plugins/ado-plugin
+        run: mvn clean package -B -V
+
+      - name: Install Plugin
+        run: |
+          mkdir -p plugins
+          cp plugins/ado-plugin/target/ado-plugin-1.0.0.jar plugins/
+          ls -la plugins/
+
+      - name: Start Firefly with Plugin
+        env:
+          LOADER_PATH: plugins
+          SPRING_DOCKER_COMPOSE_ENABLED: false
+        run: |
+          java -cp "target/firefly-*.jar" org.springframework.boot.loader.launch.PropertiesLauncher > app.log 2>&1 &
+          echo "APP_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for app to be healthy
+        run: |
+          for i in {1..60}; do
+            if curl -sf http://localhost:17922/actuator/health | grep -q '"status":"UP"'; then
+              echo "✅ App is up and healthy"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "❌ App failed to start"
+          cat app.log || true
+          exit 1
+
+      - name: Verify Plugin is loaded
+        run: |
+          response=$(curl -sf http://localhost:17922/api/ado/health)
+          echo "Plugin health response: $response"
+          echo "$response" | grep -q '"plugin":"ado"' && echo "✅ ADO Plugin loaded successfully"
+
+      - name: Stop Firefly
+        if: always()
+        run: |
+          kill "$APP_PID" 2>/dev/null || true
+          sleep 2
