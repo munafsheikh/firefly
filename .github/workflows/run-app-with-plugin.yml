@@ -27,13 +27,23 @@ jobs:
       - name: Build App
         run: ./mvnw clean package -DskipTests -B -V
 
+      - name: Build CLI Plugin
+        working-directory: plugins/cli-plugin
+        run: mvn clean package -B -V
+
+      - name: Build Actuator Plugin
+        working-directory: plugins/actuator-plugin
+        run: mvn clean package -B -V
+
       - name: Build ADO Plugin
         working-directory: plugins/ado-plugin
         run: mvn clean package -B -V
 
-      - name: Install Plugin
+      - name: Install Plugins
         run: |
           mkdir -p plugins
+          cp plugins/cli-plugin/target/cli-plugin-*.jar plugins/
+          cp plugins/actuator-plugin/target/actuator-plugin-*.jar plugins/
           cp plugins/ado-plugin/target/ado-plugin-1.0.0.jar plugins/
           ls -la plugins/
 
@@ -45,11 +55,11 @@ jobs:
           java -cp "target/firefly-*.jar" org.springframework.boot.loader.launch.PropertiesLauncher > app.log 2>&1 &
           echo "APP_PID=$!" >> "$GITHUB_ENV"
 
-      - name: Wait for app to be healthy
+      - name: Wait for app to be ready
         run: |
           for i in {1..60}; do
-            if curl -sf http://localhost:17922/actuator/health | grep -q '"status":"UP"'; then
-              echo "✅ App is up and healthy"
+            if curl -sf http://localhost:17922/ | grep -q 'Firefly Dashboard'; then
+              echo "✅ App is up and dashboard is reachable"
               exit 0
             fi
             sleep 1
@@ -58,11 +68,15 @@ jobs:
           cat app.log || true
           exit 1
 
-      - name: Verify Plugin is loaded
+      - name: Verify Actuator Plugin
+        run: |
+          curl -sf http://localhost:17922/actuator/health | grep -q '"status":"UP"' && echo '✅ Actuator Plugin loaded successfully'
+
+      - name: Verify ADO Plugin
         run: |
           response=$(curl -sf http://localhost:17922/api/ado/health)
           echo "Plugin health response: $response"
-          echo "$response" | grep -q '"plugin":"ado"' && echo "✅ ADO Plugin loaded successfully"
+          echo "$response" | grep -q '"plugin":"ado"' && echo '✅ ADO Plugin loaded successfully'
 
       - name: Stop Firefly
         if: always()

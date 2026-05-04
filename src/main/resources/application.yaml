@@ -1,5 +1,7 @@
 spring:
   application:
     name: firefly
+  thymeleaf:
+    cache: false
 server:
   port: 17922

@@ -37,11 +37,16 @@ services:
   plugin-build:
     profiles: [build, plugin]
     image: maven:3-eclipse-temurin-25
-    working_dir: /app/plugins/ado-plugin
+    working_dir: /app/plugins
     volumes:
       - .:/app
       - maven-cache:/root/.m2
-    command: mvn clean package -B -V
+    command: >
+      sh -c "
+        cd /app/plugins/cli-plugin && mvn clean package -B -V &&
+        cd /app/plugins/actuator-plugin && mvn clean package -B -V &&
+        cd /app/plugins/ado-plugin && mvn clean package -B -V
+      "
     restart: "no"
 
   # ------------------------------------------------------------------
@@ -58,8 +63,8 @@ services:
       sh -c "
         echo 'Waiting for app to be ready...' &&
         for i in $$(seq 1 60); do
-          if curl -sf http://app:17922/actuator/health | grep -q '\"status\":\"UP\"'; then
-            echo '✅ App is up and healthy'
+          if curl -sf http://app:17922/ | grep -q 'Firefly Dashboard'; then
+            echo '✅ App is up and dashboard is reachable'
             break
           fi
           sleep 1

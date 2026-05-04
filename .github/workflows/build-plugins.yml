@@ -21,13 +21,24 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Build CLI Plugin
+        working-directory: plugins/cli-plugin
+        run: mvn clean package -B -V
+
+      - name: Build Actuator Plugin
+        working-directory: plugins/actuator-plugin
+        run: mvn clean package -B -V
+
       - name: Build ADO Plugin
         working-directory: plugins/ado-plugin
         run: mvn clean package -B -V
 
-      - name: Upload Plugin artifact
+      - name: Upload Plugin artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ado-plugin-jar
-          path: plugins/ado-plugin/target/ado-plugin-*.jar
+          name: plugin-jars
+          path: |
+            plugins/cli-plugin/target/cli-plugin-*.jar
+            plugins/actuator-plugin/target/actuator-plugin-*.jar
+            plugins/ado-plugin/target/ado-plugin-*.jar
           retention-days: 1

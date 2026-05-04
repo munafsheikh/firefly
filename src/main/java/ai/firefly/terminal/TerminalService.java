@@ -45,13 +45,43 @@ public class TerminalService {
         String[] base = new String[]{properties.getCommand()};
         String args = properties.getCommandArgs();
         if (args == null || args.isBlank()) {
-            return base;
+            String cliJar = findCliPluginJar();
+            if (cliJar != null) {
+                args = "-jar " + cliJar;
+            } else {
+                log.warn("No CLI plugin JAR found in {} and no commandArgs configured. Terminal may not work.", properties.getPluginsPath());
+                return base;
+            }
         }
         String[] split = args.split("\\s+");
         String[] result = new String[base.length + split.length];
         System.arraycopy(base, 0, result, 0, base.length);
         System.arraycopy(split, 0, result, base.length, split.length);
         return result;
+    }
+
+    private String findCliPluginJar() {
+        java.nio.file.Path dir = java.nio.file.Paths.get(properties.getPluginsPath());
+        if (!java.nio.file.Files.isDirectory(dir)) {
+            return null;
+        }
+        // Prefer fat JAR (jar-with-dependencies suffix)
+        try (java.nio.file.DirectoryStream<java.nio.file.Path> stream = java.nio.file.Files.newDirectoryStream(dir, "cli-plugin*-jar-with-dependencies.jar")) {
+            for (java.nio.file.Path path : stream) {
+                return path.toString();
+            }
+        } catch (java.io.IOException e) {
+            log.warn("Failed to scan for CLI plugin fat JAR in {}", dir, e);
+        }
+        // Fallback to any cli-plugin jar
+        try (java.nio.file.DirectoryStream<java.nio.file.Path> stream = java.nio.file.Files.newDirectoryStream(dir, "cli-plugin*.jar")) {
+            for (java.nio.file.Path path : stream) {
+                return path.toString();
+            }
+        } catch (java.io.IOException e) {
+            log.warn("Failed to scan for CLI plugin JAR in {}", dir, e);
+        }
+        return null;
     }
 
     public static class PtySession {

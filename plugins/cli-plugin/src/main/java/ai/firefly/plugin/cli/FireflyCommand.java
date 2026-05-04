@@ -1,4 +1,4 @@
-package ai.firefly.cli;
+package ai.firefly.plugin.cli;
 
 import dev.tamboui.picocli.TuiCommand;
 import dev.tamboui.terminal.Frame;

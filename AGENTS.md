@@ -2,9 +2,12 @@
 
 ## Project Overview
 
-Firefly is a Spring Boot application with two personalities:
-1. **Web API** — RESTful service with actuator and OpenAPI docs
-2. **TUI/CLI** — Terminal UI application built on `tamboui` + `picocli`
+Firefly is a Spring Boot application with a plugin-based architecture:
+1. **Web API** — RESTful service with Thymeleaf dashboard and OpenAPI docs
+2. **TUI/CLI** — Terminal UI application built on `tamboui` + `picocli` (via `cli-plugin`)
+3. **Actuator** — Spring Boot Actuator endpoints (via `actuator-plugin`)
+
+Core features (dashboard, terminal, swagger) are always available. Actuator and CLI are optional plugins.
 
 The project supports both JVM execution and GraalVM native-image compilation.
 
@@ -16,7 +19,7 @@ The project supports both JVM execution and GraalVM native-image compilation.
 |-------|-----------|
 | Language | Java 25 |
 | Framework | Spring Boot 4.0.6 |
-| TUI | tamboui + jline3 + picocli |
+| TUI | tamboui + jline3 + picocli (cli-plugin) |
 | Native | GraalVM CE 25.0.2 + native-maven-plugin |
 | Terminal | xterm.js + WebSocket + pty4j |
 
@@ -164,8 +167,10 @@ sunday are closed
 ```
 src/main/java/ai/firefly/
 ├── FireflyApplication.java
-├── cli/
-│   └── FireflyCommand.java          # TUI entry point
+├── dashboard/                        # Root dashboard (Thymeleaf)
+│   ├── DashboardController.java
+│   ├── DashboardService.java
+│   └── PluginInfo.java
 └── terminal/                         # Web terminal component (drop-in)
     ├── TerminalAutoConfiguration.java
     ├── TerminalController.java
@@ -178,6 +183,8 @@ src/main/resources/
 │   └── org.springframework.boot.autoconfigure.AutoConfiguration.imports
 ├── static/
 │   └── terminal.html                 # xterm.js frontend
+├── templates/
+│   └── dashboard.html                # Thymeleaf dashboard
 └── application.yaml
 ```
 
@@ -186,6 +193,22 @@ src/main/resources/
 ## Plugin System
 
 Firefly supports runtime plugin loading via Spring Boot's `PropertiesLauncher`. Drop plugin JARs into `plugins/` and they are automatically added to the classpath.
+
+### CLI Plugin (`plugins/cli-plugin/`)
+
+- **Build**: `cd plugins/cli-plugin && mvn clean package`
+- **Install**: `cp target/cli-plugin-1.0.0.jar ../../plugins/`
+- **Nature**: Standalone executable fat JAR (not a Spring Boot auto-config plugin)
+- **Launch**: `java -jar plugins/cli-plugin-1.0.0.jar`
+- **Web terminal integration**: The terminal service auto-detects `cli-plugin*.jar` in the plugins directory and launches it automatically
+
+### Actuator Plugin (`plugins/actuator-plugin/`)
+
+- **Build**: `cd plugins/actuator-plugin && mvn clean package`
+- **Install**: `cp target/actuator-plugin-1.0.0.jar ../../plugins/`
+- **Properties prefix**: `firefly.plugin.actuator.*`
+- **Auto-config**: `ActuatorPluginAutoConfiguration` registers via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+- **Endpoints**: Standard Spring Boot Actuator endpoints at `/actuator/*`
 
 ### Azure DevOps Plugin (`plugins/ado-plugin/`)
 
@@ -204,5 +227,6 @@ Firefly supports runtime plugin loading via Spring Boot's `PropertiesLauncher`. 
 2. **Native image**: Built with `graalvm-community-25.0.2`
 3. **Port**: Default server port is 17922
 4. **Terminal**: The web terminal is auto-detected — it only activates when `pty4j` and Spring WebSocket are on the classpath
-5. **TUI classpath**: When running TamboUI inside the web terminal, use the same classpath as the host application
-6. **Plugin architecture**: Plugins are standalone Maven projects with `provided` Spring Boot deps. They use auto-configuration imports for registration and expose REST endpoints or service beans.
+5. **TUI classpath**: The web terminal auto-detects `cli-plugin*.jar` in the plugins directory and launches it directly
+6. **Plugin architecture**: Plugins are standalone Maven projects. Spring-based plugins use `provided` Spring Boot deps and auto-configuration imports. The CLI plugin is a standalone fat JAR.
+7. **Dashboard**: The root URL (`/`) renders a Thymeleaf dashboard showing installed plugins, actuator endpoints (if plugin loaded), and quick links

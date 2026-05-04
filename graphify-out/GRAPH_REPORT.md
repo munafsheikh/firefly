@@ -1,7 +1,7 @@
 # Graph Report - /home/m/code/github/munafsheikh/firefly  (2026-05-04)
 
 ## Corpus Check
-- 16 files · ~17,411 words
+- 16 files · ~17,547 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

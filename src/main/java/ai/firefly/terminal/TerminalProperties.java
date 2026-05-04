@@ -15,5 +15,7 @@ public class TerminalProperties {
 
     private String command = "java";
 
-    private String commandArgs = "-cp target/classes:target/dependency/* ai.firefly.cli.FireflyCommand";
+    private String commandArgs = null;
+
+    private String pluginsPath = "plugins";
 }

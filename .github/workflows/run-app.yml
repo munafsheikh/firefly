@@ -34,11 +34,11 @@ jobs:
           java -jar target/firefly-*.jar > app.log 2>&1 &
           echo "APP_PID=$!" >> "$GITHUB_ENV"
 
-      - name: Wait for app to be healthy
+      - name: Wait for app to be ready
         run: |
           for i in {1..60}; do
-            if curl -sf http://localhost:17922/actuator/health | grep -q '"status":"UP"'; then
-              echo "✅ App is up and healthy"
+            if curl -sf http://localhost:17922/ | grep -q 'Firefly Dashboard'; then
+              echo "✅ App is up and dashboard is reachable"
               exit 0
             fi
             sleep 1
