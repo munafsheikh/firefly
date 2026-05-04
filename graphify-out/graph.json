@@ -2946,8 +2946,8 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalWebSocketHandler.java",
       "source_location": "L26",
       "weight": 1.0,
-      "_src": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionestablished",
-      "_tgt": "adopluginmetadata_adopluginmetadata_getid",
+      "_src": "adopluginmetadata_adopluginmetadata_getid",
+      "_tgt": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionestablished",
       "source": "adopluginmetadata_adopluginmetadata_getid",
       "target": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionestablished"
     },
@@ -2958,8 +2958,8 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalWebSocketHandler.java",
       "source_location": "L43",
       "weight": 1.0,
-      "_src": "terminalwebsockethandler_terminalwebsockethandler_handletextmessage",
-      "_tgt": "adopluginmetadata_adopluginmetadata_getid",
+      "_src": "adopluginmetadata_adopluginmetadata_getid",
+      "_tgt": "terminalwebsockethandler_terminalwebsockethandler_handletextmessage",
       "source": "adopluginmetadata_adopluginmetadata_getid",
       "target": "terminalwebsockethandler_terminalwebsockethandler_handletextmessage"
     },
@@ -2970,8 +2970,8 @@
       "source_file": "src/main/java/ai/firefly/terminal/TerminalWebSocketHandler.java",
       "source_location": "L67",
       "weight": 1.0,
-      "_src": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionclosed",
-      "_tgt": "adopluginmetadata_adopluginmetadata_getid",
+      "_src": "adopluginmetadata_adopluginmetadata_getid",
+      "_tgt": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionclosed",
       "source": "adopluginmetadata_adopluginmetadata_getid",
       "target": "terminalwebsockethandler_terminalwebsockethandler_afterconnectionclosed"
     },

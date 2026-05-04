@@ -1,0 +1,65 @@
+name: Graphify Analysis
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  graphify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install graphify and matplotlib
+        run: |
+          python -m pip install --upgrade pip
+          pip install graphifyy matplotlib -q
+
+      - name: Run graphify code analysis
+        run: |
+          graphify update .
+          echo "---"
+          echo "Graphify outputs:"
+          ls -la graphify-out/
+
+      - name: Generate SVG export
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+          from graphify.export import to_svg
+          from networkx.readwrite import json_graph
+
+          data = json.loads(Path('graphify-out/graph.json').read_text())
+          G = json_graph.node_link_graph(data, edges='links')
+
+          communities = {}
+          for n, d in G.nodes(data=True):
+              cid = d.get('community')
+              if cid is not None:
+                  communities.setdefault(cid, []).append(n)
+
+          to_svg(G, communities, 'graphify-out/graph.svg')
+          print('Generated graph.svg')
+          "
+
+      - name: Upload graphify artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: graphify-analysis
+          path: |
+            graphify-out/graph.html
+            graphify-out/graph.json
+            graphify-out/graph.svg
+            graphify-out/GRAPH_REPORT.md
+            graphify-out/cost.json
+          retention-days: 30
