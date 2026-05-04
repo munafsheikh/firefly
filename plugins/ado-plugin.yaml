@@ -1,0 +1,13 @@
+# Azure DevOps Plugin Configuration
+# Copy this file to plugins/ado-plugin.yaml and fill in your values.
+# Or use environment variables: ADO_ORG, ADO_PROJECT, ADO_PAT
+
+firefly:
+  plugin:
+    ado:
+      enabled: true
+      url: https://dev.azure.com/${ADO_ORG:}
+      organization: ${ADO_ORG:}
+      project: ${ADO_PROJECT:}
+      pat: ${ADO_PAT:}
+      api-version: "7.1"

@@ -4,4 +4,8 @@ services:
       context: .
       dockerfile: .docker/java/Dockerfile
     ports:
-      - "8080:8080"
+      - "17922:17922"
+    environment:
+      - SERVER_PORT=17922
+    volumes:
+      - ./plugins:/app/plugins:ro

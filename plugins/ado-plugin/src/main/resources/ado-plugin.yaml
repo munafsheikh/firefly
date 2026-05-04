@@ -1,0 +1,19 @@
+# Azure DevOps Plugin Configuration
+# Place this file in the plugins/ directory alongside the ado-plugin JAR,
+# or configure these properties in the main application.yaml.
+
+firefly:
+  plugin:
+    ado:
+      enabled: true
+      # Azure DevOps organization URL
+      # Example: https://dev.azure.com/my-org
+      url: https://dev.azure.com/${ADO_ORG:}
+      # Organization name (used if url is not set)
+      organization: ${ADO_ORG:}
+      # Project name within the organization
+      project: ${ADO_PROJECT:}
+      # Personal Access Token (PAT) - use environment variable for security
+      pat: ${ADO_PAT:}
+      # API version
+      api-version: "7.1"

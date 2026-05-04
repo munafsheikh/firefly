@@ -1,0 +1,18 @@
+{
+  "src/test/java/ai/firefly/TestcontainersConfiguration.java": 1777541989.0,
+  "src/test/java/ai/firefly/TestFireflyApplication.java": 1777541989.0,
+  "src/test/java/ai/firefly/FireflyApplicationTests.java": 1777541989.0,
+  "src/main/java/ai/firefly/FireflyApplication.java": 1777541989.0,
+  "src/main/java/ai/firefly/cli/FireflyCommand.java": 1777558407.805037,
+  "src/main/java/ai/firefly/terminal/TerminalAutoConfiguration.java": 1777570848.9103448,
+  "src/main/java/ai/firefly/terminal/TerminalService.java": 1777570795.7038589,
+  "src/main/java/ai/firefly/terminal/TerminalWebSocketHandler.java": 1777570827.9221532,
+  "src/main/java/ai/firefly/terminal/TerminalController.java": 1777570836.3971937,
+  "src/main/java/ai/firefly/terminal/TerminalProperties.java": 1777570774.5446656,
+  "CLAUDE.md": 1777542886.9743812,
+  "AGENTS.md": 1777570753.7314756,
+  "README.md": 1777541979.1575508,
+  "cp.txt": 1777560122.2370563,
+  "HELP.md": 1777541989.0,
+  "src/main/resources/static/terminal.html": 1777570872.9545643
+}

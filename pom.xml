@@ -27,8 +27,15 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>26</java.version>
+		<java.version>25</java.version>
 	</properties>
+	<repositories>
+		<repository>
+			<id>jetbrains</id>
+			<url>https://packages.jetbrains.team/maven/p/ij/intellij-dependencies</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -46,6 +53,40 @@
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>3.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.tamboui</groupId>
+			<artifactId>tamboui-picocli</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.tamboui</groupId>
+			<artifactId>tamboui-tui</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.tamboui</groupId>
+			<artifactId>tamboui-widgets</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.tamboui</groupId>
+			<artifactId>tamboui-jline3-backend</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>4.7.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jetbrains.pty4j</groupId>
+			<artifactId>pty4j</artifactId>
+			<version>0.12.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 
 		<dependency>
@@ -102,6 +143,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<layout>ZIP</layout>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
