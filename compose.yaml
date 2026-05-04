@@ -1,4 +1,8 @@
 services:
+  # ------------------------------------------------------------------
+  # Default: Build and run the application
+  # Usage: docker compose up app --build
+  # ------------------------------------------------------------------
   app:
     build:
       context: .
@@ -9,3 +13,86 @@ services:
       - SERVER_PORT=17922
     volumes:
       - ./plugins:/app/plugins:ro
+
+  # ------------------------------------------------------------------
+  # Profile: build
+  # Mirrors CI 'Build App' stage locally.
+  # Usage: docker compose --profile build run --rm app-build
+  # ------------------------------------------------------------------
+  app-build:
+    profiles: [build]
+    image: maven:3-eclipse-temurin-25
+    working_dir: /app
+    volumes:
+      - .:/app
+      - maven-cache:/root/.m2
+    command: ./mvnw clean install -B -V
+    restart: "no"
+
+  # ------------------------------------------------------------------
+  # Profile: build / plugin
+  # Mirrors CI 'Build Plugins' stage locally.
+  # Usage: docker compose --profile build run --rm plugin-build
+  # ------------------------------------------------------------------
+  plugin-build:
+    profiles: [build, plugin]
+    image: maven:3-eclipse-temurin-25
+    working_dir: /app/plugins/ado-plugin
+    volumes:
+      - .:/app
+      - maven-cache:/root/.m2
+    command: mvn clean package -B -V
+    restart: "no"
+
+  # ------------------------------------------------------------------
+  # Profile: verify / test
+  # Mirrors CI 'Run App' verification stage.
+  # Usage: docker compose --profile verify up app verify
+  # ------------------------------------------------------------------
+  verify:
+    profiles: [verify, test]
+    image: curlimages/curl:latest
+    depends_on:
+      - app
+    command: >
+      sh -c "
+        echo 'Waiting for app to be ready...' &&
+        for i in $$(seq 1 60); do
+          if curl -sf http://app:17922/actuator/health | grep -q '\"status\":\"UP\"'; then
+            echo '✅ App is up and healthy'
+            break
+          fi
+          sleep 1
+        done &&
+        curl -sf http://app:17922/v3/api-docs | grep -q 'openapi' && echo '✅ OpenAPI docs available'
+      "
+    restart: "no"
+
+  # ------------------------------------------------------------------
+  # Profile: plugin / verify
+  # Mirrors CI 'Run App with Plugin' verification stage.
+  # Usage: docker compose --profile plugin up app verify-plugin
+  # ------------------------------------------------------------------
+  verify-plugin:
+    profiles: [plugin, verify]
+    image: curlimages/curl:latest
+    depends_on:
+      - app
+    command: >
+      sh -c "
+        echo 'Waiting for app with plugin to be ready...' &&
+        for i in $$(seq 1 60); do
+          if curl -sf http://app:17922/actuator/health | grep -q '\"status\":\"UP\"'; then
+            echo '✅ App is up and healthy'
+            break
+          fi
+          sleep 1
+        done &&
+        response=$$(curl -sf http://app:17922/api/ado/health) &&
+        echo \"Plugin health: $$response\" &&
+        echo \"$$response\" | grep -q '\"plugin\":\"ado\"' && echo '✅ ADO Plugin loaded successfully'
+      "
+    restart: "no"
+
+volumes:
+  maven-cache:

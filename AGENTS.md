@@ -40,7 +40,7 @@ Requires GraalVM CE 25.0.2:
 ### Docker Compose
 Supported runtime. Builds from `.docker/java/Dockerfile` and exposes port `17922`:
 ```bash
-docker compose up --build
+docker compose up app --build
 ```
 
 **Docker notes:**
@@ -49,6 +49,21 @@ docker compose up --build
 - Port: `17922` (mapped `17922:17922` in `compose.yaml`)
 - `SERVER_PORT=17922` is passed as an environment variable
 - **Plugins**: `plugins/` directory is mounted to `/app/plugins` and loaded via `PropertiesLauncher` at runtime
+
+#### Local Pipeline Stages (Docker Compose)
+The `compose.yaml` mirrors the GitHub Actions pipeline stages so they can be run locally using Docker Compose profiles:
+
+| Stage | CI Equivalent | Local Command |
+|-------|--------------|---------------|
+| Build App | `build-app.yml` | `docker compose --profile build run --rm app-build` |
+| Build Plugins | `build-plugins.yml` | `docker compose --profile build run --rm plugin-build` |
+| Run App | `run-app.yml` | `docker compose --profile verify up app verify` |
+| Run App with Plugin | `run-app-with-plugin.yml` | `docker compose --profile plugin up app verify-plugin` |
+
+**Notes:**
+- Use `--abort-on-container-exit` with `up` to auto-stop services after verification completes.
+- The `app` service builds the JAR inside Docker; `app-build` builds against the host-mounted source.
+- Maven dependencies are cached in a `maven-cache` volume for faster rebuilds.
 
 ---
 

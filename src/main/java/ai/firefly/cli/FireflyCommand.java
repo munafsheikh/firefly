@@ -1,7 +1,9 @@
 package ai.firefly.cli;
 
 import dev.tamboui.picocli.TuiCommand;
+import dev.tamboui.terminal.Frame;
 import dev.tamboui.tui.TuiRunner;
+import dev.tamboui.tui.event.Event;
 import dev.tamboui.tui.event.KeyEvent;
 import dev.tamboui.widgets.paragraph.Paragraph;
 import dev.tamboui.text.Text;
@@ -16,7 +18,7 @@ public class FireflyCommand extends TuiCommand {
         runner.run(this::handleEvent, this::render);
     }
 
-    private boolean handleEvent(Object event, TuiRunner runner) {
+    private boolean handleEvent(Event event, TuiRunner runner) {
         if (event instanceof KeyEvent k && k.isQuit()) {
             runner.quit();
             return false;
@@ -24,7 +26,7 @@ public class FireflyCommand extends TuiCommand {
         return false;
     }
 
-    private void render(dev.tamboui.terminal.Frame frame) {
+    private void render(Frame frame) {
         var paragraph = Paragraph.builder()
             .text(Text.from("Hello, Firefly! Press 'q' to quit."))
             .build();
