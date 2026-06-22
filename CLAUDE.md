@@ -4,174 +4,49 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Firefly — Java TUI app integrating TamboUI, Thymeleaf, Spring Boot, RabbitMQ, Redis, Oracle DB, AI, and Azure DevOps. Currently in early scaffolding phase.
+Firefly — Spring Boot app, plugin-based architecture. Core always-on: web dashboard (Thymeleaf), web terminal (xterm.js + pty4j over WebSocket), Swagger/OpenAPI. Optional features ship as separate Maven modules under `plugins/`, built independently and loaded at runtime via Spring Boot's `PropertiesLauncher` (drop JAR in `plugins/`, app picks it up off classpath — no rebuild of core app needed).
+
+See `AGENTS.md` for full roadmap, CI/Docker Compose profile mapping, and per-plugin build/install/config instructions — don't duplicate that here, read it directly when touching plugins or compose profiles.
 
 ## Commands
 
+**Build, run, and test through Docker Compose — that's the supported workflow in this repo.** The host JVM/Maven setup is not guaranteed to match the project's Java 25 toolchain; Compose builds inside `maven:3-eclipse-temurin-25` and runs inside `eclipse-temurin:25-jre`, so don't rely on a bare local `./mvnw`/`java` unless you've separately confirmed the host has a matching JDK.
+
 ```bash
-# Build
-./mvnw clean package
+# Build the core app (mirrors CI "Build App"; runs unit tests as part of `mvn install`)
+docker compose --profile build run --rm app-build
 
-# Run
-./mvnw spring-boot:run
+# Build all plugins (mirrors CI "Build Plugins")
+docker compose --profile build run --rm plugin-build
 
-# Run tests
-./mvnw test
+# Run a single test inside the build container
+docker compose --profile build run --rm app-build ./mvnw test -Dtest=FireflyApplicationTests#contextLoads
 
-# Run single test
-./mvnw test -Dtest=FireflyApplicationTests#contextLoads
+# Run the core app (plugins/ mounted read-only, picked up by PropertiesLauncher)
+docker compose up app --build
 
-# Run with Testcontainers dev mode
-./mvnw spring-boot:test-run
+# Run with all plugins baked into the image + smoke-test dashboard/Swagger/Actuator/ADO/CLI together
+docker compose --profile showcase up app-all-plugins showcase --build
 
-# Native image (GraalVM)
-./mvnw native:compile -Pnative
+# Run + verify (mirrors CI "Run App" / "Run App with Plugin")
+docker compose --profile verify up app verify
+docker compose --profile plugin up app verify-plugin
 ```
 
-## Stack
+Each plugin is its own Maven module under `plugins/<name>-plugin/`, built the same way as `plugin-build` does internally (`cd plugins/<name>-plugin && mvn clean package` inside the `maven:3-eclipse-temurin-25` container), then copied into the shared `plugins/` dir for the running app to pick up.
 
-- **Java 26**, Spring Boot 4.0.6, Spring MVC (`spring-boot-starter-webmvc`)
-- **REST client**: `spring-boot-starter-restclient` (not WebClient/RestTemplate)
-- **API docs**: SpringDoc OpenAPI 3 at `/swagger-ui.html`
-- **Actuator**: enabled via `spring-boot-starter-actuator`
-- **Lombok**: annotation processing wired in both compile and test-compile phases
-- **Docker Compose**: `spring-boot-docker-compose` auto-manages `compose.yaml` on startup
-- **Testcontainers**: JUnit 5 integration; `TestcontainersConfiguration` is the shared `@TestConfiguration` — add containers there
-- **GraalVM native**: `native-maven-plugin` present; keep reflection/proxy usage GraalVM-compatible
+App listens on port **17922** (not Spring Boot's default 8080) — set in `application.yaml` and mirrored via `SERVER_PORT` in Docker Compose. Full profile-to-CI mapping is in `AGENTS.md`.
 
-## Architecture notes
+## Architecture
 
-Base package: `ai.firefly`. Entry point: `FireflyApplication`.
-
-`compose.yaml` is currently empty — add services (RabbitMQ, Redis, Oracle) there; Spring Boot will start/stop them automatically in dev.
-
-`TestFireflyApplication` bootstraps the app with `TestcontainersConfiguration` for local dev against live containers without a full Docker Compose stack.
-
-## CLI / Command pattern
-
-Firefly is a TUI application. Model all user-facing operations as commands:
-- Each command implements a shared `Command` interface (`execute`, `undo` if reversible, `help`)
-- Commands are registered in a central `CommandRegistry` and dispatched by name/alias
-- TUI input loop reads a line, tokenises, looks up command, delegates execution
-- Side-effectful commands (SSH, Azure DevOps, AI) are async by default — wrap in `CompletableFuture`, surface progress to TUI via a callback/event bus
-
-## TamboUI
-
-TamboUI drives all terminal rendering. Rules:
-- Never write directly to `System.out` from business logic — route through TamboUI components
-- Layouts are declared programmatically; keep layout construction in dedicated `*View` classes separate from data-fetching logic
-- Refresh only dirty regions; avoid full-screen redraws on incremental data updates
-
-## Azure DevOps integration
-
-Used for ticket retrieval. Encapsulate behind an `AzureDevOpsClient` service using `RestClient` (already on classpath).
-- Credentials sourced from `application.yaml` (`azure.devops.org`, `azure.devops.pat`) — never hardcoded
-- Ticket/work-item responses mapped to internal `WorkItem` record; no Azure SDK types leak outside the client package
-- Cache work-item lists in Redis with a short TTL; bust on explicit refresh command
-
-## AI integration
-
-Wrap AI calls (Claude / Azure OpenAI) behind an `AiService` interface.
-- Use `RestClient` — no Langchain4j or Spring AI dependency unless explicitly added
-- Stream responses to TUI incrementally; do not buffer full completion before display
-- Prompts live in `src/main/resources/prompts/` as `.txt` or `.md` files, loaded via `ClassPathResource`
-- Keep model name and endpoint in `application.yaml`; swap models without code changes
-
-## SSH
-
-Use Apache MINA SSHD or JSch (add as dependency when implementing).
-- `SshService` manages a pool of `ClientSession` objects keyed by host
-- Execute remote commands via `ChannelExec`; stream stdout/stderr back to TUI
-- SSH config (hosts, keys) in `application.yaml` under `ssh.hosts[*]`
-
-## RabbitMQ
-
-Declare exchanges, queues, and bindings as `@Bean`s in a `RabbitConfig` class.
-- Use `RabbitTemplate` for outbound; `@RabbitListener` for inbound
-- Message payloads serialised as JSON via `Jackson2JsonMessageConverter` — register it in `RabbitConfig`
-- Add `rabbitmq` service to `compose.yaml` and mirror it with a `RabbitMQContainer` in `TestcontainersConfiguration`
-
-## Redis
-
-Used for caching (Azure DevOps work items, AI responses) and session state.
-- Inject `RedisTemplate<String, Object>` with `GenericJackson2JsonRedisSerializer` for value serialisation
-- Cache abstractions via Spring `@Cacheable` where TTL is acceptable; use `RedisTemplate` directly for finer control
-- Add `redis` service to `compose.yaml` and mirror with `GenericContainer("redis:8-alpine")` in `TestcontainersConfiguration`
-
-## Oracle DB
-
-Accessed via Spring Data JPA.
-- Use `@Entity` + repository pattern; keep entities in `ai.firefly.domain`
-- Liquibase (or Flyway) for schema migrations — add to `pom.xml` when implementing; migrations in `src/main/resources/db/changelog/`
-- Add Oracle container (`gvenzl/oracle-free`) to `TestcontainersConfiguration` for integration tests
-- Never use `spring.jpa.hibernate.ddl-auto=update` in any environment
-
-## Thymeleaf
-
-Used for HTML rendering (web views alongside the TUI).
-- Templates in `src/main/resources/templates/`; fragments in `templates/fragments/`
-- Controllers annotated `@Controller` (not `@RestController`) return view names; never return raw HTML strings
-- Model attributes populated via `Model` parameter — no `ModelAndView`
-
-## Testing
-
-**Favour integration tests over unit tests.** Prefer `@SpringBootTest` with real containers over mocks.
-- All infrastructure containers (RabbitMQ, Redis, Oracle) declared in `TestcontainersConfiguration` — tests import it via `@Import(TestcontainersConfiguration.class)`
-- `@SpringBootTest(webEnvironment = RANDOM_PORT)` for full-stack HTTP tests
-- Use `MockMvcTester` (Spring Boot 4 `spring-boot-starter-webmvc-test`) for controller slice tests when a full context is wasteful
-- Test coverage target: all public service methods and all REST/TUI command handlers
-- No Mockito mocks for infrastructure — if it calls a database, queue, or cache, test against the real container
-
-## Container-first development
-
-- All services run in containers; local JVM connects to them via `compose.yaml` (dev) or Testcontainers (test)
-- `spring-boot-docker-compose` starts `compose.yaml` automatically on `./mvnw spring-boot:run` — no manual `docker compose up` needed
-- Add new infrastructure services to **both** `compose.yaml` (dev) and `TestcontainersConfiguration` (test) simultaneously
-- Production target is a GraalVM native image — keep all code native-compatible (no runtime reflection without `@RegisterReflectionForBinding`, no dynamic proxies outside Spring's own infrastructure)
-
-## Project structure
-
-```
-.docker/
-  java/Dockerfile        # App image — multi-stage: Maven build → GraalVM native or JRE runtime
-  redis/Dockerfile       # Redis with any custom config layered on top of redis:8-alpine
-  rabbitmq/Dockerfile    # RabbitMQ with management plugin + custom definitions baked in
-compose.yaml             # Dev orchestration — references .docker/*/Dockerfile via build.context
-src/
-  main/
-    java/ai/firefly/     # All application code (base package)
-    resources/
-      application.yaml   # All config; no .properties files
-      prompts/           # AI prompt templates (*.md or *.txt)
-      templates/         # Thymeleaf HTML templates
-        fragments/       # Reusable Thymeleaf fragments
-      db/changelog/      # Liquibase migrations
-  test/
-    java/ai/firefly/
-      TestcontainersConfiguration.java  # Shared container beans for all tests
-      TestFireflyApplication.java       # Dev entrypoint with containers
-```
-
-## Containerisation dependencies
-
-`compose.yaml` service entries must reference the local Dockerfiles:
-
-```yaml
-services:
-  app:
-    build: { context: ., dockerfile: .docker/java/Dockerfile }
-  redis:
-    build: { context: .docker/redis }
-  rabbitmq:
-    build: { context: .docker/rabbitmq }
-```
-
-`TestcontainersConfiguration` mirrors each service:
-- `rabbitmq` → `RabbitMQContainer("rabbitmq:4-management-alpine")`
-- `redis` → `GenericContainer("redis:8-alpine")`
-- `oracle` → `OracleContainer("gvenzl/oracle-free:latest-faststart")`
-
-`.docker/java/Dockerfile` multi-stage pattern:
-1. Stage `build` — `maven:3-eclipse-temurin-26` → `./mvnw package -DskipTests` (tests run in CI, not image build)
-2. Stage `native` — `ghcr.io/graalvm/native-image:26` → compile to binary
-3. Stage `runtime` — `gcr.io/distroless/static` → copy binary, minimal attack surface
+- **Java 25** (downgraded from 26 for GraalVM compatibility), Spring Boot 4.0.6, `spring-boot-starter-webmvc` + `spring-boot-starter-restclient` (no WebClient/RestTemplate).
+- Base package `ai.firefly`; entry point `FireflyApplication`.
+- **Plugins are independent Maven projects**, not modules of the root `pom.xml`. Each builds its own JAR with its own `pom.xml` under `plugins/<name>-plugin/`. They are *not* on the compile classpath of the core app — discovery happens at runtime by scanning the `plugins/` directory.
+- Two plugin shapes:
+  - **Spring auto-config plugins** (`actuator-plugin`, `ado-plugin`): declare Spring Boot as `provided`, register via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`, gated by `@ConditionalOnProperty(prefix = "firefly.plugin.<name>", name = "enabled", matchIfMissing = true)`. Each carries a `META-INF/plugin.properties` (id/name/version/description/author) that `DashboardService.readPluginMetadata` reads to list it on the dashboard.
+  - **Standalone CLI plugin** (`cli-plugin`): a self-contained fat JAR (TamboUI + jline3 + picocli), not Spring-managed. `TerminalService.findCliPluginJar()` auto-detects `cli-plugin*.jar` in the plugins directory and launches it as the PTY's child process — this is how the web terminal at `/terminal` gets a TUI to run.
+- **Terminal component** (`ai.firefly.terminal`): `TerminalAutoConfiguration` is itself conditional — `@ConditionalOnClass(PtyProcess.class)` + `@ConditionalOnProperty(firefly.terminal.enabled)` — so it only activates when `pty4j` and Spring WebSocket are present. `TerminalWebSocketHandler` bridges the WebSocket to a `TerminalService.PtySession`, which spawns the PTY process and streams stdout via a virtual thread.
+- **Dashboard** (`ai.firefly.dashboard`): root `/` renders `templates/dashboard.html`, listing installed plugins (scanned from `plugins/*.jar` metadata) and, if the actuator plugin is loaded, fetches `/actuator` endpoints via `RestClient` to surface them.
+- `compose.yaml` defines profile-gated services (`build`, `verify`/`test`, `plugin`, `showcase`) that mirror the GitHub Actions workflows in `.github/workflows/`; check that file before assuming a `docker compose` invocation needs flags not already encoded in a profile.
+- `TestcontainersConfiguration` (`src/test`) is currently an empty shared `@TestConfiguration` — no infra containers (DB/queue/cache) are wired up yet; add bean definitions there if/when persistence or messaging lands.
+- `graphify-out/` and `app.log` are generated artifacts, not source — ignore when reasoning about architecture.

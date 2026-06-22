@@ -27,23 +27,36 @@ The project supports both JVM execution and GraalVM native-image compilation.
 
 ## Build Commands
 
-### Maven (JVM)
+**Docker Compose is the supported way to build, run, and test this project.** Use it rather than a bare local `mvnw`/`java` — the host toolchain isn't guaranteed to match the Java 25 / GraalVM 25.0.2 versions this project requires; Compose pins those via `maven:3-eclipse-temurin-25` (build) and `eclipse-temurin:25-jre` (runtime).
+
+### Docker Compose — build / run / test
+```bash
+# Build core app (runs unit tests as part of `mvn install`)
+docker compose --profile build run --rm app-build
+
+# Build all plugins
+docker compose --profile build run --rm plugin-build
+
+# Run a single test
+docker compose --profile build run --rm app-build ./mvnw test -Dtest=FireflyApplicationTests#contextLoads
+
+# Run the app (builds from `.docker/java/Dockerfile`, exposes port 17922)
+docker compose up app --build
+```
+
+See [Local Pipeline Stages](#local-pipeline-stages-docker-compose) below for the full profile table.
+
+### Maven (JVM) — local alternative, requires matching JDK 25 on the host
 ```bash
 ./mvnw clean install
 java -jar target/firefly-*.jar
 ```
 
-### Maven (Native Image)
+### Maven (Native Image) — local alternative
 Requires GraalVM CE 25.0.2:
 ```bash
 ./mvnw clean -Pnative native:compile -DskipTests
 ./target/firefly
-```
-
-### Docker Compose
-Supported runtime. Builds from `.docker/java/Dockerfile` and exposes port `17922`:
-```bash
-docker compose up app --build
 ```
 
 **Docker notes:**

@@ -6,13 +6,29 @@ A Java TUI with TamboUI, Thymeleaf + Spring Boot, RabbitMQ, Redis, Oracle DB, Ba
 
 ### Prerequisites
 
-- Java 25 (GraalVM CE 25.0.2 recommended for native image builds)
-- Maven 3.9+ (or use the included `./mvnw` wrapper)
-- Docker & Docker Compose (optional, for containerized runtime)
+- Docker & Docker Compose — the supported way to build, run, and test this project
+- (Optional, local-only alternative) Java 25 + Maven 3.9+ / `./mvnw`, GraalVM CE 25.0.2 for native builds — only if your host JDK matches the project's toolchain
 
-## Running the Application
+## Building, Running, and Testing
 
-### Option 1: Maven (JVM)
+### Option 1: Docker Compose (recommended)
+
+```bash
+# Build the core app (runs unit tests as part of `mvn install`)
+docker compose --profile build run --rm app-build
+
+# Build all plugins
+docker compose --profile build run --rm plugin-build
+
+# Run the app
+docker compose up app --build
+```
+
+The application is exposed on **port 17922**. See `AGENTS.md` for the full table of Compose profiles (build/verify/plugin/showcase) and how they map to CI.
+
+**Plugins:** Drop built plugin JARs into the `plugins/` directory before starting. These are mounted read-only into the container and loaded at runtime via Spring Boot's `PropertiesLauncher`.
+
+### Option 2: Maven (JVM) — local alternative
 
 ```bash
 ./mvnw clean package
@@ -21,7 +37,7 @@ java -jar target/firefly-*.jar
 
 The application will start on **port 17922**.
 
-### Option 2: Maven (Native Image)
+### Option 3: Maven (Native Image) — local alternative
 
 Requires GraalVM CE 25.0.2:
 
@@ -32,21 +48,16 @@ Requires GraalVM CE 25.0.2:
 
 Native image starts in ~61ms.
 
-### Option 3: Docker Compose
-
-```bash
-docker compose up --build
-```
-
-The application is exposed on **port 17922**.
-
-**Plugins:** Drop built plugin JARs into the `plugins/` directory before starting. These are mounted read-only into the container and loaded at runtime via Spring Boot's `PropertiesLauncher`.
-
 ### Azure DevOps Plugin
 
 The ADO plugin connects Firefly to Azure DevOps for work item management.
 
-**Build:**
+**Build (Docker):**
+```bash
+docker compose --profile build run --rm plugin-build
+```
+
+**Build (local Maven alternative):**
 ```bash
 cd plugins/ado-plugin
 mvn clean package
