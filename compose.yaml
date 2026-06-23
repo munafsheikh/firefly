@@ -85,6 +85,29 @@ services:
     restart: "no"
 
   # ------------------------------------------------------------------
+  # Profile: native
+  # Builds a GraalVM native executable for the container's platform
+  # (linux/amd64 or linux/arm64, matching the host running Docker).
+  # The base image ships GraalVM + native-image but not a C toolchain,
+  # so it's installed here before invoking the native-image build.
+  # Usage: docker compose --profile native run --rm native-build
+  # Output: target/firefly (native executable, run directly: ./target/firefly)
+  # ------------------------------------------------------------------
+  native-build:
+    profiles: [native]
+    image: ghcr.io/graalvm/native-image-community:25
+    working_dir: /app
+    volumes:
+      - .:/app
+      - maven-cache:/root/.m2
+    command: >
+      sh -c "
+        microdnf install -y gcc glibc-devel zlib-devel libstdc++-static unzip findutils tar gzip &&
+        ./mvnw -Pnative -DskipTests native:compile
+      "
+    restart: "no"
+
+  # ------------------------------------------------------------------
   # Profile: build / plugin
   # Mirrors CI 'Build Plugins' stage locally.
   # Usage: docker compose --profile build run --rm plugin-build

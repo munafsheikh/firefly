@@ -11,9 +11,9 @@
 	<groupId>com.flash.firefighters</groupId>
 	<artifactId>firefly</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
+	<name>firefly</name>
+	<description>Spring Boot plugin-based platform with web dashboard, terminal, and Swagger UI</description>
+	<url>https://github.com/munafsheikh/firefly</url>
 	<licenses>
 		<license/>
 	</licenses>
@@ -21,11 +21,18 @@
 		<developer/>
 	</developers>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:git@github.com:munafsheikh/firefly.git</connection>
+		<developerConnection>scm:git:git@github.com:munafsheikh/firefly.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/munafsheikh/firefly</url>
 	</scm>
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/munafsheikh/firefly</url>
+		</repository>
+	</distributionManagement>
 	<properties>
 		<java.version>25</java.version>
 	</properties>
@@ -48,11 +55,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -125,19 +127,48 @@
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
-						<exclude>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-starter-actuator</artifactId>
-						</exclude>
-						<exclude>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-actuator</artifactId>
-						</exclude>
-						<exclude>
-							<groupId>org.springframework.boot</groupId>
-							<artifactId>spring-boot-actuator-autoconfigure</artifactId>
-						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!--
+					Spring Boot's Maven plugin dropped the "fully executable jar" launch-script
+					feature (the old <executable>true</executable> config has no effect on 4.x).
+					Replicate it ourselves: prepend a #!/bin/sh launcher so the jar can be run
+					directly as ./firefly-<version>.jar instead of java -jar firefly-<version>.jar.
+					Relies on the JVM/zip readers that seek the end-of-central-directory record
+					from EOF (true for java, unzip, jar) rather than requiring the zip to start at
+					offset 0 — this is Linux-oriented and was the same tradeoff Boot's own removed
+					feature had, so don't assume every zip tool handles it.
+				-->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.6.3</version>
+				<executions>
+					<execution>
+						<id>make-jar-executable</id>
+						<phase>package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>sh</executable>
+							<arguments>
+								<argument>-c</argument>
+								<argument>set -e; JAR="${project.build.directory}/${project.build.finalName}.jar"; printf '#!/bin/sh\nexec java -jar "$0" "$@"\n' &gt; "$JAR.launch"; cat "$JAR.launch" "$JAR" &gt; "$JAR.tmp"; rm -f "$JAR.launch"; mv "$JAR.tmp" "$JAR"; chmod +x "$JAR"</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+					<tagNameFormat>v@{project.version}</tagNameFormat>
+					<pushChanges>false</pushChanges>
+					<localCheckout>true</localCheckout>
 				</configuration>
 			</plugin>
 			<plugin>

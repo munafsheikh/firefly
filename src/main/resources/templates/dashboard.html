@@ -182,10 +182,10 @@
 
         <div class="card" style="margin-bottom:1.5rem;">
             <h2>Installed Plugins</h2>
-            <div th:if="${#lists.isEmpty(plugins)}" class="empty-state">
+            <div th:if="${plugins.isEmpty()}" class="empty-state">
                 <p>No plugins found in the plugins directory.</p>
             </div>
-            <table th:unless="${#lists.isEmpty(plugins)}">
+            <table th:unless="${plugins.isEmpty()}">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -207,10 +207,10 @@
 
         <div class="card" th:if="${actuatorAvailable}">
             <h2>Actuator Endpoints</h2>
-            <div th:if="${#maps.isEmpty(actuatorLinks)}" class="empty-state">
+            <div th:if="${actuatorLinks.isEmpty()}" class="empty-state">
                 <p>Actuator is installed but no endpoints were discovered.</p>
             </div>
-            <div class="endpoint-grid" th:unless="${#maps.isEmpty(actuatorLinks)}">
+            <div class="endpoint-grid" th:unless="${actuatorLinks.isEmpty()}">
                 <div class="endpoint-item" th:each="link : ${actuatorLinks}">
                     <a th:href="${link.value.href}" th:text="${link.key}">endpoint</a>
                 </div>

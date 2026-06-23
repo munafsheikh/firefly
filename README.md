@@ -32,17 +32,24 @@ The application is exposed on **port 17922**. See `AGENTS.md` for the full table
 
 ```bash
 ./mvnw clean package
-java -jar target/firefly-*.jar
+./target/firefly-*.jar     # directly executable, or: java -jar target/firefly-*.jar
 ```
 
 The application will start on **port 17922**.
 
 ### Option 3: Maven (Native Image) — local alternative
 
-Requires GraalVM CE 25.0.2:
+Requires GraalVM CE 25.0.2 (`JAVA_HOME` must point at it — `asdf` users: `JAVA_HOME=$(asdf where java)`):
 
 ```bash
-./mvnw -Pnative native:compile -DskipTests
+JAVA_HOME=$(asdf where java) ./mvnw -Pnative native:compile -DskipTests
+./target/firefly
+```
+
+Or build inside Docker (no local GraalVM needed; targets whatever platform Docker runs on):
+
+```bash
+docker compose --profile native run --rm native-build
 ./target/firefly
 ```
 
@@ -138,3 +145,7 @@ server:
 ## Development
 
 See `AGENTS.md` for detailed agent-oriented documentation, feature roadmap, and coding conventions.
+
+## Releases
+
+Each Maven project here (root `firefly`, plus `ado-plugin`/`actuator-plugin`/`cli-plugin`) is independently versioned and released via `maven-release-plugin`. See [AGENTS.md § Releases](AGENTS.md#releases-maven-release-plugin) for the `release:prepare`/`release:perform` workflow and GitHub Packages deploy setup.

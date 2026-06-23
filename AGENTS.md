@@ -53,11 +53,19 @@ java -jar target/firefly-*.jar
 ```
 
 ### Maven (Native Image) — local alternative
-Requires GraalVM CE 25.0.2:
+Requires GraalVM CE 25.0.2 (`asdf install` picks this up automatically via `.tool-versions`; make sure `JAVA_HOME` points at the GraalVM install, not just `PATH` — Maven reads `JAVA_HOME` first):
 ```bash
-./mvnw clean -Pnative native:compile -DskipTests
+JAVA_HOME=$(asdf where java) ./mvnw clean -Pnative native:compile -DskipTests
 ./target/firefly
 ```
+
+### Docker — native image build (any platform running Docker)
+No local GraalVM install needed; builds inside `ghcr.io/graalvm/native-image-community:25` (toolchain packages installed at container start):
+```bash
+docker compose --profile native run --rm native-build
+./target/firefly
+```
+The resulting binary targets whatever platform Docker itself is running on (matches `docker compose up app`'s host).
 
 **Docker notes:**
 - Base image: `eclipse-temurin:25-jre`
@@ -76,6 +84,7 @@ The `compose.yaml` mirrors the GitHub Actions pipeline stages so they can be run
 | Run App | `run-app.yml` | `docker compose --profile verify up app verify` |
 | Run App with Plugin | `run-app-with-plugin.yml` | `docker compose --profile plugin up app verify-plugin` |
 | Showcase All Plugins | — | `docker compose --profile showcase up app-all-plugins showcase --build` |
+| Native Image Build | — | `docker compose --profile native run --rm native-build` |
 
 **Notes:**
 - Use `--abort-on-container-exit` with `up` to auto-stop services after verification completes.
@@ -83,6 +92,34 @@ The `compose.yaml` mirrors the GitHub Actions pipeline stages so they can be run
 - The `app-all-plugins` service bakes all plugin JARs into the image (no host volume mount).
 - The `showcase` service verifies the dashboard, Swagger, Actuator, ADO, and CLI plugins collectively.
 - Maven dependencies are cached in a `maven-cache` volume for faster rebuilds.
+
+#### Executable jar
+The root pom's `exec-maven-plugin` execution prepends a `#!/bin/sh` launcher to the repackaged jar after `spring-boot:repackage` runs, so `target/firefly-<version>.jar` is directly runnable (`./target/firefly-<version>.jar`) instead of requiring `java -jar`. Spring Boot 4 dropped its own built-in "fully executable jar" feature (the old `<executable>true</executable>` config is a no-op now), so this replicates it manually. Same caveat the original feature had: relies on zip readers that seek the end-of-central-directory record from EOF (true for `java`, `unzip`, `jar`) rather than requiring the archive to start at offset 0 — works on Linux/macOS, not guaranteed for every zip tool.
+
+#### Releases (maven-release-plugin)
+Each of the 4 Maven projects in this repo (root `firefly`, `ado-plugin`, `actuator-plugin`, `cli-plugin`) is independently releasable — they're separate artifacts, not reactor modules, so version/tag per project:
+
+```bash
+# Root app (tag: v<version>)
+JAVA_HOME=$(asdf where java) ./mvnw release:prepare release:perform
+git push origin main --follow-tags   # pushChanges=false by default — push is a separate, explicit step
+
+# A plugin (tag: <plugin-name>-<version>), e.g. ado-plugin
+cd plugins/ado-plugin
+mvn release:prepare release:perform
+cd ../.. && git push origin main --follow-tags
+```
+
+`release:prepare` bumps the version, commits, and tags locally only (`pushChanges=false`) — nothing reaches the remote until you `git push --follow-tags` yourself. Pushing a tag matching `v*`/`ado-plugin-*`/`actuator-plugin-*`/`cli-plugin-*` triggers `.github/workflows/release.yml`, which deploys that artifact to GitHub Packages (`https://maven.pkg.github.com/munafsheikh/firefly`) using the workflow's built-in `GITHUB_TOKEN` — no manual credential setup needed for CI.
+
+For a **local** `mvn deploy` (outside CI), add a `<server>` entry to `~/.m2/settings.xml` with a [GitHub PAT](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry) that has `write:packages` scope:
+```xml
+<server>
+  <id>github</id>
+  <username>YOUR_GITHUB_USERNAME</username>
+  <password>YOUR_GITHUB_PAT</password>
+</server>
+```
 
 ---
 
