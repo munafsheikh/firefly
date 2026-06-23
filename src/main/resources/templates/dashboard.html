@@ -141,6 +141,16 @@
             </div>
 
             <div class="card">
+                <h2>Demo Pages</h2>
+                <ul class="link-list">
+                    <li th:if="${actuatorAvailable}"><a href="/pages/actuator">Actuator Plugin Demo</a></li>
+                    <li><a href="/pages/ado">Ado Plugin Demo</a></li>
+                    <li><a href="/pages/cli">CLI Plugin Demo</a></li>
+                    <li><a href="/pages/overview">System Overview (cross-plugin)</a></li>
+                </ul>
+            </div>
+
+            <div class="card">
                 <h2>System Status</h2>
                 <ul class="link-list">
                     <li>

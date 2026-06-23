@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Firefly — System Overview</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #2d3748; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 1.5rem; }
+        header h1 { font-size: 1.75rem; }
+        header p { opacity: 0.9; font-size: 0.9rem; margin-top: 0.25rem; }
+        a.back { color: white; text-decoration: none; opacity: 0.85; font-size: 0.9rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+        .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #4a5568; }
+        button { background: #667eea; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+        button:hover { background: #5a67d8; }
+        pre { background: #f7fafc; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.85rem; white-space: pre-wrap; word-break: break-word; }
+        .error { color: #c53030; }
+        .empty-state { color: #a0aec0; font-size: 0.9rem; }
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+        .badge-installed { background: #c6f6d5; color: #22543d; }
+        .badge-missing { background: #fed7d7; color: #742a2a; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a class="back" href="/">&larr; Dashboard</a>
+            <h1>System Overview</h1>
+            <p>Combines the base app's terminal feature with the actuator and ado plugins (when installed).</p>
+        </header>
+
+        <div class="card">
+            <h2>Base — Web Terminal</h2>
+            <p style="margin-bottom: 0.75rem;">Always available from core; launches the cli plugin's TUI if it is installed.</p>
+            <span class="badge" th:classappend="${cliAvailable} ? 'badge-installed' : 'badge-missing'"
+                  th:text="${cliAvailable} ? 'cli plugin detected' : 'cli plugin not installed'">cli status</span>
+        </div>
+
+        <div class="card">
+            <h2>Actuator Plugin — Health</h2>
+            <div th:if="${actuatorAvailable}">
+                <button onclick="callApi('/actuator/health', 'actuator-result')">Check Health</button>
+                <pre id="actuator-result">Click "Check Health" to call /actuator/health</pre>
+            </div>
+            <p th:unless="${actuatorAvailable}" class="empty-state">Actuator plugin is not installed.</p>
+        </div>
+
+        <div class="card">
+            <h2>Ado Plugin — Open Bugs</h2>
+            <div th:if="${adoAvailable}">
+                <button onclick="callApi('/api/ado/workitems/open-bugs', 'ado-result')">Load Open Bugs</button>
+                <pre id="ado-result">Click "Load Open Bugs" to call /api/ado/workitems/open-bugs</pre>
+            </div>
+            <p th:unless="${adoAvailable}" class="empty-state">Ado plugin is not installed.</p>
+        </div>
+    </div>
+
+    <script th:inline="none">
+        async function callApi(url, targetId) {
+            const target = document.getElementById(targetId);
+            target.textContent = 'Loading...';
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                target.textContent = response.status + ' ' + response.statusText + '\n' + text;
+                if (!response.ok) target.classList.add('error');
+                else target.classList.remove('error');
+            } catch (e) {
+                target.textContent = 'Request failed: ' + e;
+                target.classList.add('error');
+            }
+        }
+    </script>
+</body>
+</html>

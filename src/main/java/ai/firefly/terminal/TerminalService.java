@@ -47,7 +47,7 @@ public class TerminalService {
         if (args == null || args.isBlank()) {
             String cliJar = findCliPluginJar();
             if (cliJar != null) {
-                args = "-jar " + cliJar;
+                args = "--enable-native-access=ALL-UNNAMED -jar " + cliJar;
             } else {
                 log.warn("No CLI plugin JAR found in {} and no commandArgs configured. Terminal may not work.", properties.getPluginsPath());
                 return base;

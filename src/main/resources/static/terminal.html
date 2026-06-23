@@ -71,6 +71,20 @@
             }
         });
 
+        // Browsers move focus away from the terminal on Tab by default, which
+        // means the keystroke never reaches xterm. Intercept it ourselves and
+        // forward Tab / Shift+Tab as terminal input instead of letting it escape.
+        term.attachCustomKeyEventHandler((event) => {
+            if (event.key === 'Tab' && event.type === 'keydown') {
+                event.preventDefault();
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(event.shiftKey ? '\x1b[Z' : '\t');
+                }
+                return false;
+            }
+            return true;
+        });
+
         function sendResize() {
             if (socket.readyState === WebSocket.OPEN) {
                 const dims = fitAddon.proposeDimensions();

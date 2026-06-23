@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Firefly — Actuator Plugin</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #2d3748; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 1.5rem; }
+        header h1 { font-size: 1.75rem; }
+        a.back { color: white; text-decoration: none; opacity: 0.85; font-size: 0.9rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+        .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #4a5568; }
+        button { background: #667eea; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; margin-right: 0.5rem; }
+        button:hover { background: #5a67d8; }
+        pre { background: #f7fafc; border-radius: 8px; padding: 1rem; overflow-x: auto; font-size: 0.85rem; white-space: pre-wrap; word-break: break-word; }
+        .error { color: #c53030; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a class="back" href="/">&larr; Dashboard</a>
+            <h1>Actuator Plugin</h1>
+        </header>
+
+        <div class="card">
+            <h2>Health</h2>
+            <button onclick="callApi('/actuator/health', 'health-result')">Check Health</button>
+            <pre id="health-result">Click "Check Health" to call /actuator/health</pre>
+        </div>
+
+        <div class="card">
+            <h2>Info</h2>
+            <button onclick="callApi('/actuator/info', 'info-result')">Load Info</button>
+            <pre id="info-result">Click "Load Info" to call /actuator/info</pre>
+        </div>
+
+        <div class="card">
+            <h2>Metrics</h2>
+            <button onclick="callApi('/actuator/metrics', 'metrics-result')">Load Metrics</button>
+            <pre id="metrics-result">Click "Load Metrics" to call /actuator/metrics</pre>
+        </div>
+    </div>
+
+    <script th:inline="none">
+        async function callApi(url, targetId) {
+            const target = document.getElementById(targetId);
+            target.textContent = 'Loading...';
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                target.textContent = response.status + ' ' + response.statusText + '\n' + text;
+                if (!response.ok) target.classList.add('error');
+                else target.classList.remove('error');
+            } catch (e) {
+                target.textContent = 'Request failed: ' + e;
+                target.classList.add('error');
+            }
+        }
+    </script>
+</body>
+</html>

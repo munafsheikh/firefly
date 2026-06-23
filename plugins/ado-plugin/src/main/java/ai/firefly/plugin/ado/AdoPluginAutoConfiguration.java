@@ -40,4 +40,9 @@ public class AdoPluginAutoConfiguration {
     public AdoPluginController adoPluginController(AdoWorkItemService workItemService) {
         return new AdoPluginController(workItemService);
     }
+
+    @Bean
+    public AdoPageController adoPageController() {
+        return new AdoPageController();
+    }
 }
