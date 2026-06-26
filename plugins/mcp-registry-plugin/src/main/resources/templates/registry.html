@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>MCP Registry - Firefly</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Firefly MCP Registry</h1>
+  <p>Registered MCP servers:</p>
+  <table th:if="${mcps != null and mcps.size() > 0}">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Executable</th>
+        <th>Enabled</th>
+        <th>Version</th>
+        <th>Tools</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="mcp : ${mcps}">
+        <td th:text="${mcp.id()}"></td>
+        <td th:text="${mcp.name()}"></td>
+        <td th:text="${mcp.type()}"></td>
+        <td th:text="${mcp.executable()}"></td>
+        <td th:text="${mcp.enabled()}"></td>
+        <td th:text="${mcp.version()}"></td>
+        <td th:text="${mcp.tools().size()}"></td>
+      </tr>
+    </tbody>
+  </table>
+  <p th:if="${mcps == null or mcps.size() == 0}">No MCP servers registered yet.</p>
+  <hr/>
+  <p>API: <a href="/api/mcp-registry/mcps">/api/mcp-registry/mcps</a></p>
+</body>
+</html>
