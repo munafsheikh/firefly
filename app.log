@@ -26,3 +26,5 @@
 2026-05-04T08:19:54.305+02:00  INFO 3550605 --- [firefly] [io-17923-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
 2026-05-04T08:19:54.306+02:00  INFO 3550605 --- [firefly] [io-17923-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-05-04T08:19:54.307+02:00  INFO 3550605 --- [firefly] [io-17923-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-05-04T13:35:51.645+02:00  INFO 3550605 --- [firefly] [ionShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-05-04T13:35:51.654+02:00  INFO 3550605 --- [firefly] [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete

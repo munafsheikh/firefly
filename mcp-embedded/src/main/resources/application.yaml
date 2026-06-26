@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: firefly
+  thymeleaf:
+    cache: false
+server:
+  port: 17922
+
+firefly:
+  mcp:
+    enabled: true
+    name: "firefly-mcp"
+    version: "1.0.0"
+    description: "Firefly Dashboard & Plugin Management"
+    maxToolsDiscoveryTimeMs: 5000
+    toolInvocationTimeoutMs: 30000
+    debugLogging: false
