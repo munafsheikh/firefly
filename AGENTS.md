@@ -215,6 +215,19 @@ sunday are closed
 
 ---
 
+## Test Doc Screenshots
+
+`ScreenshotDocumentationExtension` (`src/test/java/ai/firefly/testdoc/`) is a JUnit 5 extension that is auto-detected for the whole test run (`src/test/resources/META-INF/services/org.junit.jupiter.api.extension.Extension` + `junit.jupiter.extensions.autodetection.enabled=true` in `junit-platform.properties`) — it requires no per-test wiring, so it covers every existing and future test automatically.
+
+- **What gets screenshotted**: only tests with a visually detectable outcome, i.e. ones that boot a real embedded web server (`@SpringBootTest(webEnvironment = RANDOM_PORT)`/`DEFINED_PORT`, detected via the `local.server.port` Spring property). Plain unit tests, `MOCK`/`NONE` web-environment tests, and anything with no Spring context are silently skipped — there is nothing to render.
+- **Default page**: `/`. Override per test class/method with `@DocScreenshot(paths = {...})` (`src/test/java/ai/firefly/testdoc/DocScreenshot.java`) to capture additional/different pages (e.g. `/swagger-ui/index.html`, `/terminal`).
+- **When**: after every applicable test, pass or fail — output file names are suffixed `PASS`/`FAIL`.
+- **Output**: `target/test-screenshots/<TestClass>/<testMethod>__<PASS|FAIL>__<path>.png` — a build artifact (`target/` is gitignored), not committed.
+- **Failure handling**: any Playwright problem (Chromium not installed, no network for the first download, etc.) is caught and logged as a warning; it never fails a test. The extension disables itself for the rest of the run after the first such failure rather than spamming logs.
+- **Browser provisioning**: `Playwright.create()` lazily installs browsers on first use if its cache (`~/.cache/ms-playwright`) is empty — and it installs Chromium, Firefox, *and* WebKit even though this extension only launches Chromium, so the first run needs network access to all three CDNs. Pre-install just Chromium once to skip that: `./mvnw exec:java -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.classpathScope=test -Dexec.args="install chromium"`, then set `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1` so later runs never attempt the Firefox/WebKit downloads. Without either step the extension still degrades safely (see failure handling above) — it just retries the full three-browser install attempt every run until one succeeds. See `DashboardScreenshotTests` (`src/test/java/ai/firefly/dashboard/`) for a working example against the dashboard and Swagger UI.
+
+---
+
 ## Directory Structure
 
 ```
