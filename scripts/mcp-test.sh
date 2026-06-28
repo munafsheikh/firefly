@@ -50,21 +50,35 @@ fi
 # Test 4: MCP Registry endpoints
 echo -e "\n${BLUE}Test 4: MCP Registry Plugin endpoints${NC}"
 
-# Test 4a: /api/mcp/tools
-echo "  4a. GET /api/mcp/tools"
-MOCKS_RESPONSE=$(curl -s -m $TIMEOUT "${BASE_URL}/api/mcp/tools" 2>/dev/null || echo "error")
-if echo "$MOCKS_RESPONSE" | grep -q "ListPlugins\|DashboardHealth\|ActuatorData" || echo "$MOCKS_RESPONSE" | grep -q "\[\]"; then
-    echo -e "     ${GREEN}✓ MCP tools endpoint responds${NC}"
+# Test 4a: /api/mcp-registry/mcps (list registered MCPs)
+echo "  4a. GET /api/mcp-registry/mcps"
+MCP_LIST=$(curl -s -m $TIMEOUT "${BASE_URL}/api/mcp-registry/mcps" 2>/dev/null || echo "error")
+if echo "$MCP_LIST" | grep -q "\[\]" || echo "$MCP_LIST" | grep -q "id"; then
+    echo -e "     ${GREEN}✓ MCP registry list endpoint responds${NC}"
+    # Show count if non-empty
+    COUNT=$(echo "$MCP_LIST" | grep -o '"id"' | wc -l)
+    if [ "$COUNT" -gt 0 ]; then
+        echo -e "     ${GREEN}  (${COUNT} MCP(s) registered)${NC}"
+    else
+        echo -e "     ${YELLOW}  (empty registry - ready to register MCPs)${NC}"
+    fi
 else
     echo -e "     ${YELLOW}~ MCP Registry plugin may not be active (not required)${NC}"
 fi
 
-# Test 4b: /api/mcp/registry
-echo "  4b. GET /api/mcp/registry"
-if curl -s -m $TIMEOUT "${BASE_URL}/api/mcp/registry" > /dev/null 2>&1; then
-    echo -e "     ${GREEN}✓ MCP registry endpoint responds${NC}"
+# Test 4b: Dashboard lists 4 embedded MCP tools
+echo "  4b. Embedded MCP Tools (in dashboard)"
+DASHBOARD=$(curl -s -m $TIMEOUT "${BASE_URL}/" 2>/dev/null)
+TOOLS_COUNT=0
+for tool in "ListPlugins" "DashboardHealth" "ActuatorData" "ListActuatorEndpoints"; do
+    if echo "$DASHBOARD" | grep -q "$tool"; then
+        TOOLS_COUNT=$((TOOLS_COUNT + 1))
+    fi
+done
+if [ "$TOOLS_COUNT" -eq 4 ]; then
+    echo -e "     ${GREEN}✓ All 4 embedded MCP tools listed on dashboard${NC}"
 else
-    echo -e "     ${YELLOW}~ MCP Registry plugin may not be active (not required)${NC}"
+    echo -e "     ${YELLOW}~ Only $TOOLS_COUNT/4 tools found on dashboard${NC}"
 fi
 
 # Test 5: Terminal endpoint
@@ -103,9 +117,16 @@ echo -e "${GREEN}MCP Tests Complete!${NC}"
 echo -e "${YELLOW}========================================${NC}"
 echo ""
 echo "Access Firefly in your browser:"
-echo "  🌐 Dashboard:   ${BASE_URL}"
-echo "  🧠 MCP Tools:   ${BASE_URL}/api/mcp/tools"
-echo "  💻 Terminal UI: ${BASE_URL}/terminal"
-echo "  📚 Swagger:     ${BASE_URL}/swagger-ui.html"
-echo "  🏥 Actuator:    ${BASE_URL}/actuator"
+echo "  🌐 Dashboard:      ${BASE_URL}"
+echo "  🧠 MCP Registry:   ${BASE_URL}/api/mcp-registry/mcps"
+echo "  🧠 MCP Registry UI: ${BASE_URL}/pages/mcp-registry"
+echo "  💻 Terminal UI:    ${BASE_URL}/terminal"
+echo "  📚 Swagger:        ${BASE_URL}/swagger-ui.html"
+echo "  🏥 Actuator:       ${BASE_URL}/actuator"
+echo ""
+echo "Dashboard displays 4 embedded MCP tools:"
+echo "  • ListPlugins — Discover installed plugins"
+echo "  • DashboardHealth — Real-time system status"
+echo "  • ActuatorData — Fetch metrics, health, info"
+echo "  • ListActuatorEndpoints — Browse actuator endpoints"
 echo ""
