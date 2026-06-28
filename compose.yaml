@@ -123,7 +123,8 @@ services:
       sh -c "
         cd /app/plugins/cli-plugin && mvn clean package -B -V &&
         cd /app/plugins/actuator-plugin && mvn clean package -B -V &&
-        cd /app/plugins/ado-plugin && mvn clean package -B -V
+        cd /app/plugins/ado-plugin && mvn clean package -B -V &&
+        cd /app/plugins/mcp-registry-plugin && mvn clean package -B -V
       "
     restart: "no"
 
