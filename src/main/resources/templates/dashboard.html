@@ -125,38 +125,72 @@
 <body>
     <div class="container">
         <header>
-            <h1>🔥 Firefly Dashboard</h1>
-            <p>Version <strong th:text="${appVersion}">0.0.1-SNAPSHOT</strong> — Spring Boot Application</p>
+            <h1>🔥 Firefly — Plugin-Powered Spring Boot Platform</h1>
+            <p>Version <strong th:text="${appVersion}">0.0.1-SNAPSHOT</strong> — Extensible app with web API, CLI, terminal, and Model Context Protocol integration</p>
         </header>
+
+        <div class="card" style="margin-bottom: 1.5rem; background: #f0f4ff; border: 2px solid #667eea;">
+            <h2 style="color: #667eea;">🚀 What Can You Do?</h2>
+            <ul class="link-list">
+                <li><strong>📡 Explore the REST API:</strong> Full OpenAPI/Swagger documentation with interactive testing at <a href="/swagger-ui.html" style="color: #667eea; font-weight: bold;">/swagger-ui.html</a></li>
+                <li><strong>💻 Web Terminal:</strong> SSH-like terminal interface in your browser at <a href="/terminal" style="color: #667eea; font-weight: bold;">/terminal</a> (powered by xterm.js + pty4j)</li>
+                <li><strong>📊 System Health:</strong> Real-time health, metrics, and info via Spring Actuator endpoints at <a href="/actuator" style="color: #667eea; font-weight: bold;">/actuator</a></li>
+                <li><strong>🔧 Extensible Architecture:</strong> Drop new plugin JARs into <code>plugins/</code> — they auto-load with zero server restart</li>
+                <li><strong>🧠 Model Context Protocol (MCP):</strong> Embedded MCP server exposes tools for AI agents (list plugins, health checks, actuator data, endpoints)</li>
+            </ul>
+        </div>
 
         <div class="grid">
             <div class="card">
-                <h2>Quick Links</h2>
+                <h2>🌐 API & Documentation</h2>
                 <ul class="link-list">
-                    <li><a href="/swagger-ui.html">Swagger UI (API Documentation)</a></li>
+                    <li><a href="/swagger-ui.html">Swagger UI (Interactive API Testing)</a></li>
                     <li><a href="/v3/api-docs">OpenAPI Specification (JSON)</a></li>
-                    <li th:if="${terminalAvailable}"><a href="/terminal">Web Terminal</a></li>
-                    <li th:if="${actuatorAvailable}"><a href="/actuator">Actuator Base</a></li>
                 </ul>
             </div>
 
             <div class="card">
-                <h2>Demo Pages</h2>
+                <h2>💬 Interfaces</h2>
                 <ul class="link-list">
-                    <li th:if="${actuatorAvailable}"><a href="/pages/actuator">Actuator Plugin Demo</a></li>
-                    <li><a href="/pages/ado">Ado Plugin Demo</a></li>
-                    <li><a href="/pages/cli">CLI Plugin Demo</a></li>
-                    <li><a href="/pages/overview">System Overview (cross-plugin)</a></li>
+                    <li th:if="${terminalAvailable}"><a href="/terminal">Web Terminal (xterm.js + pty4j)</a></li>
+                    <li><a href="/">Dashboard (this page, Thymeleaf)</a></li>
                 </ul>
             </div>
 
             <div class="card">
-                <h2>System Status</h2>
+                <h2>🧠 Model Context Protocol (MCP)</h2>
+                <ul class="link-list">
+                    <li><strong>Embedded MCP Server</strong> — Exposes AI-ready tools</li>
+                    <li>🔹 <code>ListPlugins</code> — Discover installed plugins</li>
+                    <li>🔹 <code>DashboardHealth</code> — Real-time system status</li>
+                    <li>🔹 <code>ActuatorData</code> — Fetch metrics, health, info</li>
+                    <li>🔹 <code>ListActuatorEndpoints</code> — Browse actuator endpoints</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>✨ Features</h2>
                 <ul class="link-list">
                     <li>
                         <span style="display:flex;align-items:center;padding:0.75rem 1rem;background:#edf2f7;border-radius:8px;">
                             <span style="margin-right:0.75rem;color:#667eea;font-weight:bold;">→</span>
-                            Actuator:
+                            RESTful API:
+                            <span class="badge badge-installed" style="margin-left:auto;">Active</span>
+                        </span>
+                    </li>
+                    <li>
+                        <span style="display:flex;align-items:center;padding:0.75rem 1rem;background:#edf2f7;border-radius:8px;">
+                            <span style="margin-right:0.75rem;color:#667eea;font-weight:bold;">→</span>
+                            Web Terminal:
+                            <span class="badge" th:classappend="${terminalAvailable} ? 'badge-installed' : 'badge-missing'"
+                                  th:text="${terminalAvailable} ? 'Active' : 'Unavailable'"
+                                  style="margin-left:auto;">Status</span>
+                        </span>
+                    </li>
+                    <li>
+                        <span style="display:flex;align-items:center;padding:0.75rem 1rem;background:#edf2f7;border-radius:8px;">
+                            <span style="margin-right:0.75rem;color:#667eea;font-weight:bold;">→</span>
+                            Actuator Monitoring:
                             <span class="badge" th:classappend="${actuatorAvailable} ? 'badge-installed' : 'badge-missing'"
                                   th:text="${actuatorAvailable} ? 'Installed' : 'Not Installed'"
                                   style="margin-left:auto;">Status</span>
@@ -165,15 +199,15 @@
                     <li>
                         <span style="display:flex;align-items:center;padding:0.75rem 1rem;background:#edf2f7;border-radius:8px;">
                             <span style="margin-right:0.75rem;color:#667eea;font-weight:bold;">→</span>
-                            Terminal:
-                            <span class="badge badge-installed" style="margin-left:auto;">Available</span>
+                            MCP Server:
+                            <span class="badge badge-installed" style="margin-left:auto;">Active</span>
                         </span>
                     </li>
                     <li>
                         <span style="display:flex;align-items:center;padding:0.75rem 1rem;background:#edf2f7;border-radius:8px;">
                             <span style="margin-right:0.75rem;color:#667eea;font-weight:bold;">→</span>
-                            Swagger:
-                            <span class="badge badge-installed" style="margin-left:auto;">Available</span>
+                            Plugin System:
+                            <span class="badge badge-installed" style="margin-left:auto;">Running</span>
                         </span>
                     </li>
                 </ul>
