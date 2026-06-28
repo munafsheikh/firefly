@@ -2,12 +2,21 @@
 
 ## Project Overview
 
-Firefly is a Spring Boot application with a plugin-based architecture:
-1. **Web API** — RESTful service with Thymeleaf dashboard and OpenAPI docs
-2. **TUI/CLI** — Terminal UI application built on `tamboui` + `picocli` (via `cli-plugin`)
-3. **Actuator** — Spring Boot Actuator endpoints (via `actuator-plugin`)
+Firefly is a plugin-powered Spring Boot platform with **4 integrated plugins** + **embedded MCP server**:
 
-Core features (dashboard, terminal, swagger) are always available. Actuator and CLI are optional plugins.
+**Core (always-on):**
+- **Web Dashboard** — Thymeleaf HTML with plugin browser, system status, quick links
+- **Web Terminal** — xterm.js + pty4j WebSocket bridge for running the TUI
+- **REST API** — RESTful service with OpenAPI/Swagger documentation
+- **MCP Server** — Model Context Protocol embedded server for AI agent integration
+
+**Optional Plugins (drop-in runtime JAR loading):**
+1. **CLI Plugin** — Terminal UI (TamboUI) with 3-panel explorer, menus, search, output history
+2. **Actuator Plugin** — Spring Boot Actuator endpoints (health, metrics, info)
+3. **ADO Plugin** — Azure DevOps work item management and querying
+4. **MCP Registry Plugin** — MCP tool registry and UI for managing AI protocol services
+
+All plugins auto-load from `plugins/` directory with zero server restart.
 
 The project supports both JVM execution and GraalVM native-image compilation.
 
@@ -205,6 +214,40 @@ sunday are closed
 
 ---
 
+## Terminal UI (TUI) — 3-Panel Web Interface
+
+**Access:** `http://localhost:17922/terminal`
+
+The TUI runs in your browser via xterm.js connected to the server-side `cli-plugin` (TamboUI) over WebSocket.
+
+### Layout
+- **Left Panel** — Explorer with 4 brownable items:
+  - `firefly-core` — Core Spring Boot application
+  - `actuator-plugin` — Health, metrics, info endpoints
+  - `ado-plugin` — Azure DevOps integration
+  - `cli-plugin` — This TUI (TamboUI)
+- **Center Panel** — Main content view
+- **Right Panel** — Status indicators
+- **Output Panel (bottom)** — Command history (up to 200 lines)
+
+### Controls
+| Key | Action |
+|-----|--------|
+| `Ctrl+/` | Toggle search mode |
+| `↑/↓` | Navigate explorer/menus |
+| `Enter` | Select item / activate menu |
+| `Esc` | Close menu / exit search |
+| Mouse | Full mouse support (click, drag, scroll) |
+
+### Features
+- **Menu System** — File, Edit, View menus
+- **Toolbar** — RUN, BUILD, TEST, SEARCH action buttons
+- **Search Filter** — Type to filter explorer items in real-time
+- **Dark Theme** — Configurable appearance toggle
+- **Responsive** — Adapts to terminal window size
+
+---
+
 ## Coding Conventions
 
 - **Package**: `ai.firefly.*` for all application code
@@ -284,6 +327,26 @@ Firefly supports runtime plugin loading via Spring Boot's `PropertiesLauncher`. 
 - **Properties prefix**: `firefly.plugin.ado.*`
 - **Auto-config**: `AdoPluginAutoConfiguration` registers beans via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`
 - **REST endpoints**: `/api/ado/*` — see README.md for full endpoint list
+
+### MCP Registry Plugin (`plugins/mcp-registry-plugin/`)
+
+**Model Context Protocol (MCP)** server for AI agent integration.
+
+- **Build**: `cd plugins/mcp-registry-plugin && mvn clean package`
+- **Install**: `cp target/mcp-registry-plugin-1.0.0.jar ../../plugins/`
+- **Properties prefix**: `firefly.plugin.mcp-registry.*`
+- **Storage**: JSON file-based registry (persisted to disk)
+- **Auto-config**: `McpRegistryAutoConfiguration` via `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`
+- **REST endpoints**:
+  - `GET /api/mcp/tools` — List registered MCP tools
+  - `GET /api/mcp/registry` — Get registry state
+  - `GET /pages/mcp-registry` — Web UI for MCP registry management
+- **Embedded MCP Tools**:
+  - `ListPlugins(namespace)` — Discover installed plugins
+  - `DashboardHealth()` — Real-time system status
+  - `ActuatorData(endpoint)` — Fetch metrics/health/info
+  - `ListActuatorEndpoints()` — Browse available endpoints
+- **Web Dashboard Integration**: MCP tools are listed on the dashboard homepage under "Model Context Protocol (MCP)" section
 
 ---
 

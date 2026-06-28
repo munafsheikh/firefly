@@ -1,6 +1,12 @@
 # Firefly
 
-A Java TUI with TamboUI, Thymeleaf + Spring Boot, RabbitMQ, Redis, Oracle DB, Bash, AI and Azure DevOps integration.
+Plugin-powered Spring Boot platform with web dashboard, terminal UI, REST API, OpenAPI docs, system health monitoring, and Model Context Protocol (MCP) integration for AI agents.
+
+**Live Demo:** Start the app and visit:
+- **Dashboard** → `http://localhost:17922`
+- **Terminal UI (TUI)** → `http://localhost:17922/terminal` (3-panel TamboUI interface)
+- **Swagger API Docs** → `http://localhost:17922/swagger-ui.html`
+- **Actuator Health** → `http://localhost:17922/actuator`
 
 ## Quick Start
 
@@ -14,19 +20,28 @@ A Java TUI with TamboUI, Thymeleaf + Spring Boot, RabbitMQ, Redis, Oracle DB, Ba
 ### Option 1: Docker Compose (recommended)
 
 ```bash
+# Build everything
+./scripts/build.sh
+
+# Run the app
+docker compose up app --build
+```
+
+Or step-by-step:
+```bash
 # Build the core app (runs unit tests as part of `mvn install`)
 docker compose --profile build run --rm app-build
 
 # Build all plugins
 docker compose --profile build run --rm plugin-build
 
-# Run the app
+# Run the app (exposes port 17922)
 docker compose up app --build
 ```
 
-The application is exposed on **port 17922**. See `AGENTS.md` for the full table of Compose profiles (build/verify/plugin/showcase) and how they map to CI.
+**First run only:** Plugins must be built and copied to `plugins/` directory. The build script does this automatically.
 
-**Plugins:** Drop built plugin JARs into the `plugins/` directory before starting. These are mounted read-only into the container and loaded at runtime via Spring Boot's `PropertiesLauncher`.
+The application is exposed on **port 17922**. See `AGENTS.md` for full Compose profile reference (build/verify/plugin/showcase/native).
 
 ### Option 2: Maven (JVM) — local alternative
 
@@ -75,6 +90,48 @@ mvn clean package
 cp plugins/ado-plugin/target/ado-plugin-1.0.0.jar plugins/
 ```
 
+### MCP Registry Plugin
+
+Embedded Model Context Protocol server for AI agent integration.
+
+**Build (Docker):**
+```bash
+docker compose --profile build run --rm plugin-build
+```
+
+**Endpoints exposed when plugin is active:**
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/mcp/tools` | GET | List registered MCP tools |
+| `/api/mcp/registry` | GET | Get MCP registry state |
+| `/pages/mcp-registry` | GET | Web UI for MCP registry |
+
+**MCP Tools Exposed:**
+- `ListPlugins` — List installed Firefly plugins
+- `DashboardHealth` — Get real-time system health status
+- `ActuatorData` — Fetch metrics, health, application info
+- `ListActuatorEndpoints` — Browse available actuator endpoints
+
+### Azure DevOps Plugin
+
+The ADO plugin connects Firefly to Azure DevOps for work item management.
+
+**Build (Docker):**
+```bash
+docker compose --profile build run --rm plugin-build
+```
+
+**Build (local Maven alternative):**
+```bash
+cd plugins/ado-plugin
+mvn clean package
+```
+
+**Install:**
+```bash
+cp plugins/ado-plugin/target/ado-plugin-1.0.0.jar plugins/
+```
+
 **Configure:** Copy `plugins/ado-plugin.yaml` to `plugins/ado-plugin.yaml` and set your values, or use environment variables:
 ```yaml
 firefly:
@@ -100,27 +157,71 @@ firefly:
 | `POST /api/ado/bugs` | Create a bug |
 | `GET /api/ado/projects` | List projects |
 
-## Endpoints
+## Core Endpoints
 
 | Endpoint | Description |
 |----------|-------------|
-| `http://localhost:17922` | Main web application |
-| `http://localhost:17922/terminal.html` | Web terminal (xterm.js) |
-| `ws://localhost:17922/ws/terminal` | WebSocket for terminal PTY |
+| `GET /` | Dashboard — installed plugins, system status, quick links |
+| `GET /terminal` | Web terminal UI (xterm.js + pty4j) with TUI (TamboUI) |
+| `GET /swagger-ui.html` | OpenAPI/Swagger interactive API documentation |
+| `GET /v3/api-docs` | OpenAPI specification (JSON) |
+| `GET /actuator` | Spring Boot Actuator endpoints (if plugin loaded) |
+| `WS /ws/terminal` | WebSocket bridge for terminal PTY |
+
+## Dashboard Info Panel
+
+The dashboard homepage displays:
+- **What Can You Do?** — introduction to Firefly capabilities
+- **API & Documentation** — links to Swagger UI and OpenAPI JSON
+- **Interfaces** — web terminal and dashboard links
+- **Model Context Protocol (MCP)** — embedded MCP server exposing 4 AI-ready tools:
+  - `ListPlugins` — discover installed plugins
+  - `DashboardHealth` — real-time system status
+  - `ActuatorData` — fetch metrics, health, info
+  - `ListActuatorEndpoints` — browse actuator endpoints
+- **Features** — status of REST API, Web Terminal, Actuator, MCP, Plugin System
+- **Installed Plugins** — table of loaded plugins with metadata
+- **Actuator Endpoints** — clickable endpoints if Actuator plugin is active
+
+## Terminal UI (TUI) — Web-Based 3-Panel Interface
+
+Access at **`http://localhost:17922/terminal`** (runs in your browser).
+
+**Features:**
+- **Left Panel (Explorer)** — Browse installed plugins (firefly-core, actuator-plugin, ado-plugin, cli-plugin)
+- **Center Panel** — Main content area
+- **Right Panel (Status)** — System status indicators
+- **Search Mode** (Ctrl+/) — Filter explorer items
+- **Menu System** — File, Edit, View menus
+- **Toolbar** — RUN, BUILD, TEST, SEARCH actions
+- **Output Panel** — Command history (up to 200 lines)
+- **Dark Theme Toggle** — Configurable appearance
+- **Full Mouse Support** — Click menus, drag, select
+
+Built with **TamboUI** (terminal UI framework) + **picocli** (command-line interface).
 
 ## Project Structure
 
 ```
 src/main/java/ai/firefly/
 ├── FireflyApplication.java
-├── cli/
-│   └── FireflyCommand.java          # TUI entry point
-└── terminal/                         # Web terminal component (auto-detected)
+├── dashboard/                        # Web dashboard (Thymeleaf)
+│   ├── DashboardController.java
+│   ├── DashboardService.java
+│   └── PluginInfo.java
+└── terminal/                         # Web terminal component (xterm.js + pty4j)
     ├── TerminalAutoConfiguration.java
     ├── TerminalController.java
     ├── TerminalProperties.java
     ├── TerminalService.java
     └── TerminalWebSocketHandler.java
+
+plugins/
+├── cli-plugin/                       # TUI app (tamboui + picocli)
+│   └── FireflyCommand.java
+├── actuator-plugin/                  # Spring Boot Actuator endpoints
+├── ado-plugin/                       # Azure DevOps integration
+└── mcp-registry-plugin/              # Model Context Protocol registry
 ```
 
 ## Tech Stack
@@ -129,9 +230,13 @@ src/main/java/ai/firefly/
 |-------|-----------|
 | Language | Java 25 |
 | Framework | Spring Boot 4.0.6 |
-| TUI | tamboui + jline3 + picocli |
-| Native | GraalVM CE 25.0.2 |
-| Terminal | xterm.js + WebSocket + pty4j |
+| Web Dashboard | Thymeleaf (server-side templates) |
+| Terminal UI (TUI) | TamboUI + jline3 + picocli |
+| Web Terminal | xterm.js + WebSocket + pty4j |
+| AI Integration | Model Context Protocol (MCP) server |
+| Native Compilation | GraalVM CE 25.0.2 + native-maven-plugin |
+| API Docs | SpringDoc OpenAPI (Swagger UI) |
+| Testing | JUnit 5 + Playwright screenshot documentation |
 
 ## Configuration
 
