@@ -17,10 +17,53 @@
             width: 100%;
             height: 100%;
         }
+        .alert-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 400px;
+            pointer-events: none;
+        }
+        .alert {
+            pointer-events: auto;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: alertSlideIn 0.3s ease-out;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 0.9rem;
+        }
+        .alert-success { background: #1a3a2a; color: #c6f6d5; border-left: 4px solid #48bb78; }
+        .alert-info { background: #1a2a3a; color: #bee3f8; border-left: 4px solid #4299e1; }
+        .alert-warning { background: #2a2a1a; color: #fefcbf; border-left: 4px solid #ecc94b; }
+        .alert-error { background: #3a1a1a; color: #fed7d7; border-left: 4px solid #fc8181; }
+        .alert-icon { font-size: 1.1rem; flex-shrink: 0; line-height: 1; }
+        .alert-text { flex: 1; font-size: 0.9rem; line-height: 1.4; }
+        .alert-close { font-size: 1.2rem; opacity: 0.4; cursor: pointer; flex-shrink: 0; line-height: 1; }
+        .alert-close:hover { opacity: 1; }
+        @keyframes alertSlideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .alert.alert-dismissing {
+            animation: alertSlideOut 0.25s ease-in forwards;
+        }
+        @keyframes alertSlideOut {
+            to { transform: translateX(100%); opacity: 0; }
+        }
     </style>
 </head>
 <body>
     <div id="terminal"></div>
+    <div class="alert-container" id="alert-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
     <script>
@@ -43,38 +86,68 @@
         term.open(document.getElementById('terminal'));
         fitAddon.fit();
 
+        function fireflyDismissAlert(el) {
+            el.classList.add('alert-dismissing');
+            setTimeout(function() { if (el.parentNode) el.remove(); }, 250);
+        }
+
+        function fireflyShowAlert(type, message) {
+            var icons = { success: '\u2713', info: '\u2139', warning: '\u26A0', error: '\u2715' };
+            var c = document.getElementById('alert-container');
+            if (!c) return;
+            var el = document.createElement('div');
+            el.className = 'alert alert-' + type;
+            el.setAttribute('data-timeout', '5000');
+            el.onclick = function() { fireflyDismissAlert(el); };
+            el.innerHTML = '<span class="alert-icon">' + (icons[type] || '') + '</span>'
+                + '<span class="alert-text">' + message + '</span>'
+                + '<span class="alert-close" onclick="event.stopPropagation(); fireflyDismissAlert(this.parentNode)">\u00D7</span>';
+            c.appendChild(el);
+            setTimeout(function() {
+                if (el.parentNode) fireflyDismissAlert(el);
+            }, 5000);
+        }
+
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = protocol + '//' + window.location.host + '/ws/terminal';
         const socket = new WebSocket(wsUrl);
 
-        socket.onopen = () => {
+        socket.onopen = function() {
             term.writeln('\x1b[32mConnected to Firefly terminal\x1b[0m');
+            fireflyShowAlert('success', 'Terminal connected');
             sendResize();
         };
 
-        socket.onmessage = (event) => {
-            term.write(event.data);
+        socket.onmessage = function(event) {
+            var data = event.data;
+            if (data.charCodeAt(0) === 0x02) {
+                var msg = JSON.parse(data.substring(1));
+                if (msg.type === 'alert') {
+                    fireflyShowAlert(msg.level, msg.message);
+                }
+            } else {
+                term.write(data);
+            }
         };
 
-        socket.onclose = () => {
+        socket.onclose = function() {
             term.writeln('\x1b[31mTerminal connection closed\x1b[0m');
+            fireflyShowAlert('error', 'Terminal disconnected');
         };
 
-        socket.onerror = (err) => {
+        socket.onerror = function(err) {
             term.writeln('\x1b[31mTerminal connection error\x1b[0m');
+            fireflyShowAlert('error', 'Terminal connection error');
             console.error('WebSocket error:', err);
         };
 
-        term.onData((data) => {
+        term.onData(function(data) {
             if (socket.readyState === WebSocket.OPEN) {
                 socket.send(data);
             }
         });
 
-        // Browsers move focus away from the terminal on Tab by default, which
-        // means the keystroke never reaches xterm. Intercept it ourselves and
-        // forward Tab / Shift+Tab as terminal input instead of letting it escape.
-        term.attachCustomKeyEventHandler((event) => {
+        term.attachCustomKeyEventHandler(function(event) {
             if (event.key === 'Tab' && event.type === 'keydown') {
                 event.preventDefault();
                 if (socket.readyState === WebSocket.OPEN) {
@@ -87,19 +160,18 @@
 
         function sendResize() {
             if (socket.readyState === WebSocket.OPEN) {
-                const dims = fitAddon.proposeDimensions();
+                var dims = fitAddon.proposeDimensions();
                 if (dims) {
                     socket.send('\x01' + dims.cols + ',' + dims.rows);
                 }
             }
         }
 
-        window.addEventListener('resize', () => {
+        window.addEventListener('resize', function() {
             fitAddon.fit();
             sendResize();
         });
 
-        // Initial resize after a short delay to ensure terminal is ready
         setTimeout(sendResize, 100);
     </script>
 </body>

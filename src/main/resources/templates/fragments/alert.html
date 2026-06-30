@@ -1,0 +1,86 @@
+<div th:fragment="alerts">
+    <style>
+        .alert-container {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 400px;
+            pointer-events: none;
+        }
+        .alert {
+            pointer-events: auto;
+            padding: 0.875rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: alertSlideIn 0.3s ease-out;
+            cursor: pointer;
+        }
+        .alert-success { background: #c6f6d5; color: #22543d; border-left: 4px solid #48bb78; }
+        .alert-info { background: #bee3f8; color: #2a4365; border-left: 4px solid #4299e1; }
+        .alert-warning { background: #fefcbf; color: #744210; border-left: 4px solid #ecc94b; }
+        .alert-error { background: #fed7d7; color: #742a2a; border-left: 4px solid #fc8181; }
+        .alert-icon { font-size: 1.1rem; flex-shrink: 0; line-height: 1; }
+        .alert-text { flex: 1; font-size: 0.9rem; line-height: 1.4; }
+        .alert-close { font-size: 1.2rem; opacity: 0.4; cursor: pointer; flex-shrink: 0; line-height: 1; transition: opacity 0.15s; }
+        .alert-close:hover { opacity: 1; }
+        @keyframes alertSlideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .alert.alert-dismissing {
+            animation: alertSlideOut 0.25s ease-in forwards;
+        }
+        @keyframes alertSlideOut {
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+    <script>
+        function fireflyDismissAlert(el) {
+            el.classList.add('alert-dismissing');
+            setTimeout(function() { if (el.parentNode) el.remove(); }, 250);
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('#alert-container > .alert').forEach(function(el) {
+                var t = parseInt(el.getAttribute('data-timeout') || '5000');
+                if (t > 0) {
+                    setTimeout(function() {
+                        if (el.parentNode) fireflyDismissAlert(el);
+                    }, t);
+                }
+            });
+        });
+        function fireflyShowAlert(type, message) {
+            var icons = { success: '\u2713', info: '\u2139', warning: '\u26A0', error: '\u2715' };
+            var c = document.getElementById('alert-container');
+            if (!c) return;
+            var el = document.createElement('div');
+            el.className = 'alert alert-' + type;
+            el.setAttribute('data-timeout', '5000');
+            el.onclick = function() { fireflyDismissAlert(el); };
+            el.innerHTML = '<span class="alert-icon">' + (icons[type] || '') + '</span>'
+                + '<span class="alert-text">' + message + '</span>'
+                + '<span class="alert-close" onclick="event.stopPropagation(); fireflyDismissAlert(this.parentNode)">\u00D7</span>';
+            c.appendChild(el);
+            setTimeout(function() {
+                if (el.parentNode) fireflyDismissAlert(el);
+            }, 5000);
+        }
+    </script>
+    <div class="alert-container" id="alert-container">
+        <div th:each="alert : ${alerts}"
+             th:class="'alert alert-' + ${alert.type}"
+             data-timeout="5000"
+             onclick="fireflyDismissAlert(this)">
+            <span class="alert-icon" th:text="${alert.type == 'success' ? '✓' : alert.type == 'info' ? 'ℹ' : alert.type == 'warning' ? '⚠' : '✕'}"></span>
+            <span class="alert-text" th:text="${alert.message}">alert message</span>
+            <span class="alert-close" onclick="event.stopPropagation(); fireflyDismissAlert(this.parentNode)">×</span>
+        </div>
+    </div>
+</div>

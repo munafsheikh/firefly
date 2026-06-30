@@ -123,6 +123,7 @@
     </style>
 </head>
 <body>
+    <div th:replace="~{fragments/alert :: alerts}"></div>
     <div class="container">
         <header>
             <h1>🔥 Firefly — Plugin-Powered Spring Boot Platform</h1>
@@ -237,6 +238,17 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="card" style="margin-bottom:1.5rem;">
+            <h2>🔔 Alert Balloons</h2>
+            <p style="margin-bottom:1rem;color:#718096;font-size:0.9rem;">Click buttons to test different alert notification types. Alerts auto-dismiss after 5 seconds.</p>
+            <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                <button onclick="fireflyShowAlert('success','Operation completed successfully — all systems nominal')" style="padding:0.6rem 1.2rem;border:none;border-radius:8px;background:#48bb78;color:white;font-weight:600;cursor:pointer;font-size:0.85rem;">Success</button>
+                <button onclick="fireflyShowAlert('info','New update available: version 0.1.0 is ready for deployment')" style="padding:0.6rem 1.2rem;border:none;border-radius:8px;background:#4299e1;color:white;font-weight:600;cursor:pointer;font-size:0.85rem;">Info</button>
+                <button onclick="fireflyShowAlert('warning','Disk usage at 85% — consider cleaning up old plugin artifacts')" style="padding:0.6rem 1.2rem;border:none;border-radius:8px;background:#ecc94b;color:#744210;font-weight:600;cursor:pointer;font-size:0.85rem;">Warning</button>
+                <button onclick="fireflyShowAlert('error','Failed to connect to ADO service — check network and credentials')" style="padding:0.6rem 1.2rem;border:none;border-radius:8px;background:#fc8181;color:white;font-weight:600;cursor:pointer;font-size:0.85rem;">Error</button>
+            </div>
         </div>
 
         <div class="card" th:if="${actuatorAvailable}">

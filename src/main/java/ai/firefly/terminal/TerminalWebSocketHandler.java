@@ -14,6 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class TerminalWebSocketHandler extends TextWebSocketHandler {
 
+    private static final char CONTROL_PREFIX = '\u0002';
+
     private final TerminalService terminalService;
     private final Map<String, TerminalService.PtySession> sessions = new ConcurrentHashMap<>();
 
@@ -24,17 +26,23 @@ public class TerminalWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
         String id = session.getId();
-        TerminalService.PtySession ptySession = terminalService.createSession(data -> {
-            try {
-                if (session.isOpen()) {
-                    session.sendMessage(new TextMessage(data));
+        try {
+            TerminalService.PtySession ptySession = terminalService.createSession(data -> {
+                try {
+                    if (session.isOpen()) {
+                        session.sendMessage(new TextMessage(data));
+                    }
+                } catch (IOException e) {
+                    log.debug("Failed to send message to session {}", id);
                 }
-            } catch (IOException e) {
-                log.debug("Failed to send message to session {}", id);
-            }
-        });
-        sessions.put(id, ptySession);
-        log.info("WebSocket terminal session established: {}", id);
+            });
+            sessions.put(id, ptySession);
+            log.info("WebSocket terminal session established: {}", id);
+            sendAlert(session, "success", "Terminal session started");
+        } catch (Exception e) {
+            log.warn("Failed to establish terminal session: {}", e.getMessage());
+            sendAlert(session, "error", "Failed to start terminal: " + e.getMessage());
+        }
     }
 
     @Override
@@ -46,7 +54,6 @@ public class TerminalWebSocketHandler extends TextWebSocketHandler {
         }
 
         if (payload.startsWith("\u0001")) {
-            // Control sequence: resize
             String[] parts = payload.substring(1).split(",");
             if (parts.length == 2) {
                 try {
@@ -70,5 +77,24 @@ public class TerminalWebSocketHandler extends TextWebSocketHandler {
             ptySession.close();
         }
         log.info("WebSocket terminal session closed: {} (status={})", id, status);
+    }
+
+    private void sendAlert(WebSocketSession session, String level, String message) {
+        try {
+            String json = CONTROL_PREFIX + "{\"type\":\"alert\",\"level\":\"" + level + "\",\"message\":\"" + escapeJson(message) + "\"}";
+            if (session.isOpen()) {
+                session.sendMessage(new TextMessage(json));
+            }
+        } catch (IOException e) {
+            log.debug("Failed to send alert to session {}", session.getId());
+        }
+    }
+
+    private static String escapeJson(String s) {
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 }

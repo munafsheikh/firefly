@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -30,6 +31,11 @@ public class DashboardController {
         model.addAttribute("actuatorLinks", actuatorLinks);
         model.addAttribute("swaggerAvailable", true);
         model.addAttribute("terminalAvailable", true);
+
+        model.addAttribute("alerts", List.of(
+                AlertMessage.info("Welcome to Firefly — system is running smoothly"),
+                AlertMessage.success("All plugins loaded successfully")
+        ));
 
         return "dashboard";
     }
