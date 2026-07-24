@@ -19,6 +19,10 @@ import java.util.Scanner;
  * Env vars:
  *   OLLAMA_HOST   default http://ollama:11434  (docker-compose service name)
  *   OLLAMA_MODEL  default qwen2.5-coder:7b
+ *
+ * When invoked from review-gate.yml, the calling workflow must grant
+ * `permissions: pull-requests: write` — the PR-comment step needs it and
+ * the default GITHUB_TOKEN is read-only otherwise.
  */
 public class ReviewGate {
 
