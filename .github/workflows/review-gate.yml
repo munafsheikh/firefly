@@ -9,6 +9,12 @@ on:
     paths:
       - '**/*.java'
 
+# actions/github-script needs write access to list/create/update PR comments;
+# the default GITHUB_TOKEN is read-only unless declared here.
+permissions:
+  contents: read
+  pull-requests: write
+
 # Cancel superseded runs when new commits land on the same PR.
 concurrency:
   group: review-gate-${{ github.event.pull_request.number }}
