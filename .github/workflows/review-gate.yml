@@ -1,0 +1,115 @@
+name: Local SLM Review Gate
+
+# First-pass code review on every PR touching Java, run entirely inside the
+# runner (no external API calls, no cost). Blocks merge on BLOCK-severity
+# findings; posts results as a PR comment either way.
+
+on:
+  pull_request:
+    paths:
+      - '**/*.java'
+
+# actions/github-script needs write access to list/create/update PR comments;
+# the default GITHUB_TOKEN is read-only unless declared here.
+permissions:
+  contents: read
+  pull-requests: write
+
+# Cancel superseded runs when new commits land on the same PR.
+concurrency:
+  group: review-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review-gate:
+    runs-on: ubuntu-latest
+    services:
+      ollama:
+        image: ollama/ollama:latest
+        ports:
+          - 11434:11434
+    env:
+      OLLAMA_HOST: http://localhost:11434
+      # 1.5b for CI speed on a CPU-only runner. Bump to qwen2.5-coder:7b
+      # (matches the local docker-compose default) if you move this to a
+      # self-hosted runner with more RAM/CPU or a GPU.
+      OLLAMA_MODEL: qwen2.5-coder:1.5b
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Wait for Ollama
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:11434/api/tags > /dev/null; then
+              echo "Ollama is up."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Ollama did not become healthy in time." >&2
+          exit 1
+
+      - name: Pull review model
+        run: |
+          curl -sf http://localhost:11434/api/pull \
+            -d "{\"name\": \"${OLLAMA_MODEL}\"}"
+
+      - name: Compute PR diff
+        run: |
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          git diff "origin/${{ github.base_ref }}"...HEAD -- '*.java' > pr.diff
+          echo "Diff lines: $(wc -l < pr.diff)"
+
+      - name: Run ReviewGate
+        id: review
+        continue-on-error: true
+        run: |
+          java tools/review-gate/ReviewGate.java < pr.diff > review-output.txt 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat review-output.txt
+
+      - name: Post review as PR comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('review-output.txt', 'utf8');
+            const marker = '<!-- review-gate -->';
+            const commentBody = `${marker}\n### 🔍 Local SLM Review Gate\n\n\`\`\`\n${body}\n\`\`\`\n`;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: commentBody,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody,
+              });
+            }
+
+      - name: Enforce gate
+        if: steps.review.outputs.exit_code == '1'
+        run: |
+          echo "Blocked by ReviewGate — see PR comment for details." >&2
+          exit 1
