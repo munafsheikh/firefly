@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 public class ScreenshotDocumentationExtension implements AfterTestExecutionCallback {
 
     private static final Logger LOG = Logger.getLogger(ScreenshotDocumentationExtension.class.getName());
-    private static final Path OUTPUT_ROOT = Path.of("target", "test-screenshots");
+    private static final Path OUTPUT_ROOT = Path.of("docs", "screenshots");
     private static final ExtensionContext.Namespace NAMESPACE =
             ExtensionContext.Namespace.create(ScreenshotDocumentationExtension.class);
 
@@ -69,9 +69,11 @@ public class ScreenshotDocumentationExtension implements AfterTestExecutionCallb
         try (Page page = browser.newPage()) {
             page.navigate(baseUrl + relativePath);
             try {
-                page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE);
+                // 3 s cap: WebSocket-backed pages (terminal) never reach NETWORKIDLE, so we don't wait forever.
+                page.waitForLoadState(com.microsoft.playwright.options.LoadState.NETWORKIDLE,
+                        new Page.WaitForLoadStateOptions().setTimeout(3000));
             } catch (Exception networkNeverIdle) {
-                // Best-effort: some pages (e.g. WebSocket-backed terminal) never go idle; capture as-is.
+                // Expected for pages with persistent connections (terminal, live-reload, etc.).
             }
             Path dir = OUTPUT_ROOT.resolve(testClass);
             java.nio.file.Files.createDirectories(dir);

@@ -44,4 +44,21 @@ class DashboardScreenshotTests {
 
         assertTrue(success);
     }
+
+    @Test
+    @DocScreenshot(paths = {"/terminal"})
+    void terminalPageRenders() {
+        // The terminal forwards to the static terminal.html page with xterm.js.
+        // In the test environment no CLI plugin JAR is present, so the WebSocket PTY
+        // connection will not establish — but the terminal shell/container still renders.
+        boolean success = RestClient.create()
+                .get()
+                .uri("http://localhost:{port}/terminal", port)
+                .retrieve()
+                .toBodilessEntity()
+                .getStatusCode()
+                .is2xxSuccessful();
+
+        assertTrue(success);
+    }
 }
