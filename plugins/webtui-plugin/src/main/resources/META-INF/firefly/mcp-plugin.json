@@ -1,0 +1,16 @@
+{
+  "skills": [
+    {
+      "name": "webtui-browse",
+      "description": "Navigate a headless Chromium page and capture rendered screenshots, with click/scroll/type/back/forward control"
+    }
+  ],
+  "servers": [
+    {
+      "name": "webtui-http",
+      "type": "http",
+      "target": "/api/webtui",
+      "description": "Local HTTP API driving the shared headless-browser session"
+    }
+  ]
+}

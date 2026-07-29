@@ -5,11 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Firefly Dashboard</title>
     <style>
+        :root {
+            --firefly-bg: #f5f7fa;
+            --firefly-surface: #ffffff;
+            --firefly-text: #2d3748;
+            --firefly-text-muted: #4a5568;
+            --firefly-border: #e2e8f0;
+            --firefly-accent: #667eea;
+            --firefly-accent-2: #764ba2;
+            --firefly-header-text: #ffffff;
+            --firefly-link-list-bg: #edf2f7;
+            --firefly-link-list-bg-hover: #e2e8f0;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #f5f7fa;
-            color: #2d3748;
+            background: var(--firefly-bg);
+            color: var(--firefly-text);
             line-height: 1.6;
         }
         .container {
@@ -18,8 +30,8 @@
             padding: 2rem;
         }
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--firefly-accent) 0%, var(--firefly-accent-2) 100%);
+            color: var(--firefly-header-text);
             padding: 2rem;
             border-radius: 12px;
             margin-bottom: 2rem;
@@ -34,17 +46,17 @@
             margin-bottom: 2rem;
         }
         .card {
-            background: white;
+            background: var(--firefly-surface);
             border-radius: 12px;
             padding: 1.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--firefly-border);
         }
         .card h2 {
             font-size: 1.25rem;
             margin-bottom: 1rem;
-            color: #4a5568;
-            border-bottom: 2px solid #e2e8f0;
+            color: var(--firefly-text-muted);
+            border-bottom: 2px solid var(--firefly-border);
             padding-bottom: 0.5rem;
         }
         .link-list {
@@ -57,20 +69,20 @@
             display: flex;
             align-items: center;
             padding: 0.75rem 1rem;
-            background: #edf2f7;
+            background: var(--firefly-link-list-bg);
             border-radius: 8px;
             text-decoration: none;
-            color: #4a5568;
+            color: var(--firefly-text-muted);
             transition: all 0.2s;
         }
         .link-list a:hover {
-            background: #e2e8f0;
+            background: var(--firefly-link-list-bg-hover);
             transform: translateX(4px);
         }
         .link-list a::before {
             content: "→";
             margin-right: 0.75rem;
-            color: #667eea;
+            color: var(--firefly-accent);
             font-weight: bold;
         }
         table {
@@ -81,14 +93,34 @@
         th, td {
             text-align: left;
             padding: 0.75rem;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid var(--firefly-border);
         }
         th {
             font-weight: 600;
-            color: #4a5568;
-            background: #f7fafc;
+            color: var(--firefly-text-muted);
+            background: var(--firefly-bg);
         }
-        tr:hover { background: #f7fafc; }
+        tr:hover { background: var(--firefly-bg); }
+        .theme-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--firefly-link-list-bg);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        .theme-activate {
+            border: none;
+            border-radius: 6px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--firefly-accent);
+            color: var(--firefly-header-text);
+        }
+        .theme-activate:disabled { opacity: 0.6; cursor: default; }
         .badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -121,6 +153,7 @@
         }
         .endpoint-item a:hover { text-decoration: underline; }
     </style>
+    <link rel="stylesheet" href="/api/theme/active.css">
 </head>
 <body>
     <div th:replace="~{fragments/alert :: alerts}"></div>
@@ -251,6 +284,23 @@
             </div>
         </div>
 
+        <div class="card" style="margin-bottom:1.5rem;">
+            <h2>🎨 Themes</h2>
+            <p style="margin-bottom:1rem;color:#718096;font-size:0.9rem;">Installed themes (built-in, plus any theme plugin dropped into <code>plugins/</code>). Activating a theme applies immediately across this dashboard.</p>
+            <div th:each="theme : ${themes}" class="theme-card">
+                <div>
+                    <strong th:text="${theme.name}">Theme Name</strong>
+                    <span style="color:#718096;font-size:0.85rem;"> — v<span th:text="${theme.version}">1.0.0</span></span>
+                    <div style="color:#718096;font-size:0.85rem;" th:text="${theme.description}">Description</div>
+                </div>
+                <button class="theme-activate"
+                        th:text="${theme.id == activeThemeId} ? 'Active' : 'Activate'"
+                        th:disabled="${theme.id == activeThemeId}"
+                        th:attr="data-theme-id=${theme.id}"
+                        onclick="activateTheme(this.dataset.themeId)">Activate</button>
+            </div>
+        </div>
+
         <div class="card" th:if="${actuatorAvailable}">
             <h2>Actuator Endpoints</h2>
             <div th:if="${actuatorLinks.isEmpty()}" class="empty-state">
@@ -263,5 +313,20 @@
             </div>
         </div>
     </div>
+    <script th:inline="none">
+        async function activateTheme(themeId) {
+            try {
+                const res = await fetch('/api/theme/' + encodeURIComponent(themeId), { method: 'POST' });
+                if (!res.ok) {
+                    const body = await res.json().catch(() => ({}));
+                    fireflyShowAlert('error', 'Failed to activate theme: ' + (body.error || res.statusText));
+                    return;
+                }
+                location.reload();
+            } catch (e) {
+                fireflyShowAlert('error', 'Failed to activate theme: ' + e);
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Firefly — Markdown Plugin</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.25rem 2rem;
+        }
+        header h1 { font-size: 1.5rem; }
+        a.back { color: white; text-decoration: none; opacity: 0.85; font-size: 0.9rem; }
+        .layout {
+            flex: 1;
+            display: flex;
+            min-height: 0;
+            padding: 1.5rem;
+            gap: 1.5rem;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            padding: 1rem;
+        }
+        .sidebar h2 { font-size: 0.95rem; margin-bottom: 0.75rem; color: #4a5568; }
+        .sidebar .actions { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+        #file-tree { flex: 1; overflow-y: auto; font-size: 0.85rem; }
+        #file-tree ul { list-style: none; padding-left: 1rem; }
+        #file-tree > ul { padding-left: 0; }
+        #file-tree li { padding: 0.15rem 0; }
+        #file-tree .dir-name { color: #4a5568; font-weight: 600; }
+        #file-tree .file-name {
+            cursor: pointer;
+            color: #4c51bf;
+            border-radius: 4px;
+            padding: 0.15rem 0.35rem;
+            display: inline-block;
+        }
+        #file-tree .file-name:hover { background: #edf2f7; }
+        #file-tree .file-name.active { background: #667eea; color: white; }
+        .empty-hint { color: #a0aec0; font-size: 0.85rem; padding: 0.5rem 0; }
+
+        .editor-area { flex: 1; min-width: 0; }
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .toolbar #current-path { flex: 1; font-size: 0.9rem; color: #4a5568; overflow-wrap: anywhere; }
+        .toolbar #current-path.placeholder { color: #a0aec0; font-style: italic; }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        button:hover { background: #5a67d8; }
+        button:disabled { background: #cbd5e0; cursor: not-allowed; }
+        button.danger { background: #e53e3e; }
+        button.danger:hover { background: #c53030; }
+        button.secondary { background: #a0aec0; }
+        button.secondary:hover { background: #718096; }
+
+        .panes { flex: 1; display: flex; min-height: 0; }
+        .pane { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .pane + .pane { border-left: 1px solid #e2e8f0; }
+        .pane-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #a0aec0;
+            padding: 0.5rem 1rem 0;
+        }
+        #editor {
+            flex: 1;
+            border: none;
+            resize: none;
+            padding: 1rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+        }
+        #preview {
+            flex: 1;
+            overflow: auto;
+            padding: 1rem 1.5rem;
+        }
+        #preview h1, #preview h2, #preview h3 { margin: 1rem 0 0.5rem; }
+        #preview p { margin: 0.5rem 0; }
+        #preview code {
+            background: #f7fafc;
+            padding: 0.1rem 0.35rem;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+        #preview pre {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        #preview pre code { background: none; padding: 0; }
+        #preview table { border-collapse: collapse; margin: 0.5rem 0; }
+        #preview th, #preview td { border: 1px solid #e2e8f0; padding: 0.4rem 0.6rem; }
+        #preview blockquote { border-left: 3px solid #cbd5e0; padding-left: 1rem; color: #4a5568; margin: 0.5rem 0; }
+
+        #status { font-size: 0.8rem; color: #a0aec0; padding: 0.25rem 1rem 0.75rem; min-height: 1.2em; }
+        #status.error { color: #c53030; }
+        #status.success { color: #2f855a; }
+
+        @media (max-width: 900px) {
+            .layout { flex-direction: column; }
+            .sidebar { width: auto; }
+            .panes { flex-direction: column; }
+            .pane + .pane { border-left: none; border-top: 1px solid #e2e8f0; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a class="back" href="/">&larr; Dashboard</a>
+        <h1>Markdown Plugin</h1>
+    </header>
+
+    <div class="layout">
+        <div class="card sidebar">
+            <h2>Files</h2>
+            <div class="actions">
+                <button id="new-file-btn" style="flex:1;">New file</button>
+                <button id="refresh-btn" class="secondary" title="Refresh file list">&#8635;</button>
+            </div>
+            <div id="file-tree"><div class="empty-hint">Loading&hellip;</div></div>
+        </div>
+
+        <div class="card editor-area">
+            <div class="toolbar">
+                <span id="current-path" class="placeholder">No file selected</span>
+                <button id="save-btn" disabled>Save</button>
+                <button id="delete-btn" class="danger" disabled>Delete</button>
+            </div>
+            <div id="status"></div>
+            <div class="panes">
+                <div class="pane">
+                    <div class="pane-label">Markdown</div>
+                    <textarea id="editor" placeholder="Select or create a file to start editing&hellip;" disabled></textarea>
+                </div>
+                <div class="pane">
+                    <div class="pane-label">Preview</div>
+                    <div id="preview"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="none">
+        const API = '/api/markdown';
+        let currentPath = null;
+        let previewTimer = null;
+
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        const currentPathEl = document.getElementById('current-path');
+        const saveBtn = document.getElementById('save-btn');
+        const deleteBtn = document.getElementById('delete-btn');
+        const statusEl = document.getElementById('status');
+        const fileTreeEl = document.getElementById('file-tree');
+
+        function encodePath(path) {
+            return path.split('/').map(encodeURIComponent).join('/');
+        }
+
+        function setStatus(message, kind) {
+            statusEl.textContent = message || '';
+            statusEl.className = kind || '';
+            if (message) {
+                clearTimeout(setStatus._t);
+                setStatus._t = setTimeout(() => { statusEl.textContent = ''; statusEl.className = ''; }, 4000);
+            }
+        }
+
+        function setCurrentPath(path) {
+            currentPath = path;
+            if (path) {
+                currentPathEl.textContent = path;
+                currentPathEl.classList.remove('placeholder');
+                saveBtn.disabled = false;
+                deleteBtn.disabled = false;
+                editor.disabled = false;
+            } else {
+                currentPathEl.textContent = 'No file selected';
+                currentPathEl.classList.add('placeholder');
+                saveBtn.disabled = true;
+                deleteBtn.disabled = true;
+                editor.disabled = true;
+            }
+            document.querySelectorAll('#file-tree .file-name').forEach(el => {
+                el.classList.toggle('active', el.dataset.path === path);
+            });
+        }
+
+        function buildTree(files) {
+            const root = {};
+            for (const f of files) {
+                const parts = f.path.split('/');
+                let node = root;
+                parts.forEach((part, i) => {
+                    if (i === parts.length - 1) {
+                        node.__files = node.__files || [];
+                        node.__files.push(f);
+                    } else {
+                        node.__dirs = node.__dirs || {};
+                        node.__dirs[part] = node.__dirs[part] || {};
+                        node = node.__dirs[part];
+                    }
+                });
+            }
+            return root;
+        }
+
+        function renderNode(node) {
+            const ul = document.createElement('ul');
+
+            const dirNames = node.__dirs ? Object.keys(node.__dirs).sort() : [];
+            for (const name of dirNames) {
+                const li = document.createElement('li');
+                const label = document.createElement('span');
+                label.className = 'dir-name';
+                label.textContent = '📁 ' + name;
+                li.appendChild(label);
+                li.appendChild(renderNode(node.__dirs[name]));
+                ul.appendChild(li);
+            }
+
+            const files = (node.__files || []).slice().sort((a, b) => a.path.localeCompare(b.path));
+            for (const f of files) {
+                const li = document.createElement('li');
+                const name = f.path.split('/').pop();
+                const span = document.createElement('span');
+                span.className = 'file-name';
+                span.textContent = '📄 ' + name;
+                span.dataset.path = f.path;
+                span.title = f.path + ' — ' + f.size + ' bytes';
+                span.addEventListener('click', () => openFile(f.path));
+                li.appendChild(span);
+                ul.appendChild(li);
+            }
+
+            return ul;
+        }
+
+        async function loadFileTree() {
+            fileTreeEl.innerHTML = '<div class="empty-hint">Loading&hellip;</div>';
+            try {
+                const res = await fetch(API + '/files');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const files = await res.json();
+                fileTreeEl.innerHTML = '';
+                if (!files.length) {
+                    fileTreeEl.innerHTML = '<div class="empty-hint">No .md files yet. Create one!</div>';
+                    return;
+                }
+                fileTreeEl.appendChild(renderNode(buildTree(files)));
+            } catch (e) {
+                fileTreeEl.innerHTML = '<div class="empty-hint">Failed to load files: ' + e.message + '</div>';
+            }
+        }
+
+        async function openFile(path) {
+            try {
+                const res = await fetch(API + '/files/' + encodePath(path));
+                if (!res.ok) {
+                    setStatus('Failed to open ' + path + ' (HTTP ' + res.status + ')', 'error');
+                    return;
+                }
+                const text = await res.text();
+                editor.value = text;
+                setCurrentPath(path);
+                schedulePreview();
+            } catch (e) {
+                setStatus('Failed to open ' + path + ': ' + e.message, 'error');
+            }
+        }
+
+        async function saveCurrentFile() {
+            if (!currentPath) return;
+            try {
+                const res = await fetch(API + '/files/' + encodePath(currentPath), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: editor.value
+                });
+                if (!res.ok) {
+                    setStatus('Save failed (HTTP ' + res.status + ')', 'error');
+                    return;
+                }
+                setStatus('Saved ' + currentPath, 'success');
+                loadFileTree();
+            } catch (e) {
+                setStatus('Save failed: ' + e.message, 'error');
+            }
+        }
+
+        async function deleteCurrentFile() {
+            if (!currentPath) return;
+            if (!confirm('Delete "' + currentPath + '"? This cannot be undone.')) return;
+            try {
+                const res = await fetch(API + '/files/' + encodePath(currentPath), { method: 'DELETE' });
+                if (!res.ok && res.status !== 204) {
+                    setStatus('Delete failed (HTTP ' + res.status + ')', 'error');
+                    return;
+                }
+                setStatus('Deleted ' + currentPath, 'success');
+                editor.value = '';
+                preview.innerHTML = '';
+                setCurrentPath(null);
+                loadFileTree();
+            } catch (e) {
+                setStatus('Delete failed: ' + e.message, 'error');
+            }
+        }
+
+        function newFile() {
+            const path = prompt('Path for the new file (relative to the markdown root), e.g. notes/todo.md');
+            if (!path) return;
+            const normalized = path.trim();
+            if (!normalized) return;
+            editor.value = '';
+            preview.innerHTML = '';
+            setCurrentPath(normalized);
+            editor.focus();
+            schedulePreview();
+        }
+
+        function schedulePreview() {
+            clearTimeout(previewTimer);
+            previewTimer = setTimeout(renderPreview, 400);
+        }
+
+        async function renderPreview() {
+            try {
+                const res = await fetch(API + '/preview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: editor.value
+                });
+                if (!res.ok) {
+                    preview.innerHTML = '<p style="color:#c53030;">Preview failed (HTTP ' + res.status + ')</p>';
+                    return;
+                }
+                preview.innerHTML = await res.text();
+            } catch (e) {
+                preview.innerHTML = '<p style="color:#c53030;">Preview failed: ' + e.message + '</p>';
+            }
+        }
+
+        editor.addEventListener('input', schedulePreview);
+        saveBtn.addEventListener('click', saveCurrentFile);
+        deleteBtn.addEventListener('click', deleteCurrentFile);
+        document.getElementById('new-file-btn').addEventListener('click', newFile);
+        document.getElementById('refresh-btn').addEventListener('click', loadFileTree);
+
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+                e.preventDefault();
+                saveCurrentFile();
+            }
+        });
+
+        loadFileTree();
+    </script>
+</body>
+</html>

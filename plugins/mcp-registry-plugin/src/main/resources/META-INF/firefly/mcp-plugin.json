@@ -1,0 +1,16 @@
+{
+  "skills": [
+    {
+      "name": "mcp-registry-lookup",
+      "description": "Register, list, and refresh externally-hosted MCP servers tracked by Firefly's registry"
+    }
+  ],
+  "servers": [
+    {
+      "name": "mcp-registry-api",
+      "type": "http",
+      "target": "/api/mcp-registry/mcps",
+      "description": "Local HTTP registry of external MCP servers known to this Firefly instance"
+    }
+  ]
+}

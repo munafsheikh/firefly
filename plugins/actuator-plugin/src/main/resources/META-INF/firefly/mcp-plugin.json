@@ -1,0 +1,16 @@
+{
+  "skills": [
+    {
+      "name": "actuator-health-check",
+      "description": "Query Spring Boot Actuator health, metrics, and info endpoints for this instance"
+    }
+  ],
+  "servers": [
+    {
+      "name": "actuator-http",
+      "type": "http",
+      "target": "/actuator",
+      "description": "Local actuator endpoints exposed as an MCP-accessible HTTP surface"
+    }
+  ]
+}

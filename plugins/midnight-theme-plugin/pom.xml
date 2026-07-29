@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.6</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>ai.firefly.plugin</groupId>
+    <artifactId>midnight-theme-plugin</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Firefly Midnight Theme Plugin</name>
+    <description>A dark theme plugin for the Firefly dashboard — no Java code, just a bundled CSS override</description>
+    <url>https://github.com/munafsheikh/firefly/tree/main/plugins/midnight-theme-plugin</url>
+
+    <scm>
+        <connection>scm:git:git@github.com:munafsheikh/firefly.git</connection>
+        <developerConnection>scm:git:git@github.com:munafsheikh/firefly.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/munafsheikh/firefly</url>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/munafsheikh/firefly</url>
+        </repository>
+    </distributionManagement>
+
+    <properties>
+        <java.version>25</java.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <tagNameFormat>midnight-theme-plugin-@{project.version}</tagNameFormat>
+                    <pushChanges>false</pushChanges>
+                    <localCheckout>true</localCheckout>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

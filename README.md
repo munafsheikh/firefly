@@ -1,6 +1,6 @@
 # Firefly
 
-Plugin-powered Spring Boot platform with web dashboard, terminal UI, REST API, OpenAPI docs, system health monitoring, and Model Context Protocol (MCP) integration for AI agents.
+Plugin-powered Spring Boot platform with web dashboard, terminal UI, REST API, OpenAPI docs, system health monitoring, a pluggable theme system, and Model Context Protocol (MCP) integration for AI agents.
 
 **Live Demo:** Start the app and visit:
 - **Dashboard** → `http://localhost:17922`
@@ -144,7 +144,7 @@ Native image starts in ~61ms.
 
 ### MCP Registry Plugin
 
-Embedded Model Context Protocol server for AI agent integration.
+Registers external MCP servers, and groups plugin-contributed skills/MCP-server definitions into a tree (any plugin can bundle a `META-INF/firefly/mcp-plugin.json` manifest — see `actuator-plugin`, `ado-plugin`, `plantuml-plugin`, `markdown-plugin` for examples).
 
 **Build (Docker):**
 ```bash
@@ -154,15 +154,57 @@ docker compose --profile build run --rm plugin-build
 **Endpoints exposed when plugin is active:**
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/mcp/tools` | GET | List registered MCP tools |
-| `/api/mcp/registry` | GET | Get MCP registry state |
-| `/pages/mcp-registry` | GET | Web UI for MCP registry |
+| `/api/mcp-registry/mcps` | GET/POST | List/register external MCP servers |
+| `/api/mcp-registry/mcps/{id}` | GET/DELETE | Get/remove a registered MCP server |
+| `/api/mcp-registry/tree` | GET | Plugin-contributed skills/servers, grouped by plugin |
+| `/api/mcp-registry/tree/{pluginId}/config` | GET | Resolved config for one plugin's tree node (secrets masked) |
+| `/mcp-registry` | GET | Web UI — registered servers + the expandable plugin tree with a Settings panel |
 
-**MCP Tools Exposed:**
-- `ListPlugins` — List installed Firefly plugins
-- `DashboardHealth` — Get real-time system health status
-- `ActuatorData` — Fetch metrics, health, application info
-- `ListActuatorEndpoints` — Browse available actuator endpoints
+See `AGENTS.md` § MCP Registry Plugin for the manifest format and full detail.
+
+### Theme Manager + Theme Plugins
+
+Core-owned theme system (not a plugin) that discovers **theme plugins** — JARs bundling a `META-INF/firefly/theme.css` override, no Java code required — and serves the active one's CSS at `/api/theme/active.css`, linked from the dashboard so switching themes needs no rebuild. `midnight-theme-plugin` ships as a working example. Activate from the dashboard's "🎨 Themes" card, or `POST /api/theme/{id}`. See `AGENTS.md` § Theme Manager for the CSS custom-property contract.
+
+### PlantUML Plugin
+
+Bundles PlantUML and renders diagram source to SVG/PNG — no external PlantUML/Graphviz install needed.
+
+**Build (Docker):** `docker compose --profile build run --rm plugin-build`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/plantuml/render?format=svg\|png` | POST | Render raw PlantUML source (`text/plain` body) to an image |
+| `/api/plantuml/health` | GET | Plugin health check |
+| `/pages/plantuml` | GET | Web UI — source textarea + live preview |
+
+### Markdown Plugin
+
+Fully functional Markdown file editor scoped to a configured root directory (`firefly.plugin.markdown.root-dir`), with path-traversal-safe file operations.
+
+**Build (Docker):** `docker compose --profile build run --rm plugin-build`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/markdown/files` | GET | List `.md` files under the root |
+| `/api/markdown/files/**` | GET/PUT/DELETE | Read/write/delete one file |
+| `/api/markdown/preview` | POST | Render raw markdown to HTML |
+| `/api/markdown/health` | GET | Plugin health check |
+| `/pages/markdown` | GET | Web UI — file tree, editor, live preview |
+
+### WebTUI Browser Plugin
+
+A modern take on the 80s terminal browser (lynx/w3m) — drives headless Chromium server-side (Playwright) and serves the rendered page as a real PNG screenshot, so pages render with actual JS/CSS/images instead of ANSI-art approximations. Degrades gracefully (`browserAvailable: false`, clean 503s) wherever Chromium's native libraries aren't installed, rather than crashing.
+
+**Build (Docker):** `docker compose --profile build run --rm plugin-build`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/webtui/health` | GET | Plugin + browser-availability status |
+| `/api/webtui/navigate` | POST | Navigate the shared page (`{"url":...}`) |
+| `/api/webtui/screenshot` | GET | Current page as `image/png` |
+| `/api/webtui/click` \| `/scroll` \| `/type` \| `/back` \| `/forward` | POST | Drive the page |
+| `/pages/webtui` | GET | Web UI — URL bar, live screenshot, click/scroll/type controls |
 
 ### Azure DevOps Plugin
 
@@ -282,19 +324,27 @@ src/main/java/ai/firefly/
 │   ├── DashboardController.java
 │   ├── DashboardService.java
 │   └── PluginInfo.java
-└── terminal/                         # Web terminal component (xterm.js + pty4j)
-    ├── TerminalAutoConfiguration.java
-    ├── TerminalController.java
-    ├── TerminalProperties.java
-    ├── TerminalService.java
-    └── TerminalWebSocketHandler.java
+├── terminal/                         # Web terminal component (xterm.js + pty4j)
+│   ├── TerminalAutoConfiguration.java
+│   ├── TerminalController.java
+│   ├── TerminalProperties.java
+│   ├── TerminalService.java
+│   └── TerminalWebSocketHandler.java
+└── theme/                            # Theme manager (scans plugins/*.jar for theme.css)
+    ├── ThemeManager.java
+    ├── ThemeController.java
+    └── ThemeInfo.java
 
 plugins/
 ├── cli-plugin/                       # TUI app (tamboui + picocli)
 │   └── FireflyCommand.java
 ├── actuator-plugin/                  # Spring Boot Actuator endpoints
 ├── ado-plugin/                       # Azure DevOps integration
-└── mcp-registry-plugin/              # Model Context Protocol registry
+├── mcp-registry-plugin/              # MCP server registry + plugin skill/server tree
+├── midnight-theme-plugin/            # Dark theme (CSS-only, no Java)
+├── plantuml-plugin/                  # PlantUML text-to-diagram rendering
+├── markdown-plugin/                  # Markdown file editor
+└── webtui-plugin/                    # Headless-Chromium terminal browser
 ```
 
 ## Tech Stack
@@ -326,4 +376,4 @@ See `AGENTS.md` for detailed agent-oriented documentation, feature roadmap, and 
 
 ## Releases
 
-Each Maven project here (root `firefly`, plus `ado-plugin`/`actuator-plugin`/`cli-plugin`) is independently versioned and released via `maven-release-plugin`. See [AGENTS.md § Releases](AGENTS.md#releases-maven-release-plugin) for the `release:prepare`/`release:perform` workflow and GitHub Packages deploy setup.
+Each Maven project here (root `firefly`, plus every `plugins/*-plugin`) is independently versioned and released via `maven-release-plugin`. See [AGENTS.md § Releases](AGENTS.md#releases-maven-release-plugin) for the `release:prepare`/`release:perform` workflow and GitHub Packages deploy setup.

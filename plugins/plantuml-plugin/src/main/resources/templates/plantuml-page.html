@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Firefly — PlantUML Plugin</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #2d3748; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 1.5rem; }
+        header h1 { font-size: 1.75rem; }
+        a.back { color: white; text-decoration: none; opacity: 0.85; font-size: 0.9rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+        .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #4a5568; }
+        .toolbar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        button { background: #667eea; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+        button:hover { background: #5a67d8; }
+        select { padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid #cbd5e0; font-size: 0.9rem; background: white; color: #2d3748; }
+        .status { font-size: 0.85rem; color: #718096; }
+        .status.error { color: #c53030; }
+        .status.ok { color: #2f855a; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+        textarea { width: 100%; min-height: 420px; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 0.85rem; padding: 1rem; border-radius: 8px; border: 1px solid #cbd5e0; resize: vertical; background: #f7fafc; color: #2d3748; }
+        .preview { min-height: 420px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f7fafc; display: flex; align-items: center; justify-content: center; overflow: auto; padding: 1rem; }
+        .preview img { max-width: 100%; }
+        .error-box { color: #c53030; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 8px; padding: 1rem; font-size: 0.85rem; white-space: pre-wrap; word-break: break-word; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a class="back" href="/">&larr; Dashboard</a>
+            <h1>PlantUML Plugin</h1>
+        </header>
+
+        <div class="card">
+            <h2>Diagram Editor</h2>
+            <div class="toolbar">
+                <button id="renderBtn" type="button">Render</button>
+                <label for="formatSelect" style="font-size:0.9rem;color:#4a5568;">Format:</label>
+                <select id="formatSelect">
+                    <option value="svg" selected>SVG</option>
+                    <option value="png">PNG</option>
+                </select>
+                <span id="status" class="status">Ready</span>
+            </div>
+            <div class="grid">
+                <div>
+                    <textarea id="source" spellcheck="false">@startuml
+Alice -> Bob: hello
+@enduml</textarea>
+                </div>
+                <div>
+                    <div class="preview" id="preview">
+                        <img id="previewImg" alt="PlantUML diagram preview" />
+                    </div>
+                    <div class="error-box" id="errorBox"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="none">
+        const sourceEl = document.getElementById('source');
+        const formatEl = document.getElementById('formatSelect');
+        const renderBtn = document.getElementById('renderBtn');
+        const statusEl = document.getElementById('status');
+        const previewImg = document.getElementById('previewImg');
+        const errorBox = document.getElementById('errorBox');
+
+        let debounceTimer = null;
+        let currentObjectUrl = null;
+
+        function setStatus(text, cls) {
+            statusEl.textContent = text;
+            statusEl.className = 'status' + (cls ? ' ' + cls : '');
+        }
+
+        function showError(message) {
+            errorBox.textContent = message;
+            errorBox.style.display = 'block';
+            previewImg.style.display = 'none';
+        }
+
+        function clearError() {
+            errorBox.style.display = 'none';
+            errorBox.textContent = '';
+        }
+
+        async function renderDiagram() {
+            const source = sourceEl.value;
+            const format = formatEl.value;
+            setStatus('Rendering…');
+
+            try {
+                const response = await fetch('/api/plantuml/render?format=' + encodeURIComponent(format), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: source
+                });
+
+                if (!response.ok) {
+                    let message = 'Render failed (' + response.status + ')';
+                    try {
+                        const body = await response.json();
+                        if (body && body.error) message = body.error;
+                    } catch (parseErr) {
+                        // response wasn't JSON; keep default message
+                    }
+                    showError(message);
+                    setStatus('Error', 'error');
+                    return;
+                }
+
+                const blob = await response.blob();
+                if (currentObjectUrl) {
+                    URL.revokeObjectURL(currentObjectUrl);
+                }
+                currentObjectUrl = URL.createObjectURL(blob);
+                previewImg.src = currentObjectUrl;
+                previewImg.style.display = 'inline-block';
+                clearError();
+                setStatus('Rendered', 'ok');
+            } catch (e) {
+                showError('Request failed: ' + e);
+                setStatus('Error', 'error');
+            }
+        }
+
+        function scheduleRender() {
+            if (debounceTimer) clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(renderDiagram, 500);
+        }
+
+        sourceEl.addEventListener('input', scheduleRender);
+        formatEl.addEventListener('change', renderDiagram);
+        renderBtn.addEventListener('click', renderDiagram);
+
+        // Initial render of the pre-filled example.
+        renderDiagram();
+    </script>
+</body>
+</html>
