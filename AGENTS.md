@@ -94,19 +94,21 @@ The `compose.yaml` mirrors the GitHub Actions pipeline stages so they can be run
 | Run App with Plugin | `run-app-with-plugin.yml` | `docker compose --profile plugin up app verify-plugin` |
 | Showcase All Plugins | — | `docker compose --profile showcase up app-all-plugins showcase --build` |
 | Native Image Build | — | `docker compose --profile native run --rm native-build` |
+| Release (Maven + Docker) | `release.yml` | triggered by pushing a release tag — see [Releases](#releases-maven-release-plugin) below |
 
 **Notes:**
 - Use `--abort-on-container-exit` with `up` to auto-stop services after verification completes.
 - The `app` service builds the JAR inside Docker; `app-build` builds against the host-mounted source.
 - The `app-all-plugins` service bakes all plugin JARs into the image (no host volume mount).
-- The `showcase` service verifies the dashboard, Swagger, Actuator, ADO, and CLI plugins collectively.
+- The `showcase` service verifies the dashboard, Swagger, Actuator, ADO, CLI, and MCP Registry plugins collectively.
 - Maven dependencies are cached in a `maven-cache` volume for faster rebuilds.
+- `build-plugins.yml` and `plugin-build` build and test all 4 plugins (`cli`, `actuator`, `ado`, `mcp-registry`) on every push/PR; `plugin-build` also flattens the built JARs into `plugins/*.jar` so the `app-all-plugins`/`showcase` Docker build can bake them in (see `.dockerignore` — plugin source subdirectories are excluded from the Docker build context, only the flattened `plugins/*.jar` files and `plugins/README.md` are copied).
 
 #### Executable jar
 The root pom's `exec-maven-plugin` execution prepends a `#!/bin/sh` launcher to the repackaged jar after `spring-boot:repackage` runs, so `target/firefly-<version>.jar` is directly runnable (`./target/firefly-<version>.jar`) instead of requiring `java -jar`. Spring Boot 4 dropped its own built-in "fully executable jar" feature (the old `<executable>true</executable>` config is a no-op now), so this replicates it manually. Same caveat the original feature had: relies on zip readers that seek the end-of-central-directory record from EOF (true for `java`, `unzip`, `jar`) rather than requiring the archive to start at offset 0 — works on Linux/macOS, not guaranteed for every zip tool.
 
 #### Releases (maven-release-plugin)
-Each of the 4 Maven projects in this repo (root `firefly`, `ado-plugin`, `actuator-plugin`, `cli-plugin`) is independently releasable — they're separate artifacts, not reactor modules, so version/tag per project:
+Each of the 5 Maven projects in this repo (root `firefly`, `ado-plugin`, `actuator-plugin`, `cli-plugin`, `mcp-registry-plugin`) is independently releasable — they're separate artifacts, not reactor modules, so version/tag per project:
 
 ```bash
 # Root app (tag: v<version>)
@@ -119,7 +121,11 @@ mvn release:prepare release:perform
 cd ../.. && git push origin main --follow-tags
 ```
 
-`release:prepare` bumps the version, commits, and tags locally only (`pushChanges=false`) — nothing reaches the remote until you `git push --follow-tags` yourself. Pushing a tag matching `v*`/`ado-plugin-*`/`actuator-plugin-*`/`cli-plugin-*` triggers `.github/workflows/release.yml`, which deploys that artifact to GitHub Packages (`https://maven.pkg.github.com/munafsheikh/firefly`) using the workflow's built-in `GITHUB_TOKEN` — no manual credential setup needed for CI.
+`release:prepare` bumps the version, commits, and tags locally only (`pushChanges=false`) — nothing reaches the remote until you `git push --follow-tags` yourself. Pushing a tag matching `v*`/`ado-plugin-*`/`actuator-plugin-*`/`cli-plugin-*`/`mcp-registry-plugin-*` triggers `.github/workflows/release.yml`, which deploys that artifact to GitHub Packages (`https://maven.pkg.github.com/munafsheikh/firefly`) using the workflow's built-in `GITHUB_TOKEN` — no manual credential setup needed for CI.
+
+Pushing a `v*` tag (root app release) additionally builds and pushes two Docker images to GHCR (`ghcr.io/munafsheikh/firefly` and `ghcr.io/munafsheikh/firefly-all-plugins`, each tagged `<version>` and `latest`), via the `release-docker-app` and `release-docker-all-plugins` jobs — no separate tag needed for these, and no extra secrets: both jobs authenticate with the workflow's built-in `GITHUB_TOKEN` against GHCR.
+- `release-docker-app`: plain core-app image, no plugins baked in (mirrors `docker compose up app`).
+- `release-docker-all-plugins`: builds all 4 plugins fresh from source and bakes their JARs into the image (mirrors the `showcase` compose profile) — note this bundles whatever plugin *source* is on `main` at release time, not necessarily the last-published plugin JAR versions from GitHub Packages.
 
 For a **local** `mvn deploy` (outside CI), add a `<server>` entry to `~/.m2/settings.xml` with a [GitHub PAT](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry) that has `write:packages` scope:
 ```xml

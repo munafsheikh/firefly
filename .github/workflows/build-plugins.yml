@@ -33,6 +33,10 @@ jobs:
         working-directory: plugins/ado-plugin
         run: mvn clean package -B -V
 
+      - name: Build MCP Registry Plugin
+        working-directory: plugins/mcp-registry-plugin
+        run: mvn clean package -B -V
+
       - name: Upload Plugin artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -41,4 +45,5 @@ jobs:
             plugins/cli-plugin/target/cli-plugin-*.jar
             plugins/actuator-plugin/target/actuator-plugin-*.jar
             plugins/ado-plugin/target/ado-plugin-*.jar
+            plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar
           retention-days: 1

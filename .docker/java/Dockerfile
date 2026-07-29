@@ -17,9 +17,12 @@ WORKDIR /app
 
 COPY --from=builder /app/target/*.jar app.jar
 
-# Plugins directory for Spring Boot PropertiesLauncher plugin loading
-# Pre-built plugin JARs are baked into the image for self-contained deployment
-COPY plugins/*.jar /app/plugins/
+# Plugins directory for Spring Boot PropertiesLauncher plugin loading.
+# Pre-built plugin JARs (if any are flattened into plugins/ at build time) are
+# baked into the image for self-contained deployment. Copying the directory
+# (rather than a plugins/*.jar glob) keeps the build working when no plugin
+# jars are present yet — see .dockerignore for what's excluded from this copy.
+COPY plugins/ /app/plugins/
 ENV LOADER_PATH=/app/plugins
 
 EXPOSE 17922

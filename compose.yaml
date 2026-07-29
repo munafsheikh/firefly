@@ -124,7 +124,8 @@ services:
         cd /app/plugins/cli-plugin && mvn clean package -B -V &&
         cd /app/plugins/actuator-plugin && mvn clean package -B -V &&
         cd /app/plugins/ado-plugin && mvn clean package -B -V &&
-        cd /app/plugins/mcp-registry-plugin && mvn clean package -B -V
+        cd /app/plugins/mcp-registry-plugin && mvn clean package -B -V &&
+        cp /app/plugins/cli-plugin/target/cli-plugin-*.jar /app/plugins/actuator-plugin/target/actuator-plugin-*.jar /app/plugins/ado-plugin/target/ado-plugin-*.jar /app/plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar /app/plugins/
       "
     restart: "no"
 

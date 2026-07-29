@@ -1,0 +1,11 @@
+.git
+target
+# Plugin source subdirectories are excluded from the Docker build context so
+# .docker/java/Dockerfile's `COPY plugins/ /app/plugins/` only bakes in the
+# flattened plugins/*.jar files (and plugins/README.md) produced by
+# `docker compose --profile build run --rm plugin-build`, not full plugin
+# source trees. Add new plugin dirs here as they're added under plugins/.
+plugins/cli-plugin/
+plugins/actuator-plugin/
+plugins/ado-plugin/
+plugins/mcp-registry-plugin/

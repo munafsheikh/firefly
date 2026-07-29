@@ -39,12 +39,17 @@ jobs:
         working-directory: plugins/ado-plugin
         run: mvn clean package -B -V
 
+      - name: Build MCP Registry Plugin
+        working-directory: plugins/mcp-registry-plugin
+        run: mvn clean package -B -V
+
       - name: Install Plugins
         run: |
           mkdir -p plugins
           cp plugins/cli-plugin/target/cli-plugin-*.jar plugins/
           cp plugins/actuator-plugin/target/actuator-plugin-*.jar plugins/
           cp plugins/ado-plugin/target/ado-plugin-1.0.0.jar plugins/
+          cp plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar plugins/
           ls -la plugins/
 
       - name: Start Firefly with Plugin
@@ -77,6 +82,10 @@ jobs:
           response=$(curl -sf http://localhost:17922/api/ado/health)
           echo "Plugin health response: $response"
           echo "$response" | grep -q '"plugin":"ado"' && echo '✅ ADO Plugin loaded successfully'
+
+      - name: Verify MCP Registry Plugin
+        run: |
+          curl -sf http://localhost:17922/api/mcp-registry/mcps > /dev/null && echo '✅ MCP Registry Plugin loaded successfully'
 
       - name: Stop Firefly
         if: always()
