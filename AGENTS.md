@@ -220,6 +220,57 @@ sunday are closed
 
 ---
 
+## Upcoming Features
+
+Planned plugins and core extensions, not yet implemented. Each follows the existing plugin conventions (own Maven module under `plugins/`, `META-INF/plugin.properties`, `firefly.plugin.<name>.*` properties prefix) unless noted otherwise.
+
+### 1. MCP Plugin Tree — pluggable skills & MCP server definitions
+
+Extend `mcp-registry-plugin` so third-party plugins can contribute to the MCP tree instead of only exposing the 4 built-in embedded tools.
+
+- **MCP plugin manifest**: any plugin JAR may ship a manifest (alongside `plugin.properties`) declaring one or more **skill definitions** and/or **MCP server definitions** it provides. A plugin can declare either or both.
+- **Grouping**: the registry groups all declared skills/servers by owning plugin name. In the MCP tree (both the `/pages/mcp-registry` UI and the `GET /api/mcp/registry` payload), each plugin name becomes a parent node, with its skills and servers listed as child nodes underneath — mirroring how the dashboard already groups actuator endpoints per plugin.
+- **Settings per node**: selecting a skill or server child node shows a "Settings" panel rendering that entry's owning plugin's configuration (the resolved `firefly.plugin.<name>.*` properties), so a user can see which plugin a given skill/server came from and how it's configured without leaving the tree view.
+- **API additions**: `GET /api/mcp/tree` (grouped, hierarchical view) and `GET /api/mcp/plugins/{name}/config` (resolved config for a given plugin's node) alongside the existing flat `/api/mcp/tools` and `/api/mcp/registry` endpoints.
+
+### 2. Theme Manager + Theme Plugins (Obsidian-style)
+
+A core `ThemeManager` plus a new plugin *shape* — theme plugins — that let the dashboard/terminal appearance be swapped without a rebuild, the same way Obsidian.md loads community themes.
+
+- **Core**: `ThemeManager` service + `ThemeController` track the active theme (persisted across restarts), expose `GET/POST /api/theme` (list installed themes, get/set active theme), and inject the active theme's CSS variables into `dashboard.html`/`terminal.html` at render time.
+- **Theme plugin shape**: a lightweight plugin containing only a `plugin.properties` (id/name/version/author/preview) and a bundled CSS resource (custom properties overriding the base palette — background, accent, font, terminal colors). No Spring auto-config or Java code required for a pure-CSS theme; a `ThemeProvider` SPI interface is available for themes that need to contribute template fragments too.
+- **Discovery**: `ThemeManager` scans `plugins/*.jar` for theme manifests the same way `DashboardService.readPluginMetadata` scans for plugin metadata today.
+- **Dashboard UI**: a "Themes" section listing installed themes with a live preview swatch and an "Activate" button; switching theme applies immediately across dashboard, terminal, and MCP registry pages via the shared CSS-variable layer.
+
+### 3. PlantUML Plugin
+
+A new `plantuml-plugin` that bundles the PlantUML jar and exposes text-to-diagram rendering as a service.
+
+- **Dependency**: bundles `net.sourceforge.plantuml:plantuml` so no external Graphviz/PlantUML install is required on the host.
+- **REST endpoint**: `POST /api/plantuml/render?format=svg|png` — body is raw PlantUML source, response is the rendered image (`image/svg+xml` or `image/png`).
+- **Web UI**: `/pages/plantuml` — a textarea for PlantUML source with a live-updating preview pane (re-renders on debounce), useful for authoring diagrams (e.g. the Gantt roadmap above) without leaving the app.
+- **Properties prefix**: `firefly.plugin.plantuml.*` (e.g. render timeout, max diagram size).
+
+### 4. Markdown Editor Plugin
+
+A new `markdown-plugin` providing fully functional Markdown file editing against a configured directory.
+
+- **REST endpoints**: list/browse files under a configured root (`firefly.plugin.markdown.root-dir`), `GET`/`PUT` file content, create/rename/delete.
+- **Web UI**: `/pages/markdown` — split-pane editor (raw Markdown left, rendered preview right, live-updating), file tree sidebar for navigation within the configured root.
+- **Rendering**: server-side Markdown-to-HTML (e.g. flexmark/commonmark) for the preview pane, keeping parity between what's edited and what's saved.
+- **Safety**: all file operations are resolved against and constrained to the configured root directory to prevent path traversal outside it.
+
+### 5. TUI Web Browser Plugin — image/CSS/JS-capable terminal browser
+
+A new plugin (working name `webtui-plugin`) that reimagines the 80s-style terminal browser (lynx/w3m) for the web terminal, but without their limitation of text-only rendering — since the "terminal" here is already xterm.js in a real browser tab, it can render actual images instead of ANSI-art approximations.
+
+- **Approach**: a headless Chromium instance (Playwright, already available in this environment) navigates to the requested URL with full JS/CSS execution. Rather than degrading to text/ANSI blocks (the Browsh/lynx approach for real ttys), frames are captured as images and displayed inline in the xterm.js pane using its image-addon, giving genuine image/CSS/JS-rendered pages inside the terminal UI.
+- **Input**: keyboard and mouse events captured by the PTY/WebSocket bridge are forwarded to the headless page (scroll, click, type, navigate back/forward), so it behaves like driving a real browser, just embedded in the terminal.
+- **Integration point**: launched the same way `cli-plugin` is auto-detected today — `TerminalService` detects a `webtui-plugin*.jar` and offers it as a launchable target from the terminal explorer panel, alongside the existing TUI.
+- **Properties prefix**: `firefly.plugin.webtui.*` (e.g. default homepage, frame rate/refresh interval, viewport size).
+
+---
+
 ## Terminal UI (TUI) — 3-Panel Web Interface
 
 **Access:** `http://localhost:17922/terminal`
