@@ -57,7 +57,7 @@ jobs:
           LOADER_PATH: plugins
           SPRING_DOCKER_COMPOSE_ENABLED: false
         run: |
-          java -cp "target/firefly-*.jar" org.springframework.boot.loader.launch.PropertiesLauncher > app.log 2>&1 &
+          java -cp target/firefly-*.jar org.springframework.boot.loader.launch.PropertiesLauncher > app.log 2>&1 &
           echo "APP_PID=$!" >> "$GITHUB_ENV"
 
       - name: Wait for app to be ready
