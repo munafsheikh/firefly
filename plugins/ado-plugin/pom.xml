@@ -14,7 +14,7 @@
 
     <groupId>ai.firefly.plugin</groupId>
     <artifactId>ado-plugin</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Firefly Azure DevOps Plugin</name>

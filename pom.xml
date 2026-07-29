@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.flash.firefighters</groupId>
 	<artifactId>firefly</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>firefly</name>
 	<description>Spring Boot plugin-based platform with web dashboard, terminal, and Swagger UI</description>
 	<url>https://github.com/munafsheikh/firefly</url>
