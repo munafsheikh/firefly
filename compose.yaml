@@ -62,6 +62,8 @@ services:
         curl -sf http://app-all-plugins:17922/api/plantuml/health | grep -q '\"plugin\":\"plantuml\"' && echo '✅ PlantUML Plugin active (/api/plantuml/health)' &&
         curl -sf http://app-all-plugins:17922/api/markdown/health | grep -q '\"plugin\":\"markdown\"' && echo '✅ Markdown Plugin active (/api/markdown/health)' &&
         curl -sf http://app-all-plugins:17922/api/webtui/health | grep -q '\"plugin\":\"webtui\"' && echo '✅ WebTUI Browser Plugin active (/api/webtui/health)' &&
+        curl -sf http://app-all-plugins:17922/docs | grep -q 'Firefly Documentation' && echo '✅ Documentation Browser reachable (/docs)' &&
+        curl -sf http://app-all-plugins:17922/docs/plantuml | grep -q 'PlantUML Plugin' && echo '✅ Documentation Browser includes plugin-contributed docs' &&
         echo '' &&
         echo '🌐 Open your browser to: http://localhost:17922/' &&
         echo '   - Dashboard with all plugins listed' &&

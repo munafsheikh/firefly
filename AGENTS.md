@@ -10,6 +10,7 @@ Firefly is a plugin-powered Spring Boot platform with **8 integrated plugins** +
 - **REST API** — RESTful service with OpenAPI/Swagger documentation
 - **MCP Server** — Model Context Protocol embedded server for AI agent integration
 - **Theme Manager** — discovers theme plugins and serves the active theme's CSS at `/api/theme/active.css` (see [Theme Manager](#theme-manager-core))
+- **Documentation Browser** — aggregates core docs with every installed plugin's own bundled docs into one browsable `/docs` (see [Documentation Browser](#documentation-browser-core))
 
 **Optional Plugins (drop-in runtime JAR loading):**
 1. **CLI Plugin** — Terminal UI (TamboUI) with 3-panel explorer, menus, search, output history
@@ -367,6 +368,19 @@ Core-owned (`src/main/java/ai/firefly/theme/`), not a plugin — discovers **the
   - `GET /api/theme/active.css` — raw CSS for the active theme; `dashboard.html` links this (`<link rel="stylesheet" href="/api/theme/active.css">`) after its own inline `<style>` block, so a theme's `:root` custom-property overrides win by cascade order without any server-side template changes
 - **Theming contract**: `dashboard.html`'s inline stylesheet defines the palette as CSS custom properties (`--firefly-bg`, `--firefly-surface`, `--firefly-text`, `--firefly-text-muted`, `--firefly-border`, `--firefly-accent`, `--firefly-accent-2`, `--firefly-header-text`, `--firefly-link-list-bg`, `--firefly-link-list-bg-hover`) with the current look as defaults; a theme plugin's `theme.css` only needs to override the variables it cares about. A theme needs zero Java code — pure CSS + `plugin.properties` metadata.
 - **Dashboard UI**: a "🎨 Themes" card lists all installed themes with an Activate button; activating posts to `/api/theme/{id}` and reloads.
+
+### Documentation Browser (core)
+
+Core-owned (`src/main/java/ai/firefly/docs/`), not a plugin — aggregates a fixed set of core topics with every installed plugin's own bundled docs into one navigable set of pages at `/docs`. This is the third composable plugin convention, alongside `plugin.properties` (identity) and `mcp-plugin.json` (MCP tree):
+
+- **Plugin docs convention**: any plugin JAR may bundle `META-INF/firefly/docs/index.md` (+ an optional `screenshots/` subfolder of images referenced by relative path) — no code required, purely resources. `DocsManager` scans `plugins/*.jar` for this the same way `DashboardService`/`ThemeManager`/`McpPluginTreeScanner` scan for their own conventions, and lists it as a "Plugin" section using that plugin's own `plugin.properties` (id/name) for identity.
+- **Core docs**: bundled directly in the core app's classpath under `src/main/resources/docs/<sectionId>/index.md` (+ `screenshots/`) — five fixed sections: `overview`, `dashboard`, `terminal`, `theme-manager`, `mcp-server`.
+- **`DocsController`**:
+  - `GET /docs` — landing page (first section)
+  - `GET /docs/{sectionId}` — renders that section's `index.md` as HTML
+  - `GET /docs/{sectionId}/assets/{*path}` — raw bytes for an image/asset from that section's docs root (core classpath or plugin JAR), with a guessed content type
+- **Rendering**: `DocMarkdownRenderer` wraps flexmark (same library `markdown-plugin` uses) and rewrites any relative `<img src="...">` in the rendered HTML to `/docs/{sectionId}/assets/...`, since the source markdown just uses a plain relative path (e.g. `screenshots/foo.png`) and the actual bytes live inside a JAR, not on a public static path.
+- **Dashboard UI**: linked from the "What Can You Do?" card and the Interfaces card as `/docs`.
 
 ### Midnight Theme Plugin (`plugins/midnight-theme-plugin/`)
 

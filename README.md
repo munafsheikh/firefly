@@ -166,6 +166,18 @@ See `AGENTS.md` § MCP Registry Plugin for the manifest format and full detail.
 
 Core-owned theme system (not a plugin) that discovers **theme plugins** — JARs bundling a `META-INF/firefly/theme.css` override, no Java code required — and serves the active one's CSS at `/api/theme/active.css`, linked from the dashboard so switching themes needs no rebuild. `midnight-theme-plugin` ships as a working example. Activate from the dashboard's "🎨 Themes" card, or `POST /api/theme/{id}`. See `AGENTS.md` § Theme Manager for the CSS custom-property contract.
 
+### Documentation Browser
+
+Core-owned (not a plugin) — combines this core app's own docs with **every installed plugin's own bundled documentation** into one browsable, in-app place at `/docs`. Any plugin can contribute by bundling `META-INF/firefly/docs/index.md` (+ a `screenshots/` folder) in its JAR — no code required, purely resources — and it shows up in the sidebar automatically, grouped under "Plugins" alongside the core topics under "Core". This is the third composable plugin convention, alongside `plugin.properties` (identity, read by the dashboard's plugin table) and `mcp-plugin.json` (skills/servers, read by the MCP tree).
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/docs` | GET | Landing page (first section) |
+| `/docs/{sectionId}` | GET | Renders that section's `index.md` |
+| `/docs/{sectionId}/assets/{*path}` | GET | Raw bytes for a screenshot/asset referenced by that section's markdown |
+
+Every plugin in this repo (`cli`, `actuator`, `ado`, `mcp-registry`, `midnight-theme`, `plantuml`, `markdown`, `webtui`) ships a docs folder as a live example — see `AGENTS.md` § Documentation Browser for the mechanism.
+
 ### PlantUML Plugin
 
 Bundles PlantUML and renders diagram source to SVG/PNG — no external PlantUML/Graphviz install needed.
@@ -330,10 +342,16 @@ src/main/java/ai/firefly/
 │   ├── TerminalProperties.java
 │   ├── TerminalService.java
 │   └── TerminalWebSocketHandler.java
-└── theme/                            # Theme manager (scans plugins/*.jar for theme.css)
-    ├── ThemeManager.java
-    ├── ThemeController.java
-    └── ThemeInfo.java
+├── theme/                            # Theme manager (scans plugins/*.jar for theme.css)
+│   ├── ThemeManager.java
+│   ├── ThemeController.java
+│   └── ThemeInfo.java
+└── docs/                             # Documentation Browser (scans plugins/*.jar for docs/index.md)
+    ├── DocsManager.java
+    ├── DocsController.java
+    └── DocMarkdownRenderer.java
+
+src/main/resources/docs/               # Core docs bundled on the classpath: overview, dashboard, terminal, theme-manager, mcp-server
 
 plugins/
 ├── cli-plugin/                       # TUI app (tamboui + picocli)

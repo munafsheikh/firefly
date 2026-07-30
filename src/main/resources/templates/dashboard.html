@@ -171,6 +171,7 @@
                 <li><strong>📊 System Health:</strong> Real-time health, metrics, and info via Spring Actuator endpoints at <a href="/actuator" style="color: #667eea; font-weight: bold;">/actuator</a></li>
                 <li><strong>🔧 Extensible Architecture:</strong> Drop new plugin JARs into <code>plugins/</code> — they auto-load with zero server restart</li>
                 <li><strong>🧠 Model Context Protocol (MCP):</strong> Embedded MCP server exposes tools for AI agents (list plugins, health checks, actuator data, endpoints)</li>
+                <li><strong>📚 Documentation:</strong> Core docs plus every installed plugin's own docs, combined in one browsable place at <a href="/docs" style="color: #667eea; font-weight: bold;">/docs</a></li>
             </ul>
         </div>
 
@@ -188,6 +189,7 @@
                 <ul class="link-list">
                     <li th:if="${terminalAvailable}"><a href="/terminal">Web Terminal (xterm.js + pty4j)</a></li>
                     <li><a href="/">Dashboard (this page, Thymeleaf)</a></li>
+                    <li><a href="/docs">Documentation Browser (core + plugin docs)</a></li>
                 </ul>
             </div>
 

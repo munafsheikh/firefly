@@ -127,6 +127,11 @@ jobs:
         run: |
           curl -sf http://localhost:17922/api/webtui/health | grep -q '"plugin":"webtui"' && echo '✅ WebTUI Browser Plugin loaded successfully (browserAvailable depends on host Chromium deps)'
 
+      - name: Verify Documentation Browser aggregates plugin docs
+        run: |
+          curl -sf http://localhost:17922/docs | grep -q 'Firefly Documentation' && echo '✅ Documentation Browser reachable'
+          curl -sf http://localhost:17922/docs/plantuml | grep -q 'PlantUML Plugin' && echo '✅ Documentation Browser includes plugin-contributed docs'
+
       - name: Stop Firefly
         if: always()
         run: |
