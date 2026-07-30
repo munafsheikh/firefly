@@ -57,6 +57,11 @@ services:
         curl -sf http://app-all-plugins:17922/actuator/health | grep -q '\"status\":\"UP\"' && echo '✅ Actuator Plugin active (/actuator/health, /actuator/info, /actuator/metrics)' &&
         curl -sf http://app-all-plugins:17922/api/ado/health | grep -q '\"plugin\":\"ado\"' && echo '✅ ADO Plugin active (/api/ado/health)' &&
         curl -sf http://app-all-plugins:17922/ | grep -q 'Firefly CLI Plugin' && echo '✅ CLI Plugin detected on dashboard (Terminal ready)' &&
+        curl -sf http://app-all-plugins:17922/api/mcp-registry/tree | grep -q '\"pluginId\":\"mcp-registry\"' && echo '✅ MCP plugin tree groups skills/servers by plugin' &&
+        curl -sf http://app-all-plugins:17922/api/theme | grep -q '\"id\":\"midnight-theme\"' && echo '✅ Midnight Theme Plugin discovered' &&
+        curl -sf http://app-all-plugins:17922/api/plantuml/health | grep -q '\"plugin\":\"plantuml\"' && echo '✅ PlantUML Plugin active (/api/plantuml/health)' &&
+        curl -sf http://app-all-plugins:17922/api/markdown/health | grep -q '\"plugin\":\"markdown\"' && echo '✅ Markdown Plugin active (/api/markdown/health)' &&
+        curl -sf http://app-all-plugins:17922/api/webtui/health | grep -q '\"plugin\":\"webtui\"' && echo '✅ WebTUI Browser Plugin active (/api/webtui/health)' &&
         echo '' &&
         echo '🌐 Open your browser to: http://localhost:17922/' &&
         echo '   - Dashboard with all plugins listed' &&
@@ -125,7 +130,11 @@ services:
         cd /app/plugins/actuator-plugin && mvn clean package -B -V &&
         cd /app/plugins/ado-plugin && mvn clean package -B -V &&
         cd /app/plugins/mcp-registry-plugin && mvn clean package -B -V &&
-        cp /app/plugins/cli-plugin/target/cli-plugin-*.jar /app/plugins/actuator-plugin/target/actuator-plugin-*.jar /app/plugins/ado-plugin/target/ado-plugin-*.jar /app/plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar /app/plugins/
+        cd /app/plugins/midnight-theme-plugin && mvn clean package -B -V &&
+        cd /app/plugins/plantuml-plugin && mvn clean package -B -V &&
+        cd /app/plugins/markdown-plugin && mvn clean package -B -V &&
+        cd /app/plugins/webtui-plugin && mvn clean package -B -V &&
+        cp /app/plugins/cli-plugin/target/cli-plugin-*.jar /app/plugins/actuator-plugin/target/actuator-plugin-*.jar /app/plugins/ado-plugin/target/ado-plugin-*.jar /app/plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar /app/plugins/midnight-theme-plugin/target/midnight-theme-plugin-*.jar /app/plugins/plantuml-plugin/target/plantuml-plugin-*.jar /app/plugins/markdown-plugin/target/markdown-plugin-*.jar /app/plugins/webtui-plugin/target/webtui-plugin-*.jar /app/plugins/
       "
     restart: "no"
 

@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 @Slf4j
 @AutoConfiguration
@@ -34,5 +35,20 @@ public class McpRegistryAutoConfiguration {
     @Bean
     public McpRegistryPageController mcpRegistryPageController(McpRegistryService service) {
         return new McpRegistryPageController(service);
+    }
+
+    @Bean
+    public McpPluginTreeScanner mcpPluginTreeScanner() {
+        return new McpPluginTreeScanner();
+    }
+
+    @Bean
+    public McpPluginConfigResolver mcpPluginConfigResolver(ConfigurableEnvironment environment, McpPluginTreeScanner scanner) {
+        return new McpPluginConfigResolver(environment, scanner);
+    }
+
+    @Bean
+    public McpTreeController mcpTreeController(McpPluginTreeScanner scanner, McpPluginConfigResolver configResolver) {
+        return new McpTreeController(scanner, configResolver);
     }
 }

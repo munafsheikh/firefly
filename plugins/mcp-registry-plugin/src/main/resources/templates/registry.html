@@ -39,5 +39,87 @@
   <p th:if="${mcps == null or mcps.size() == 0}">No MCP servers registered yet.</p>
   <hr/>
   <p>API: <a href="/api/mcp-registry/mcps">/api/mcp-registry/mcps</a></p>
+
+  <hr/>
+  <h1>MCP Plugin Tree</h1>
+  <p>Skills and MCP server definitions contributed by installed plugins, grouped by plugin.</p>
+  <div style="display:flex;gap:2rem;align-items:flex-start;">
+    <ul id="mcp-tree" style="flex:1;list-style:none;padding:0;"></ul>
+    <div id="mcp-settings" style="flex:1;min-width:0;">
+      <h3>Settings</h3>
+      <p id="mcp-settings-placeholder" style="color:#666;">Click a skill or server node to view its plugin's configuration.</p>
+      <pre id="mcp-settings-body" style="display:none;background:#f2f2f2;padding:0.75rem;overflow:auto;"></pre>
+    </div>
+  </div>
+
+  <style>
+    #mcp-tree > li { margin-bottom: 0.75rem; }
+    .mcp-plugin-name { font-weight: bold; cursor: pointer; }
+    .mcp-children { list-style: none; padding-left: 1.25rem; margin-top: 0.4rem; }
+    .mcp-children li { padding: 0.2rem 0; }
+    .mcp-node-btn { background: none; border: 1px solid #ccc; border-radius: 4px; padding: 0.15rem 0.5rem; cursor: pointer; font-size: 0.85em; }
+    .mcp-node-btn:hover { background: #eee; }
+    .mcp-badge { display:inline-block; font-size:0.75em; padding:0.1rem 0.4rem; border-radius:3px; margin-right:0.4rem; color:#fff; }
+    .mcp-badge-skill { background:#4a5568; }
+    .mcp-badge-server { background:#667eea; }
+  </style>
+
+  <script th:inline="none">
+    async function loadMcpTree() {
+      const treeEl = document.getElementById('mcp-tree');
+      try {
+        const res = await fetch('/api/mcp-registry/tree');
+        const plugins = await res.json();
+        if (!plugins.length) {
+          treeEl.innerHTML = '<li style="color:#666;">No plugins currently declare MCP skills or servers.</li>';
+          return;
+        }
+        treeEl.innerHTML = '';
+        for (const plugin of plugins) {
+          const li = document.createElement('li');
+          const children = [
+            ...plugin.skills.map(s => ({ kind: 'skill', ...s })),
+            ...plugin.servers.map(s => ({ kind: 'server', ...s }))
+          ];
+          const childItems = children.map(c => `
+            <li>
+              <span class="mcp-badge ${c.kind === 'skill' ? 'mcp-badge-skill' : 'mcp-badge-server'}">${c.kind}</span>
+              <strong>${escapeHtml(c.name)}</strong> — ${escapeHtml(c.description || '')}
+              <button class="mcp-node-btn" onclick="loadMcpSettings('${escapeAttr(plugin.pluginId)}')">Settings</button>
+            </li>`).join('');
+          li.innerHTML = `
+            <span class="mcp-plugin-name">${escapeHtml(plugin.pluginName)} <small style="font-weight:normal;color:#666;">v${escapeHtml(plugin.pluginVersion)}</small></span>
+            <ul class="mcp-children">${childItems}</ul>`;
+          treeEl.appendChild(li);
+        }
+      } catch (e) {
+        treeEl.innerHTML = '<li style="color:#c00;">Failed to load MCP tree: ' + escapeHtml(String(e)) + '</li>';
+      }
+    }
+
+    async function loadMcpSettings(pluginId) {
+      const placeholder = document.getElementById('mcp-settings-placeholder');
+      const body = document.getElementById('mcp-settings-body');
+      placeholder.style.display = 'none';
+      body.style.display = 'block';
+      body.textContent = 'Loading...';
+      try {
+        const res = await fetch('/api/mcp-registry/tree/' + encodeURIComponent(pluginId) + '/config');
+        const config = await res.json();
+        body.textContent = JSON.stringify(config, null, 2);
+      } catch (e) {
+        body.textContent = 'Failed to load settings: ' + e;
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+    function escapeAttr(value) {
+      return String(value).replace(/'/g, "\\'");
+    }
+
+    loadMcpTree();
+  </script>
 </body>
 </html>

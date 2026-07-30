@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Firefly — WebTUI Browser Plugin</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #2d3748; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 1.5rem; }
+        header h1 { font-size: 1.75rem; }
+        header p { opacity: 0.9; font-size: 0.9rem; margin-top: 0.35rem; }
+        a.back { color: white; text-decoration: none; opacity: 0.85; font-size: 0.9rem; }
+        .card { background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 1.5rem; }
+        .card h2 { font-size: 1.1rem; margin-bottom: 1rem; color: #4a5568; }
+        .toolbar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .toolbar input[type=text] { flex: 1; min-width: 220px; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 0.9rem; }
+        button { background: #667eea; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+        button:hover { background: #5a67d8; }
+        button:disabled { background: #a0aec0; cursor: not-allowed; }
+        .status { font-size: 0.85rem; color: #718096; margin-bottom: 0.75rem; min-height: 1.2rem; }
+        .error { color: #c53030; }
+        .notice { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.9rem; display: none; }
+        .keys-row { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .keys-row input[type=text] { flex: 1; padding: 0.6rem 0.8rem; border: 1px solid #cbd5e0; border-radius: 8px; }
+        .screen-wrap { border: 1px solid #e2e8f0; border-radius: 8px; overflow: auto; background: #1a202c; display: flex; align-items: flex-start; justify-content: center; min-height: 240px; }
+        #screenshot { max-width: 100%; display: block; cursor: crosshair; }
+        .scope-note { font-size: 0.8rem; color: #a0aec0; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a class="back" href="/">&larr; Dashboard</a>
+            <h1>WebTUI Browser</h1>
+            <p>A scoped-down "browsing with images/JS/CSS in a terminal-like UI" MVP: real headless Chromium rendered to a screenshot, not a full remote-desktop protocol.</p>
+        </header>
+
+        <div id="unavailableNotice" class="notice">
+            Headless Chromium isn't available in this environment, so the WebTUI Browser can't actually render pages here.
+            The plugin has degraded gracefully instead of crashing — the API still responds, but navigation, clicking,
+            scrolling, and typing are disabled until a working Chromium install is present.
+            <div id="unavailableReason" style="margin-top: 0.5rem; font-weight: 600;"></div>
+        </div>
+
+        <div class="card">
+            <h2>Browser</h2>
+            <div class="toolbar">
+                <button id="backBtn" onclick="goBack()">&larr; Back</button>
+                <button id="forwardBtn" onclick="goForward()">Forward &rarr;</button>
+                <input type="text" id="urlInput" th:value="${homepage}" placeholder="https://example.com">
+                <button id="goBtn" onclick="navigateTo()">Go</button>
+            </div>
+            <div class="status" id="statusLine">Loading...</div>
+            <div class="screen-wrap">
+                <img id="screenshot" alt="Rendered page will appear here once you navigate">
+            </div>
+            <div class="keys-row">
+                <input type="text" id="keysInput" placeholder="Text to type into the focused element">
+                <button id="sendKeysBtn" onclick="sendKeys()">Send keys</button>
+            </div>
+            <p class="scope-note">
+                Click the screenshot to click the page at that spot; scroll over it to scroll the page.
+                Click coordinates are translated from the image's rendered size back to the real viewport size.
+            </p>
+        </div>
+    </div>
+
+    <script th:inline="none">
+        let browserAvailable = false;
+        let currentScreenshotUrl = null;
+
+        function setStatus(message, isError) {
+            const el = document.getElementById('statusLine');
+            el.textContent = message;
+            el.classList.toggle('error', !!isError);
+        }
+
+        function applyAvailability() {
+            const notice = document.getElementById('unavailableNotice');
+            const controlIds = ['backBtn', 'forwardBtn', 'goBtn', 'sendKeysBtn', 'urlInput', 'keysInput'];
+            if (browserAvailable) {
+                notice.style.display = 'none';
+                controlIds.forEach(function (id) { document.getElementById(id).disabled = false; });
+            } else {
+                notice.style.display = 'block';
+                controlIds.forEach(function (id) { document.getElementById(id).disabled = true; });
+                setStatus('Browser unavailable in this environment.', true);
+            }
+        }
+
+        async function checkHealth() {
+            try {
+                const res = await fetch('/api/webtui/health');
+                const data = await res.json();
+                browserAvailable = !!data.browserAvailable;
+            } catch (e) {
+                browserAvailable = false;
+            }
+            applyAvailability();
+            if (!browserAvailable) {
+                await loadUnavailableReason();
+            }
+            return browserAvailable;
+        }
+
+        async function loadUnavailableReason() {
+            try {
+                const res = await fetch('/api/webtui/screenshot');
+                const data = await res.json().catch(function () { return {}; });
+                if (data.error) {
+                    document.getElementById('unavailableReason').textContent = data.error;
+                }
+            } catch (e) {
+                // best-effort only; the generic notice text still applies
+            }
+        }
+
+        async function refreshScreenshot() {
+            if (!browserAvailable) {
+                return;
+            }
+            try {
+                const res = await fetch('/api/webtui/screenshot');
+                if (!res.ok) {
+                    setStatus('Screenshot request failed: HTTP ' + res.status, true);
+                    return;
+                }
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                document.getElementById('screenshot').src = url;
+                if (currentScreenshotUrl) {
+                    URL.revokeObjectURL(currentScreenshotUrl);
+                }
+                currentScreenshotUrl = url;
+            } catch (e) {
+                setStatus('Screenshot request failed: ' + e, true);
+            }
+        }
+
+        async function navigateTo() {
+            if (!browserAvailable) {
+                return;
+            }
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                return;
+            }
+            setStatus('Navigating to ' + url + '...');
+            try {
+                const res = await fetch('/api/webtui/navigate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+                const data = await res.json().catch(function () { return {}; });
+                if (!res.ok) {
+                    setStatus('Navigation failed: ' + (data.error || ('HTTP ' + res.status)), true);
+                    return;
+                }
+                setStatus('Loaded: ' + (data.title || data.url || url));
+                await refreshScreenshot();
+            } catch (e) {
+                setStatus('Navigation request failed: ' + e, true);
+            }
+        }
+
+        async function postAction(path, body) {
+            if (!browserAvailable) {
+                return;
+            }
+            try {
+                const res = await fetch(path, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: body !== undefined ? JSON.stringify(body) : '{}'
+                });
+                const data = await res.json().catch(function () { return {}; });
+                if (!res.ok) {
+                    setStatus('Action failed: ' + (data.error || ('HTTP ' + res.status)), true);
+                    return;
+                }
+                if (data.url) {
+                    document.getElementById('urlInput').value = data.url;
+                }
+                setStatus('OK');
+                await refreshScreenshot();
+            } catch (e) {
+                setStatus('Action request failed: ' + e, true);
+            }
+        }
+
+        function goBack() {
+            postAction('/api/webtui/back');
+        }
+
+        function goForward() {
+            postAction('/api/webtui/forward');
+        }
+
+        function sendKeys() {
+            const input = document.getElementById('keysInput');
+            const text = input.value;
+            if (!text) {
+                return;
+            }
+            postAction('/api/webtui/type', { text: text }).then(function () {
+                input.value = '';
+            });
+        }
+
+        document.getElementById('screenshot').addEventListener('click', function (evt) {
+            if (!browserAvailable) {
+                return;
+            }
+            const img = evt.target;
+            if (!img.naturalWidth || !img.naturalHeight) {
+                return;
+            }
+            const rect = img.getBoundingClientRect();
+            const scaleX = img.naturalWidth / rect.width;
+            const scaleY = img.naturalHeight / rect.height;
+            const x = (evt.clientX - rect.left) * scaleX;
+            const y = (evt.clientY - rect.top) * scaleY;
+            postAction('/api/webtui/click', { x: x, y: y });
+        });
+
+        document.getElementById('screenshot').addEventListener('wheel', function (evt) {
+            if (!browserAvailable) {
+                return;
+            }
+            evt.preventDefault();
+            postAction('/api/webtui/scroll', { deltaY: evt.deltaY });
+        }, { passive: false });
+
+        document.getElementById('urlInput').addEventListener('keydown', function (evt) {
+            if (evt.key === 'Enter') {
+                navigateTo();
+            }
+        });
+
+        document.getElementById('keysInput').addEventListener('keydown', function (evt) {
+            if (evt.key === 'Enter') {
+                sendKeys();
+            }
+        });
+
+        (async function init() {
+            const available = await checkHealth();
+            if (!available) {
+                return;
+            }
+            const urlInput = document.getElementById('urlInput');
+            if (urlInput.value) {
+                await navigateTo();
+            } else {
+                await refreshScreenshot();
+            }
+        })();
+    </script>
+</body>
+</html>

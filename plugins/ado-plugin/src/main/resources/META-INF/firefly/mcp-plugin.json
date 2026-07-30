@@ -1,0 +1,16 @@
+{
+  "skills": [
+    {
+      "name": "ado-work-item-query",
+      "description": "Query and fetch Azure DevOps work items via WIQL"
+    }
+  ],
+  "servers": [
+    {
+      "name": "ado-http",
+      "type": "http",
+      "target": "/api/ado",
+      "description": "Local HTTP bridge to the configured Azure DevOps organization/project"
+    }
+  ]
+}

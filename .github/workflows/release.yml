@@ -8,6 +8,10 @@ on:
       - 'actuator-plugin-*'
       - 'cli-plugin-*'
       - 'mcp-registry-plugin-*'
+      - 'midnight-theme-plugin-*'
+      - 'plantuml-plugin-*'
+      - 'markdown-plugin-*'
+      - 'webtui-plugin-*'
 
 jobs:
   release-app:
@@ -140,6 +144,110 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  release-midnight-theme-plugin:
+    if: startsWith(github.ref, 'refs/tags/midnight-theme-plugin-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: plugins/midnight-theme-plugin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: github
+
+      - name: Deploy to GitHub Packages
+        run: mvn -B deploy -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-plantuml-plugin:
+    if: startsWith(github.ref, 'refs/tags/plantuml-plugin-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: plugins/plantuml-plugin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: github
+
+      - name: Deploy to GitHub Packages
+        run: mvn -B deploy -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-markdown-plugin:
+    if: startsWith(github.ref, 'refs/tags/markdown-plugin-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: plugins/markdown-plugin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: github
+
+      - name: Deploy to GitHub Packages
+        run: mvn -B deploy -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-webtui-plugin:
+    if: startsWith(github.ref, 'refs/tags/webtui-plugin-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: plugins/webtui-plugin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: github
+
+      - name: Deploy to GitHub Packages
+        run: mvn -B deploy -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   release-docker-app:
     # Core app image, no plugins baked in — mirrors `docker compose up app`.
     if: startsWith(github.ref, 'refs/tags/v')
@@ -202,6 +310,10 @@ jobs:
           cd plugins/actuator-plugin && mvn clean package -B -V -DskipTests && cd ../..
           cd plugins/ado-plugin && mvn clean package -B -V -DskipTests && cd ../..
           cd plugins/mcp-registry-plugin && mvn clean package -B -V -DskipTests && cd ../..
+          cd plugins/midnight-theme-plugin && mvn clean package -B -V -DskipTests && cd ../..
+          cd plugins/plantuml-plugin && mvn clean package -B -V -DskipTests && cd ../..
+          cd plugins/markdown-plugin && mvn clean package -B -V -DskipTests && cd ../..
+          cd plugins/webtui-plugin && mvn clean package -B -V -DskipTests && cd ../..
 
       - name: Flatten plugin jars into build context
         run: |
@@ -209,6 +321,10 @@ jobs:
           cp plugins/actuator-plugin/target/actuator-plugin-*.jar plugins/
           cp plugins/ado-plugin/target/ado-plugin-*.jar plugins/
           cp plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar plugins/
+          cp plugins/midnight-theme-plugin/target/midnight-theme-plugin-*.jar plugins/
+          cp plugins/plantuml-plugin/target/plantuml-plugin-*.jar plugins/
+          cp plugins/markdown-plugin/target/markdown-plugin-*.jar plugins/
+          cp plugins/webtui-plugin/target/webtui-plugin-*.jar plugins/
           ls -la plugins/*.jar
 
       - name: Set up Docker Buildx

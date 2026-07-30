@@ -1,0 +1,16 @@
+{
+  "skills": [
+    {
+      "name": "markdown-file-editing",
+      "description": "Read, write, and render Markdown files under the plugin's configured root directory"
+    }
+  ],
+  "servers": [
+    {
+      "name": "markdown-http",
+      "type": "http",
+      "target": "/api/markdown",
+      "description": "Local HTTP API for browsing, editing, and previewing Markdown files"
+    }
+  ]
+}

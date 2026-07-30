@@ -9,3 +9,7 @@ plugins/cli-plugin/
 plugins/actuator-plugin/
 plugins/ado-plugin/
 plugins/mcp-registry-plugin/
+plugins/midnight-theme-plugin/
+plugins/plantuml-plugin/
+plugins/markdown-plugin/
+plugins/webtui-plugin/

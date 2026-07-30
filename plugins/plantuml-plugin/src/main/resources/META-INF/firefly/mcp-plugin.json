@@ -1,0 +1,16 @@
+{
+  "skills": [
+    {
+      "name": "plantuml-render",
+      "description": "Render PlantUML diagram source into SVG or PNG images"
+    }
+  ],
+  "servers": [
+    {
+      "name": "plantuml-http",
+      "type": "http",
+      "target": "/api/plantuml/render",
+      "description": "Local HTTP text-to-diagram rendering endpoint"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package ai.firefly.dashboard;
 
+import ai.firefly.theme.ThemeManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +14,7 @@ import java.util.Map;
 public class DashboardController {
 
     private final DashboardService dashboardService;
+    private final ThemeManager themeManager;
 
     @GetMapping("/")
     public String dashboard(Model model) {
@@ -36,6 +38,9 @@ public class DashboardController {
                 AlertMessage.info("Welcome to Firefly — system is running smoothly"),
                 AlertMessage.success("All plugins loaded successfully")
         ));
+
+        model.addAttribute("themes", themeManager.listThemes());
+        model.addAttribute("activeThemeId", themeManager.getActiveThemeId());
 
         return "dashboard";
     }

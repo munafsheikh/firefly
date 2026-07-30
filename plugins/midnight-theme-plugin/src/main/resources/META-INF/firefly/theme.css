@@ -1,0 +1,18 @@
+/*
+ * Firefly "Midnight" theme.
+ * Overrides the CSS custom properties defined in dashboard.html's base stylesheet.
+ * Served by the core app's ThemeManager at /api/theme/active.css whenever this theme
+ * (plugin.id=midnight-theme) is the active one.
+ */
+:root {
+    --firefly-bg: #0f1117;
+    --firefly-surface: #1a1d29;
+    --firefly-text: #e2e8f0;
+    --firefly-text-muted: #a0aec0;
+    --firefly-border: #2d3348;
+    --firefly-accent: #7c8cff;
+    --firefly-accent-2: #a56bff;
+    --firefly-header-text: #f7fafc;
+    --firefly-link-list-bg: #232838;
+    --firefly-link-list-bg-hover: #2d3348;
+}
