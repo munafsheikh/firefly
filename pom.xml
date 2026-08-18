@@ -35,6 +35,8 @@
 	</distributionManagement>
 	<properties>
 		<java.version>25</java.version>
+		<!-- Base ref used by the explicit offline review-gate Maven runners. -->
+		<review.base>main</review.base>
 	</properties>
 	<repositories>
 		<repository>
@@ -162,6 +164,34 @@
 							<arguments>
 								<argument>-c</argument>
 								<argument>set -e; JAR="${project.build.directory}/${project.build.finalName}.jar"; printf '#!/bin/sh\nexec java -jar "$0" "$@"\n' &gt; "$JAR.launch"; cat "$JAR.launch" "$JAR" &gt; "$JAR.tmp"; rm -f "$JAR.launch"; mv "$JAR.tmp" "$JAR"; chmod +x "$JAR"</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>review-gate-1</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>bash</executable>
+							<arguments>
+								<argument>${project.basedir}/tools/review-gate/review-gate-1.sh</argument>
+								<argument>--base</argument>
+								<argument>${review.base}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>review-gate-2</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>bash</executable>
+							<arguments>
+								<argument>${project.basedir}/tools/review-gate/review-gate-2.sh</argument>
+								<argument>--base</argument>
+								<argument>${review.base}</argument>
 							</arguments>
 						</configuration>
 					</execution>
