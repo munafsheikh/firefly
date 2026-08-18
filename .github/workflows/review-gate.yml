@@ -79,7 +79,7 @@ jobs:
           script: |
             const fs = require('fs');
             const body = fs.readFileSync('review-output.txt', 'utf8');
-            const marker = '<!-- review-gate-1 -->';
+            const marker = '<!-- review-gate -->';
             const commentBody = `${marker}\n### 🔍 Local SLM Review Gate 1 — Qwen 2.5 Coder 1.5B\n\n\`\`\`\n${body}\n\`\`\`\n`;
 
             const { data: comments } = await github.rest.issues.listComments({
@@ -112,16 +112,18 @@ jobs:
           exit 1
 
   review-gate-2:
-    name: Review Gate 2 (Qwen 3.6 27B)
+    name: Review Gate 2 (Local Qwen 27B)
     needs: review-gate-1
-    # Enable only after a runner labelled `gpu` has Ollama + qwen3.6:27b
+    # Enable only after a runner labelled `gpu` has Ollama + the model
     # installed. This avoids leaving PRs permanently queued before the
     # self-hosted review machine is provisioned.
     if: ${{ vars.ENABLE_REVIEW_GATE_2 == 'true' }}
     runs-on: [self-hosted, linux, gpu]
     env:
       OLLAMA_HOST: http://localhost:11434
-      OLLAMA_MODEL: qwen3.6:27b
+      # qwen3.6:27b is the current verified local/Ollama 27B release.
+      # Override REVIEW_GATE_2_MODEL when a newer local 27B model is available.
+      OLLAMA_MODEL: ${{ vars.REVIEW_GATE_2_MODEL || 'qwen3.6:27b' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -139,7 +141,7 @@ jobs:
             exit 2
           fi
 
-      - name: Verify Qwen 27B is preloaded
+      - name: Verify Gate 2 model is preloaded
         run: |
           if ! grep -Fq "\"name\":\"${OLLAMA_MODEL}\"" ollama-tags.json; then
             echo "${OLLAMA_MODEL} is not installed on this runner." >&2
