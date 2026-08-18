@@ -1,0 +1,158 @@
+name: Pre-Merge Quality Gate
+
+# Enforces that the core app AND every plugin under plugins/ (including any new one added by
+# this PR — plugins are discovered dynamically, nothing here needs updating when one is added)
+# are documented, tested, coverage- and mutation-tested, and package/release-ready before a PR
+# can merge. See AGENTS.md "Pre-Merge Quality Gate" for the full rationale and how to run this
+# locally.
+#
+# "Release-ready" here means each artifact builds, tests, and packages cleanly (mvn verify
+# produces the jar) — it does NOT deploy anything. Actual releases stay tag-triggered via
+# release.yml, so this gate never needs deploy credentials and is safe to run on PRs from forks.
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: pr-quality-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ------------------------------------------------------------------
+  # Docs + test-existence check: every plugins/*/ directory must carry
+  # a README.md, plugin.properties, and (if it has Java source) tests.
+  # ------------------------------------------------------------------
+  docs-and-tests-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check plugin documentation and test completeness
+        run: ./scripts/check-plugin-completeness.sh
+
+  # ------------------------------------------------------------------
+  # Core app: build, unit test, enforce jacoco line-coverage minimum
+  # (mvn verify), then enforce the pitest mutation-score minimum.
+  # ------------------------------------------------------------------
+  app-quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Make mvnw executable
+        run: chmod +x ./mvnw
+
+      - name: Build, test, and enforce coverage gate
+        run: ./mvnw -B -V clean verify
+
+      - name: Enforce mutation-testing gate
+        run: ./mvnw -B org.pitest:pitest-maven:mutationCoverage
+
+      - name: Upload coverage/mutation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-quality-reports
+          path: |
+            target/site/jacoco/**
+            target/pit-reports/**
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ------------------------------------------------------------------
+  # Discover every plugin module so the matrix below auto-covers new
+  # plugins added by this PR without any workflow edits.
+  # ------------------------------------------------------------------
+  discover-plugins:
+    runs-on: ubuntu-latest
+    outputs:
+      plugins: ${{ steps.list.outputs.plugins }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          plugins=$(for d in plugins/*/; do
+            [ -f "${d}pom.xml" ] && basename "$d"
+          done | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "Discovered plugins: $plugins"
+          echo "plugins=$plugins" >> "$GITHUB_OUTPUT"
+
+  # ------------------------------------------------------------------
+  # Each plugin: build, unit test, enforce its jacoco/pitest gates.
+  # Plugins with no Java source (e.g. a pure-CSS theme plugin) only
+  # need to package cleanly — there's nothing to unit- or mutation-test.
+  # ------------------------------------------------------------------
+  plugin-quality-gate:
+    needs: discover-plugins
+    if: needs.discover-plugins.outputs.plugins != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin: ${{ fromJson(needs.discover-plugins.outputs.plugins) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build, test, and enforce coverage gate (${{ matrix.plugin }})
+        working-directory: plugins/${{ matrix.plugin }}
+        run: |
+          if find src/main/java -name '*.java' 2>/dev/null | grep -q .; then
+            mvn -B -V clean verify
+          else
+            echo "No Java source in ${{ matrix.plugin }} — packaging only, no coverage gate applies."
+            mvn -B -V clean package
+          fi
+
+      - name: Enforce mutation-testing gate (${{ matrix.plugin }})
+        working-directory: plugins/${{ matrix.plugin }}
+        run: |
+          if find src/main/java -name '*.java' 2>/dev/null | grep -q .; then
+            mvn -B org.pitest:pitest-maven:mutationCoverage
+          else
+            echo "No Java source in ${{ matrix.plugin }} — skipping mutation testing."
+          fi
+
+      - name: Upload coverage/mutation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.plugin }}-quality-reports
+          path: |
+            plugins/${{ matrix.plugin }}/target/site/jacoco/**
+            plugins/${{ matrix.plugin }}/target/pit-reports/**
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ------------------------------------------------------------------
+  # Single required status check for branch protection: green only if
+  # docs/tests, the app gate, and every plugin's gate all passed.
+  # ------------------------------------------------------------------
+  quality-gate:
+    name: Pre-Merge Quality Gate
+    if: always()
+    needs: [docs-and-tests-check, app-quality-gate, discover-plugins, plugin-quality-gate]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify every required job succeeded
+        run: |
+          echo '${{ toJson(needs) }}' | jq -r 'to_entries[] | "\(.key)=\(.value.result)"'
+          if ! echo '${{ toJson(needs) }}' | jq -e 'to_entries | all(.value.result == "success")' > /dev/null; then
+            echo "One or more pre-merge quality gate jobs did not succeed." >&2
+            exit 1
+          fi
+          echo "All pre-merge quality gate checks passed: app and every plugin are documented, tested, coverage- and mutation-gated, and package-ready."
