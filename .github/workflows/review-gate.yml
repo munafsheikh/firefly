@@ -1,9 +1,10 @@
 name: Local SLM Review Gates
 
 # Two-stage code review for PRs touching Java.
-# Gate 1 is a fast CPU-only review on the GitHub-hosted runner.
-# Gate 2 is a deeper review using a preloaded 27B Qwen model on a
-# self-hosted GPU runner. Both inference stages use local Ollama only.
+# Each gate is opt-in through a repository Actions variable:
+#   ENABLE_REVIEW_GATE_1=true
+#   ENABLE_REVIEW_GATE_2=true
+# The exact same Bash entrypoints are runnable locally through Maven.
 
 on:
   pull_request:
@@ -21,6 +22,7 @@ concurrency:
 jobs:
   review-gate-1:
     name: Review Gate 1 (Qwen 2.5 Coder 1.5B)
+    if: ${{ vars.ENABLE_REVIEW_GATE_1 == 'true' }}
     runs-on: ubuntu-latest
     services:
       ollama:
@@ -29,8 +31,7 @@ jobs:
           - 11434:11434
     env:
       OLLAMA_HOST: http://localhost:11434
-      # Small first-pass model for CPU-only GitHub-hosted CI.
-      OLLAMA_MODEL: qwen2.5-coder:1.5b
+      REVIEW_GATE_1_MODEL: ${{ vars.REVIEW_GATE_1_MODEL || 'qwen2.5-coder:1.5b' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,12 +40,12 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
 
       - name: Wait for Ollama
         run: |
           for i in $(seq 1 30); do
-            if curl -sf http://localhost:11434/api/tags > /dev/null; then
+            if curl -sf "${OLLAMA_HOST}/api/tags" >/dev/null; then
               echo "Ollama is up."
               exit 0
             fi
@@ -53,34 +54,34 @@ jobs:
           echo "Ollama did not become healthy in time." >&2
           exit 1
 
-      - name: Pull review model
+      - name: Run Review Gate 1
+        id: review1
+        env:
+          # GitHub-hosted runners are ephemeral, so Gate 1 may populate the
+          # local Ollama service. Manual Maven runs default to offline/no-pull.
+          REVIEW_GATE_ALLOW_PULL: 'true'
         run: |
-          curl -sf http://localhost:11434/api/pull \
-            -d "{\"name\": \"${OLLAMA_MODEL}\"}"
+          set +e
+          bash tools/review-gate/review-gate-1.sh \
+            --base "${{ github.base_ref }}" > review-output-1.txt 2>&1
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          cat review-output-1.txt
 
-      - name: Compute PR diff
-        run: |
-          git fetch origin "${{ github.base_ref }}" --depth=1
-          git diff "origin/${{ github.base_ref }}"...HEAD -- '*.java' > pr.diff
-          echo "Diff lines: $(wc -l < pr.diff)"
-
-      - name: Run ReviewGate
-        id: review
-        continue-on-error: true
-        run: |
-          java tools/review-gate/ReviewGate.java < pr.diff > review-output.txt 2>&1
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
-          cat review-output.txt
-
-      - name: Post review as PR comment
+      - name: Post Gate 1 review as PR comment
         if: always()
         uses: actions/github-script@v7
+        env:
+          REVIEW_MODEL: ${{ env.REVIEW_GATE_1_MODEL }}
         with:
           script: |
             const fs = require('fs');
-            const body = fs.readFileSync('review-output.txt', 'utf8');
-            const marker = '<!-- review-gate -->';
-            const commentBody = `${marker}\n### 🔍 Local SLM Review Gate 1 — Qwen 2.5 Coder 1.5B\n\n\`\`\`\n${body}\n\`\`\`\n`;
+            const body = fs.existsSync('review-output-1.txt')
+              ? fs.readFileSync('review-output-1.txt', 'utf8')
+              : 'Review Gate 1 did not produce output.';
+            const marker = '<!-- review-gate-1 -->';
+            const commentBody = `${marker}\n### 🔍 Local SLM Review Gate 1 — ${process.env.REVIEW_MODEL}\n\n\`\`\`\n${body}\n\`\`\`\n`;
 
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -105,25 +106,26 @@ jobs:
               });
             }
 
-      - name: Enforce gate 1
-        if: steps.review.outputs.exit_code == '1'
+      - name: Enforce Gate 1
+        if: steps.review1.outputs.exit_code != '0'
         run: |
-          echo "Blocked by Review Gate 1 — see PR comment for details." >&2
+          echo "Review Gate 1 failed with exit code ${{ steps.review1.outputs.exit_code }} — see PR comment." >&2
           exit 1
 
   review-gate-2:
-    name: Review Gate 2 (Local Qwen 27B)
+    name: Review Gate 2 (Qwen 3.6 27B)
     needs: review-gate-1
-    # Enable only after a runner labelled `gpu` has Ollama + the model
-    # installed. This avoids leaving PRs permanently queued before the
-    # self-hosted review machine is provisioned.
-    if: ${{ vars.ENABLE_REVIEW_GATE_2 == 'true' }}
+    # Gate 2 may run when Gate 1 is disabled, but never after Gate 1 fails.
+    if: >-
+      ${{
+        always() &&
+        vars.ENABLE_REVIEW_GATE_2 == 'true' &&
+        (needs.review-gate-1.result == 'success' || needs.review-gate-1.result == 'skipped')
+      }}
     runs-on: [self-hosted, linux, gpu]
     env:
       OLLAMA_HOST: http://localhost:11434
-      # qwen3.6:27b is the current verified local/Ollama 27B release.
-      # Override REVIEW_GATE_2_MODEL when a newer local 27B model is available.
-      OLLAMA_MODEL: ${{ vars.REVIEW_GATE_2_MODEL || 'qwen3.6:27b' }}
+      REVIEW_GATE_2_MODEL: ${{ vars.REVIEW_GATE_2_MODEL || 'qwen3.6:27b' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -132,43 +134,24 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
 
-      - name: Verify local Ollama
-        run: |
-          if ! curl -sf "${OLLAMA_HOST}/api/tags" > ollama-tags.json; then
-            echo "Review Gate 2 requires Ollama on ${OLLAMA_HOST}." >&2
-            exit 2
-          fi
-
-      - name: Verify Gate 2 model is preloaded
-        run: |
-          if ! grep -Fq "\"name\":\"${OLLAMA_MODEL}\"" ollama-tags.json; then
-            echo "${OLLAMA_MODEL} is not installed on this runner." >&2
-            echo "Preload it once with: ollama pull ${OLLAMA_MODEL}" >&2
-            echo "Gate 2 deliberately does not download model weights during PR execution." >&2
-            exit 2
-          fi
-
-      - name: Compute PR diff
-        run: |
-          git fetch origin "${{ github.base_ref }}" --depth=1
-          git diff "origin/${{ github.base_ref }}"...HEAD -- '*.java' > pr.diff
-          echo "Diff lines: $(wc -l < pr.diff)"
-
-      - name: Run ReviewGate 2
+      - name: Run Review Gate 2
         id: review2
-        continue-on-error: true
         run: |
-          java tools/review-gate/ReviewGate.java --model "${OLLAMA_MODEL}" < pr.diff > review-output-2.txt 2>&1
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          set +e
+          bash tools/review-gate/review-gate-2.sh \
+            --base "${{ github.base_ref }}" > review-output-2.txt 2>&1
+          code=$?
+          set -e
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
           cat review-output-2.txt
 
       - name: Post Gate 2 review as PR comment
         if: always()
         uses: actions/github-script@v7
         env:
-          REVIEW_MODEL: ${{ env.OLLAMA_MODEL }}
+          REVIEW_MODEL: ${{ env.REVIEW_GATE_2_MODEL }}
         with:
           script: |
             const fs = require('fs');
@@ -201,14 +184,8 @@ jobs:
               });
             }
 
-      - name: Enforce gate 2 finding
-        if: steps.review2.outputs.exit_code == '1'
+      - name: Enforce Gate 2
+        if: steps.review2.outputs.exit_code != '0'
         run: |
-          echo "Blocked by Review Gate 2 — see PR comment for details." >&2
-          exit 1
-
-      - name: Enforce gate 2 availability
-        if: steps.review2.outputs.exit_code != '0' && steps.review2.outputs.exit_code != '1'
-        run: |
-          echo "Review Gate 2 could not complete successfully." >&2
+          echo "Review Gate 2 failed with exit code ${{ steps.review2.outputs.exit_code }} — see PR comment." >&2
           exit 1
