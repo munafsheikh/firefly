@@ -56,6 +56,11 @@ done
 
 [[ -n "$MODEL" ]] || { echo "[$GATE_NAME] OLLAMA_MODEL is required." >&2; exit 2; }
 
+# ReviewGate.java reads these from the environment. Export the resolved defaults
+# so local Maven runs use localhost rather than ReviewGate.java's Docker default.
+export OLLAMA_HOST
+export OLLAMA_MODEL="$MODEL"
+
 for cmd in git curl java; do
   command -v "$cmd" >/dev/null 2>&1 || {
     echo "[$GATE_NAME] Required command not found: $cmd" >&2
