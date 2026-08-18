@@ -10,6 +10,9 @@ on:
   pull_request:
     paths:
       - '**/*.java'
+      - 'tools/review-gate/**'
+      - '.github/workflows/review-gate.yml'
+      - 'pom.xml'
 
 permissions:
   contents: read
@@ -41,6 +44,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
+
+      - name: Validate ReviewGate implementation
+        run: bash tools/review-gate/test-review-gate.sh
 
       - name: Wait for Ollama
         run: |
@@ -135,6 +141,9 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
+
+      - name: Validate ReviewGate implementation
+        run: bash tools/review-gate/test-review-gate.sh
 
       - name: Run Review Gate 2
         id: review2
