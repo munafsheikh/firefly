@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Firefly Bash Runner</title>
+    <link rel="stylesheet" href="/api/theme/active.css">
+    <style>
+        body { max-width: 1100px; margin: 0 auto; padding: 2rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+        .grid { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(320px, 2fr); gap: 1rem; }
+        .card { border: 1px solid currentColor; border-radius: 10px; padding: 1rem; opacity: .96; }
+        label { display: block; margin: .8rem 0 .3rem; font-weight: 700; }
+        select, textarea, button { width: 100%; box-sizing: border-box; font: inherit; padding: .65rem; }
+        textarea { min-height: 150px; resize: vertical; }
+        button { cursor: pointer; margin-top: 1rem; font-weight: 800; }
+        pre { white-space: pre-wrap; overflow-wrap: anywhere; min-height: 80px; max-height: 380px; overflow: auto; }
+        .row { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .row input { width: auto; }
+        .muted { opacity: .7; }
+        .status { font-weight: 800; }
+        @media (max-width: 780px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<h1>Firefly Bash Runner</h1>
+<p class="muted">Run a script, wait for it to finish, then open its declared result with <code>xdg-open</code>.</p>
+
+<div class="grid">
+    <section class="card">
+        <label for="script">Script</label>
+        <select id="script"></select>
+
+        <label for="args">Arguments — one per line</label>
+        <textarea id="args" placeholder="first argument&#10;second argument"></textarea>
+
+        <div class="row">
+            <input id="open" type="checkbox" checked>
+            <label for="open" style="margin:0">Open successful result</label>
+        </div>
+
+        <button id="run">Run and wait</button>
+        <p id="status" class="status"></p>
+    </section>
+
+    <section class="card">
+        <div class="row">
+            <span>Exit: <strong id="exit">—</strong></span>
+            <span>Duration: <strong id="duration">—</strong></span>
+            <span>Timed out: <strong id="timeout">—</strong></span>
+        </div>
+        <p>Open target: <code id="target">—</code></p>
+        <p>Open status: <span id="openStatus">—</span></p>
+        <h3>stdout</h3>
+        <pre id="stdout"></pre>
+        <h3>stderr</h3>
+        <pre id="stderr"></pre>
+    </section>
+</div>
+
+<script>
+const script = document.getElementById('script');
+const run = document.getElementById('run');
+const status = document.getElementById('status');
+
+async function loadScripts() {
+    const response = await fetch('/api/bash-runner/scripts');
+    if (!response.ok) throw new Error(await response.text());
+    const scripts = await response.json();
+    script.innerHTML = scripts.map(s => `<option value="${escapeHtml(s.path)}">${escapeHtml(s.path)}</option>`).join('');
+    if (!scripts.length) status.textContent = 'No .sh scripts found in the configured scripts root.';
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+}
+
+run.addEventListener('click', async () => {
+    run.disabled = true;
+    status.textContent = 'Running…';
+    document.getElementById('stdout').textContent = '';
+    document.getElementById('stderr').textContent = '';
+    try {
+        const args = document.getElementById('args').value.split(/\r?\n/).filter(line => line.length > 0);
+        const response = await fetch('/api/bash-runner/run', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({script: script.value, args, open: document.getElementById('open').checked})
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || JSON.stringify(result));
+        document.getElementById('exit').textContent = result.exitCode;
+        document.getElementById('duration').textContent = `${result.durationMs} ms`;
+        document.getElementById('timeout').textContent = result.timedOut;
+        document.getElementById('target').textContent = result.openTarget || '—';
+        document.getElementById('openStatus').textContent = result.openStarted ? 'launched' : (result.openError || 'not requested');
+        document.getElementById('stdout').textContent = result.stdout || '';
+        document.getElementById('stderr').textContent = result.stderr || '';
+        status.textContent = result.exitCode === 0 && !result.timedOut ? 'Completed.' : 'Script failed.';
+    } catch (e) {
+        status.textContent = `Error: ${e.message}`;
+    } finally {
+        run.disabled = false;
+    }
+});
+
+loadScripts().catch(e => status.textContent = `Error loading scripts: ${e.message}`);
+</script>
+</body>
+</html>

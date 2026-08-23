@@ -53,6 +53,10 @@ jobs:
         working-directory: plugins/webtui-plugin
         run: mvn clean package -B -V
 
+      - name: Build Bash Runner Plugin
+        working-directory: plugins/bash-runner-plugin
+        run: mvn clean package -B -V
+
       - name: Upload Plugin artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -66,4 +70,5 @@ jobs:
             plugins/plantuml-plugin/target/plantuml-plugin-*.jar
             plugins/markdown-plugin/target/markdown-plugin-*.jar
             plugins/webtui-plugin/target/webtui-plugin-*.jar
+            plugins/bash-runner-plugin/target/bash-runner-plugin-*.jar
           retention-days: 1

@@ -1,0 +1,16 @@
+{
+  "skills": [
+    {
+      "name": "bash-script-execution",
+      "description": "Run configured local Bash scripts synchronously and inspect their bounded stdout/stderr results"
+    }
+  ],
+  "servers": [
+    {
+      "name": "bash-runner-http",
+      "type": "http",
+      "target": "/api/bash-runner",
+      "description": "Local HTTP API for discovering and running allowlisted Bash scripts and opening successful results"
+    }
+  ]
+}
