@@ -68,7 +68,7 @@ jobs:
           mkdir -p plugins
           cp plugins/cli-plugin/target/cli-plugin-*.jar plugins/
           cp plugins/actuator-plugin/target/actuator-plugin-*.jar plugins/
-          cp plugins/ado-plugin/target/ado-plugin-1.0.0.jar plugins/
+          cp plugins/ado-plugin/target/ado-plugin-*.jar plugins/
           cp plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar plugins/
           cp plugins/midnight-theme-plugin/target/midnight-theme-plugin-*.jar plugins/
           cp plugins/plantuml-plugin/target/plantuml-plugin-*.jar plugins/
