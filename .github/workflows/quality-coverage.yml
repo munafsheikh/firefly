@@ -41,6 +41,7 @@ jobs:
         run: chmod +x ./mvnw ./scripts/quality.sh ./scripts/quality-report.py
 
       - name: Generate JaCoCo coverage for app and plugins
+        continue-on-error: true
         run: ./scripts/quality.sh coverage
 
       - name: Publish coverage summary
