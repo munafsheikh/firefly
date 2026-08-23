@@ -59,6 +59,10 @@ jobs:
         working-directory: plugins/webtui-plugin
         run: mvn clean package -B -V
 
+      - name: Build Bash Runner Plugin
+        working-directory: plugins/bash-runner-plugin
+        run: mvn clean package -B -V
+
       - name: Install Plugins
         run: |
           mkdir -p plugins
@@ -70,6 +74,7 @@ jobs:
           cp plugins/plantuml-plugin/target/plantuml-plugin-*.jar plugins/
           cp plugins/markdown-plugin/target/markdown-plugin-*.jar plugins/
           cp plugins/webtui-plugin/target/webtui-plugin-*.jar plugins/
+          cp plugins/bash-runner-plugin/target/bash-runner-plugin-*.jar plugins/
           ls -la plugins/
 
       - name: Start Firefly with Plugin
@@ -126,6 +131,11 @@ jobs:
       - name: Verify WebTUI Browser Plugin
         run: |
           curl -sf http://localhost:17922/api/webtui/health | grep -q '"plugin":"webtui"' && echo '✅ WebTUI Browser Plugin loaded successfully (browserAvailable depends on host Chromium deps)'
+
+      - name: Verify Bash Runner Plugin
+        run: |
+          curl -sf http://localhost:17922/api/bash-runner/health | grep -q '"plugin":"bash-runner"' && echo '✅ Bash Runner Plugin loaded successfully'
+          curl -sf http://localhost:17922/api/mcp-registry/tree | grep -q '"pluginId":"bash-runner"' && echo '✅ Bash Runner MCP manifest discovered'
 
       - name: Stop Firefly
         if: always()
