@@ -77,6 +77,16 @@ jobs:
           cp plugins/bash-runner-plugin/target/bash-runner-plugin-*.jar plugins/
           ls -la plugins/
 
+      - name: Create Bash Runner smoke script
+        run: |
+          mkdir -p "$HOME/.firefly/scripts"
+          cat > "$HOME/.firefly/scripts/ci-smoke.sh" <<'SCRIPT'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          printf 'argument=%s\n' "$1"
+          printf 'FIREFLY_OPEN=https://example.com/firefly-ci\n'
+          SCRIPT
+
       - name: Start Firefly with Plugin
         env:
           LOADER_PATH: plugins
@@ -136,6 +146,14 @@ jobs:
         run: |
           curl -sf http://localhost:17922/api/bash-runner/health | grep -q '"plugin":"bash-runner"' && echo '✅ Bash Runner Plugin loaded successfully'
           curl -sf http://localhost:17922/api/mcp-registry/tree | grep -q '"pluginId":"bash-runner"' && echo '✅ Bash Runner MCP manifest discovered'
+          response=$(curl -sf \
+            -H 'Content-Type: application/json' \
+            -d '{"script":"ci-smoke.sh","args":["hello world"],"open":false}' \
+            http://localhost:17922/api/bash-runner/run)
+          echo "Bash Runner response: $response"
+          echo "$response" | grep -q '"exitCode":0' && echo '✅ Bash Runner waited for a successful script'
+          echo "$response" | grep -q 'argument=hello world' && echo '✅ Bash Runner passed argv without shell interpolation'
+          echo "$response" | grep -q '"openTarget":"https://example.com/firefly-ci"' && echo '✅ Bash Runner resolved FIREFLY_OPEN result'
 
       - name: Stop Firefly
         if: always()
