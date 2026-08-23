@@ -62,12 +62,14 @@ services:
         curl -sf http://app-all-plugins:17922/api/plantuml/health | grep -q '\"plugin\":\"plantuml\"' && echo '✅ PlantUML Plugin active (/api/plantuml/health)' &&
         curl -sf http://app-all-plugins:17922/api/markdown/health | grep -q '\"plugin\":\"markdown\"' && echo '✅ Markdown Plugin active (/api/markdown/health)' &&
         curl -sf http://app-all-plugins:17922/api/webtui/health | grep -q '\"plugin\":\"webtui\"' && echo '✅ WebTUI Browser Plugin active (/api/webtui/health)' &&
+        curl -sf http://app-all-plugins:17922/api/bash-runner/health | grep -q '\"plugin\":\"bash-runner\"' && echo '✅ Bash Runner Plugin active (/api/bash-runner/health)' &&
         echo '' &&
         echo '🌐 Open your browser to: http://localhost:17922/' &&
         echo '   - Dashboard with all plugins listed' &&
         echo '   - Terminal at /terminal' &&
         echo '   - Swagger UI at /swagger-ui.html' &&
         echo '   - Actuator at /actuator' &&
+        echo '   - Bash Runner at /bash-runner' &&
         echo '' &&
         echo '✨ All plugins working collectively!' &&
         echo '========================================'
@@ -134,7 +136,8 @@ services:
         cd /app/plugins/plantuml-plugin && mvn clean package -B -V &&
         cd /app/plugins/markdown-plugin && mvn clean package -B -V &&
         cd /app/plugins/webtui-plugin && mvn clean package -B -V &&
-        cp /app/plugins/cli-plugin/target/cli-plugin-*.jar /app/plugins/actuator-plugin/target/actuator-plugin-*.jar /app/plugins/ado-plugin/target/ado-plugin-*.jar /app/plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar /app/plugins/midnight-theme-plugin/target/midnight-theme-plugin-*.jar /app/plugins/plantuml-plugin/target/plantuml-plugin-*.jar /app/plugins/markdown-plugin/target/markdown-plugin-*.jar /app/plugins/webtui-plugin/target/webtui-plugin-*.jar /app/plugins/
+        cd /app/plugins/bash-runner-plugin && mvn clean package -B -V &&
+        cp /app/plugins/cli-plugin/target/cli-plugin-*.jar /app/plugins/actuator-plugin/target/actuator-plugin-*.jar /app/plugins/ado-plugin/target/ado-plugin-*.jar /app/plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar /app/plugins/midnight-theme-plugin/target/midnight-theme-plugin-*.jar /app/plugins/plantuml-plugin/target/plantuml-plugin-*.jar /app/plugins/markdown-plugin/target/markdown-plugin-*.jar /app/plugins/webtui-plugin/target/webtui-plugin-*.jar /app/plugins/bash-runner-plugin/target/bash-runner-plugin-*.jar /app/plugins/
       "
     restart: "no"
 
@@ -184,7 +187,8 @@ services:
         done &&
         response=$$(curl -sf http://app:17922/api/ado/health) &&
         echo \"Plugin health: $$response\" &&
-        echo \"$$response\" | grep -q '\"plugin\":\"ado\"' && echo '✅ ADO Plugin loaded successfully'
+        echo \"$$response\" | grep -q '\"plugin\":\"ado\"' && echo '✅ ADO Plugin loaded successfully' &&
+        curl -sf http://app:17922/api/bash-runner/health | grep -q '\"plugin\":\"bash-runner\"' && echo '✅ Bash Runner Plugin loaded successfully'
       "
     restart: "no"
 

@@ -13,3 +13,4 @@ plugins/midnight-theme-plugin/
 plugins/plantuml-plugin/
 plugins/markdown-plugin/
 plugins/webtui-plugin/
+plugins/bash-runner-plugin/

@@ -12,6 +12,7 @@ on:
       - 'plantuml-plugin-*'
       - 'markdown-plugin-*'
       - 'webtui-plugin-*'
+      - 'bash-runner-plugin-*'
 
 jobs:
   release-app:
@@ -248,6 +249,32 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  release-bash-runner-plugin:
+    if: startsWith(github.ref, 'refs/tags/bash-runner-plugin-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    defaults:
+      run:
+        working-directory: plugins/bash-runner-plugin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+          server-id: github
+
+      - name: Deploy to GitHub Packages
+        run: mvn -B deploy -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   release-docker-app:
     # Core app image, no plugins baked in — mirrors `docker compose up app`.
     if: startsWith(github.ref, 'refs/tags/v')
@@ -314,6 +341,7 @@ jobs:
           cd plugins/plantuml-plugin && mvn clean package -B -V -DskipTests && cd ../..
           cd plugins/markdown-plugin && mvn clean package -B -V -DskipTests && cd ../..
           cd plugins/webtui-plugin && mvn clean package -B -V -DskipTests && cd ../..
+          cd plugins/bash-runner-plugin && mvn clean package -B -V -DskipTests && cd ../..
 
       - name: Flatten plugin jars into build context
         run: |
@@ -325,6 +353,7 @@ jobs:
           cp plugins/plantuml-plugin/target/plantuml-plugin-*.jar plugins/
           cp plugins/markdown-plugin/target/markdown-plugin-*.jar plugins/
           cp plugins/webtui-plugin/target/webtui-plugin-*.jar plugins/
+          cp plugins/bash-runner-plugin/target/bash-runner-plugin-*.jar plugins/
           ls -la plugins/*.jar
 
       - name: Set up Docker Buildx

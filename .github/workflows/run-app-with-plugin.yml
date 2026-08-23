@@ -59,18 +59,33 @@ jobs:
         working-directory: plugins/webtui-plugin
         run: mvn clean package -B -V
 
+      - name: Build Bash Runner Plugin
+        working-directory: plugins/bash-runner-plugin
+        run: mvn clean package -B -V
+
       - name: Install Plugins
         run: |
           mkdir -p plugins
           cp plugins/cli-plugin/target/cli-plugin-*.jar plugins/
           cp plugins/actuator-plugin/target/actuator-plugin-*.jar plugins/
-          cp plugins/ado-plugin/target/ado-plugin-1.0.0.jar plugins/
+          cp plugins/ado-plugin/target/ado-plugin-*.jar plugins/
           cp plugins/mcp-registry-plugin/target/mcp-registry-plugin-*.jar plugins/
           cp plugins/midnight-theme-plugin/target/midnight-theme-plugin-*.jar plugins/
           cp plugins/plantuml-plugin/target/plantuml-plugin-*.jar plugins/
           cp plugins/markdown-plugin/target/markdown-plugin-*.jar plugins/
           cp plugins/webtui-plugin/target/webtui-plugin-*.jar plugins/
+          cp plugins/bash-runner-plugin/target/bash-runner-plugin-*.jar plugins/
           ls -la plugins/
+
+      - name: Create Bash Runner smoke script
+        run: |
+          mkdir -p "$HOME/.firefly/scripts"
+          cat > "$HOME/.firefly/scripts/ci-smoke.sh" <<'SCRIPT'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          printf 'argument=%s\n' "$1"
+          printf 'FIREFLY_OPEN=https://example.com/firefly-ci\n'
+          SCRIPT
 
       - name: Start Firefly with Plugin
         env:
@@ -126,6 +141,19 @@ jobs:
       - name: Verify WebTUI Browser Plugin
         run: |
           curl -sf http://localhost:17922/api/webtui/health | grep -q '"plugin":"webtui"' && echo '✅ WebTUI Browser Plugin loaded successfully (browserAvailable depends on host Chromium deps)'
+
+      - name: Verify Bash Runner Plugin
+        run: |
+          curl -sf http://localhost:17922/api/bash-runner/health | grep -q '"plugin":"bash-runner"' && echo '✅ Bash Runner Plugin loaded successfully'
+          curl -sf http://localhost:17922/api/mcp-registry/tree | grep -q '"pluginId":"bash-runner"' && echo '✅ Bash Runner MCP manifest discovered'
+          response=$(curl -sf \
+            -H 'Content-Type: application/json' \
+            -d '{"script":"ci-smoke.sh","args":["hello world"],"open":false}' \
+            http://localhost:17922/api/bash-runner/run)
+          echo "Bash Runner response: $response"
+          echo "$response" | grep -q '"exitCode":0' && echo '✅ Bash Runner waited for a successful script'
+          echo "$response" | grep -q 'argument=hello world' && echo '✅ Bash Runner passed argv without shell interpolation'
+          echo "$response" | grep -q '"openTarget":"https://example.com/firefly-ci"' && echo '✅ Bash Runner resolved FIREFLY_OPEN result'
 
       - name: Stop Firefly
         if: always()
