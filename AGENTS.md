@@ -100,6 +100,7 @@ The `compose.yaml` mirrors the GitHub Actions pipeline stages so they can be run
 | Showcase All Plugins | — | `docker compose --profile showcase up app-all-plugins showcase --build` |
 | Native Image Build | — | `docker compose --profile native run --rm native-build` |
 | Release (Maven + Docker) | `release.yml` | triggered by pushing a release tag — see [Releases](#releases-maven-release-plugin) below |
+| Pre-Merge Quality Gate | `pr-quality-gate.yml` | see [Pre-Merge Quality Gate](#pre-merge-quality-gate) below |
 
 **Notes:**
 - Use `--abort-on-container-exit` with `up` to auto-stop services after verification completes.
@@ -140,6 +141,40 @@ For a **local** `mvn deploy` (outside CI), add a `<server>` entry to `~/.m2/sett
   <password>YOUR_GITHUB_PAT</password>
 </server>
 ```
+
+---
+
+#### Pre-Merge Quality Gate
+
+`.github/workflows/pr-quality-gate.yml` runs on every PR to `main`/`master` and blocks merge unless the core app **and every plugin** (including any new one added by the PR — plugins are discovered dynamically by scanning `plugins/*/pom.xml`, so nothing in the workflow needs editing when a plugin is added) are documented, tested, and pass coverage/mutation thresholds. It has four jobs feeding one required check:
+
+- **`docs-and-tests-check`** — runs `./scripts/check-plugin-completeness.sh`, which requires every `plugins/<name>/` directory to have a `README.md`, a `META-INF/plugin.properties`, and (if it ships any `.java` under `src/main/java`) at least one test class under `src/test/java`. A plugin with no Java source at all (e.g. `midnight-theme-plugin`, pure CSS) is exempt from the test-class requirement — there's nothing to unit test.
+- **`app-quality-gate`** — `./mvnw clean verify` (compiles, unit tests, packages, then `jacoco:check` fails the build if line coverage drops below the module's `jacoco.line.ratio` property), followed by `./mvnw org.pitest:pitest-maven:mutationCoverage` (fails the build if the mutation score drops below `pitest.mutation.threshold`).
+- **`discover-plugins`** — lists `plugins/*/pom.xml` directories into a JSON array consumed as a dynamic matrix by the next job.
+- **`plugin-quality-gate`** — the same `mvn verify` + `mvn org.pitest:pitest-maven:mutationCoverage` cycle, run per-plugin in that matrix (working directory `plugins/<name>`). A plugin with no Java source only needs to `mvn package` cleanly.
+- **`quality-gate`** — the actual required status check: green only if every job above succeeded. Point branch protection's required check at this job, not at the individual sub-jobs.
+
+**Thresholds**: each `pom.xml` (root + per-plugin) defines its own `jacoco.line.ratio` and `pitest.mutation.threshold` properties, set just below each module's actual measured coverage at the time this gate was added. They intentionally vary by module — e.g. `cli-plugin` is set low (0.12 / 10) because `FireflyCommand` is almost entirely terminal-rendering code that needs a live `Frame`/`TuiRunner` and can't be exercised headlessly (see that plugin's README), while `ado-plugin` and `actuator-plugin` are set high (0.90 / 45 and 0.80 / 60) because they're fully unit-testable. **These are a starting baseline, not a ceiling** — ratchet them up over time as coverage improves; never lower them to make a failing PR pass.
+
+**"Release-ready", not deployed**: the gate proves each artifact builds, tests, and packages cleanly (`mvn verify` produces the jar). It does **not** run `mvn deploy` or push Docker images on PRs — that stays tag-triggered via `release.yml` (see [Releases](#releases-maven-release-plugin) above), so this gate never needs deploy credentials and is safe to run on PRs from forks.
+
+**Running it locally** (mirrors the CI job exactly):
+```bash
+# Docs/test completeness
+./scripts/check-plugin-completeness.sh
+
+# App: build + coverage gate, then mutation gate
+docker compose --profile build run --rm app-build ./mvnw clean verify
+docker compose --profile build run --rm app-build ./mvnw org.pitest:pitest-maven:mutationCoverage
+
+# One plugin: build + coverage gate, then mutation gate
+docker compose --profile build run --rm app-build sh -c "cd plugins/ado-plugin && mvn clean verify"
+docker compose --profile build run --rm app-build sh -c "cd plugins/ado-plugin && mvn org.pitest:pitest-maven:mutationCoverage"
+```
+
+Coverage/mutation HTML reports land at `target/site/jacoco/index.html` and `target/pit-reports/index.html` (per module) and are uploaded as CI artifacts on every run.
+
+**Adding a new plugin**: give it a `README.md`, a `META-INF/plugin.properties`, at least one test class if it has Java source, and copy the `jacoco-maven-plugin`/`pitest-maven` `<plugin>` blocks (with a `jacoco.line.ratio`/`pitest.mutation.threshold` pair under `<properties>`) from an existing plugin's `pom.xml` — the workflow picks it up automatically, no CI changes required.
 
 ---
 
