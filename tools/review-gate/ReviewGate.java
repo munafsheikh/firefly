@@ -8,17 +8,17 @@ import java.time.Duration;
 import java.util.Scanner;
 
 /**
- * ReviewGate — sends a git diff to a local Ollama-served SLM for a first-pass
+ * ReviewGate — sends a git diff to a locally served SLM for a first-pass
  * code review, prints the review, and exits non-zero if the model flags a
  * blocking issue. No external dependencies beyond the JDK (11+).
  *
  * Usage:
  *   git diff --cached | java ReviewGate.java
- *   git diff --cached | java ReviewGate.java --model qwen2.5-coder:7b
+ *   git diff --cached | java ReviewGate.java --model <model-id>
  *
  * Env vars:
- *   OLLAMA_HOST   default http://ollama:11434  (docker-compose service name)
- *   OLLAMA_MODEL  default qwen2.5-coder:7b
+ *   LLM_HOST   default http://llm-runtime:11434  (docker-compose service name)
+ *   LLM_MODEL  review model id (required unless --model is given)
  *
  * When invoked from review-gate.yml, the calling workflow must grant
  * `permissions: pull-requests: write` — the PR-comment step needs it and
@@ -27,9 +27,9 @@ import java.util.Scanner;
 public class ReviewGate {
 
     private static final String HOST = System.getenv().getOrDefault(
-            "OLLAMA_HOST", "http://ollama:11434");
+            "LLM_HOST", "http://llm-runtime:11434");
     private static final String DEFAULT_MODEL = System.getenv().getOrDefault(
-            "OLLAMA_MODEL", "qwen2.5-coder:7b");
+            "LLM_MODEL", "");
 
     private static final String SYSTEM_PROMPT = """
             You are a senior Java code reviewer performing a first-pass gate
@@ -57,6 +57,10 @@ public class ReviewGate {
         for (int i = 0; i < args.length - 1; i++) {
             if (args[i].equals("--model")) model = args[i + 1];
         }
+        if (model.isBlank()) {
+            System.err.println("[ReviewGate] No model: set LLM_MODEL or pass --model <model-id>");
+            System.exit(2);
+        }
 
         String diff = readStdin();
         if (diff.isBlank()) {
@@ -65,7 +69,7 @@ public class ReviewGate {
             System.exit(0);
         }
 
-        // Ollama has a context window; truncate very large diffs rather than
+        // The model has a context window; truncate very large diffs rather than
         // failing outright — the gate should degrade gracefully, not block CI
         // because someone committed a vendored file.
         if (diff.length() > 24_000) {
@@ -74,7 +78,7 @@ public class ReviewGate {
 
         String prompt = SYSTEM_PROMPT + "\n\nDIFF:\n```\n" + diff + "\n```\n";
 
-        String responseText = callOllama(model, prompt);
+        String responseText = callModel(model, prompt);
         System.out.println(responseText.trim());
 
         String severity = extractSeverity(responseText);
@@ -101,7 +105,7 @@ public class ReviewGate {
         return sb.toString();
     }
 
-    private static String callOllama(String model, String prompt) throws IOException, InterruptedException {
+    private static String callModel(String model, String prompt) throws IOException, InterruptedException {
         String escapedPrompt = jsonEscape(prompt);
         String body = "{\"model\":\"" + model + "\",\"prompt\":\"" + escapedPrompt
                 + "\",\"stream\":false}";
@@ -121,14 +125,14 @@ public class ReviewGate {
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException e) {
-            System.err.println("[ReviewGate] Could not reach Ollama at " + HOST
-                    + " — is the ollama container up? (" + e.getMessage() + ")");
+            System.err.println("[ReviewGate] Could not reach the model runtime at " + HOST
+                    + " — is the llm-runtime container up? (" + e.getMessage() + ")");
             System.exit(2);
             return "";
         }
 
         if (response.statusCode() != 200) {
-            System.err.println("[ReviewGate] Ollama returned HTTP " + response.statusCode()
+            System.err.println("[ReviewGate] Model runtime returned HTTP " + response.statusCode()
                     + ": " + response.body());
             System.exit(2);
             return "";

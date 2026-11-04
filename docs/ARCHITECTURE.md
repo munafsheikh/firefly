@@ -13,7 +13,7 @@
 ```mermaid
 C4Context
   Person(browser, "Browser User", "Developer or operator accessing the web UI")
-  Person(ai_agent, "AI Agent", "Claude / Copilot / Codex CLI via MCP protocol")
+  Person(ai_agent, "AI Agent", "agent CLIs via MCP protocol")
 
   System_Boundary(firefly, "Firefly Application") {
     Container(web, "Spring Boot Web", "Java 25, Spring Boot 4.0.6", "Serves Thymeleaf pages, REST API, Swagger UI on port 17922")

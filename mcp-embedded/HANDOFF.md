@@ -1,4 +1,4 @@
-# Handoff to Copilot: Implement Embedded MCP Server in Firefly
+# Handoff to AI assistant: Implement Embedded MCP Server in Firefly
 
 **Branch**: `mcp-embedded` (isolated worktree)  
 **Deadline**: 2026-06-26 23:59:59 (midnight)  
@@ -59,7 +59,7 @@ Standalone Spring component that reads Phase 2 registry and proxies to multiple 
 
 - **Worktree**: `/home/m/code/github/munafsheikh/firefly/mcp-embedded/` (clean, on `mcp-embedded` branch)
 - **Project**: Spring Boot 4.0.6, Java 25, plugin-based architecture
-- **Key files read**: CLAUDE.md, pom.xml, DashboardService, TerminalAutoConfiguration
+- **Key files read**: ai.md, pom.xml, DashboardService, TerminalAutoConfiguration
 - **Design doc**: `docs/MCP-ARCHITECTURE.md` (full reference)
 - **Spec**: `IMPLEMENTATION.md` (complete with all code snippets)
 
@@ -192,7 +192,7 @@ Expected: 3 tests pass
 ./mvnw clean install -q && echo "BUILD OK"
 ```
 
-**Manual test (optional, if Claude CLI available)**:
+**Manual test (optional, if AI CLI available)**:
 ```bash
 java -jar target/firefly-*.jar &
 # Firefly starts, MCP server runs on stdio

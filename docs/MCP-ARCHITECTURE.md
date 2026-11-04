@@ -4,7 +4,7 @@
 
 This document details embedding a Model Context Protocol (MCP) server directly into the Firefly Spring Boot application. Instead of external processes, MCP runs as a native Spring Boot component using the same language, configuration, and lifecycle as the rest of Firefly.
 
-**Architecture**: MCP server runs in-process via a background thread on stdio transport. Claude CLI registers it like any other MCP. All tools are Spring beans, enabling reuse of existing Firefly services (DashboardService, TerminalService, etc).
+**Architecture**: MCP server runs in-process via a background thread on stdio transport. AI CLI registers it like any other MCP. All tools are Spring beans, enabling reuse of existing Firefly services (DashboardService, TerminalService, etc).
 
 **Scope**: Three progressive phases (same as original plan, but all Java/Spring Boot):
 - **Phase 1**: Firefly exposes native MCP server (embedded)
@@ -41,8 +41,8 @@ Embedded is cleaner for Firefly because:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  Claude / Copilot / Codex CLI                               │
-│  (register: claude mcp add firefly -- java -jar firefly.jar)│
+│  agent CLIs                               │
+│  (register: $AI_CLI mcp add firefly -- java -jar firefly.jar)│
 └────────────────┬────────────────────────────────────────────┘
                  │ MCP Protocol (stdio)
                  ▼
@@ -819,8 +819,8 @@ Add to dependencies:
 - [ ] Register auto-configuration in META-INF
 - [ ] Update pom.xml
 - [ ] Test: Build and run Firefly, verify MCP server on stdio
-- [ ] Test: Register with Claude CLI (`claude mcp add firefly -- java -jar target/firefly-*.jar`)
-- [ ] Test: Invoke tools via Claude CLI
+- [ ] Test: Register with AI CLI (`$AI_CLI mcp add firefly -- java -jar target/firefly-*.jar`)
+- [ ] Test: Invoke tools via AI CLI
 
 ---
 
@@ -883,12 +883,12 @@ echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | nc localhost 17922
 ### Manual CLI Test
 
 ```bash
-# Register Firefly MCP with Claude CLI
-claude mcp add firefly -- java -jar /path/to/firefly-*.jar
+# Register Firefly MCP with AI CLI
+$AI_CLI mcp add firefly -- java -jar /path/to/firefly-*.jar
 
-# Test via Claude
-claude ask "List my Firefly plugins"
-claude ask "What's the health of my Firefly instance?"
+# Test via AI assistant
+$AI_CLI ask "List my Firefly plugins"
+$AI_CLI ask "What's the health of my Firefly instance?"
 ```
 
 ---
@@ -1038,7 +1038,7 @@ Create a Spring Boot application (can be standalone or a plugin) that:
 
 ## Success Metrics
 
-- Phase 1: MCP server functional; all tools discoverable and invokable via Claude CLI
+- Phase 1: MCP server functional; all tools discoverable and invokable via AI CLI
 - Phase 2: Registry CRUD API complete; external MCPs discoverable via dashboard
 - Phase 3: Unified proxy aggregates 3+ MCPs; tool routing works end-to-end
 
