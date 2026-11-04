@@ -10,7 +10,7 @@
 
 ## Overview
 
-Embed a Model Context Protocol (MCP) server directly in Firefly's Spring Boot application. MCP server runs as a background thread on stdio, allowing Claude CLI to register and invoke Firefly tools without external processes.
+Embed a Model Context Protocol (MCP) server directly in Firefly's Spring Boot application. MCP server runs as a background thread on stdio, allowing AI CLI to register and invoke Firefly tools without external processes.
 
 **Reference Architecture**: See `/docs/MCP-ARCHITECTURE.md` (full design document)
 
@@ -880,9 +880,9 @@ docker compose up app --build
 # Verify MCP server is loaded
 docker compose up app --build 2>&1 | grep -i "mcp server"
 
-# Manual test (if you have Claude CLI)
-claude mcp add firefly -- java -jar target/firefly-*.jar
-claude ask "List my Firefly plugins"
+# Manual test (if you have AI CLI)
+$AI_CLI mcp add firefly -- java -jar target/firefly-*.jar
+$AI_CLI ask "List my Firefly plugins"
 ```
 
 ---
@@ -894,7 +894,7 @@ claude ask "List my Firefly plugins"
 - ✓ All 4 tools registered and discoverable
 - ✓ Tests pass: `./mvnw test`
 - ✓ MCP server starts when Firefly starts
-- ✓ Claude CLI can register and invoke tools
+- ✓ AI CLI can register and invoke tools
 
 ### Phase 2
 - ✓ Registry plugin loads alongside core app
@@ -909,7 +909,7 @@ claude ask "List my Firefly plugins"
 
 ---
 
-## Notes for Copilot
+## Notes for AI assistant
 
 1. **Stay in Java**: All code is Java. No Node.js, Python, or shell scripts (except tests).
 2. **Follow Spring patterns**: Use @Component, @Service, @AutoConfiguration following existing code.
@@ -924,6 +924,6 @@ claude ask "List my Firefly plugins"
 ## References
 
 - Full design: `/docs/MCP-ARCHITECTURE.md`
-- Firefly conventions: `/CLAUDE.md`
+- Firefly conventions: `/ai.md`
 - Spring Boot docs: https://spring.io/projects/spring-boot
 - MCP spec: https://modelcontextprotocol.io/

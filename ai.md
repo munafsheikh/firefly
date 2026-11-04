@@ -1,6 +1,6 @@
-# CLAUDE.md
+# ai.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for AI agents working in this repository. LLM and agent settings: `ai/llm.env.example` (values in the untracked `ai/llm.env`).
 
 ## Project
 

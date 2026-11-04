@@ -3,6 +3,11 @@ name: Local SLM Review Gate
 # First-pass code review on every PR touching Java, run entirely inside the
 # runner (no external API calls, no cost). Blocks merge on BLOCK-severity
 # findings; posts results as a PR comment either way.
+#
+# Runtime and model are repository variables (Settings > Variables > Actions):
+#   LLM_RUNTIME_IMAGE  local model runtime container image (serves /api/* on 11434)
+#   LLM_MODEL          review model id (small, CPU-friendly)
+# The job is skipped until LLM_RUNTIME_IMAGE is set.
 
 on:
   pull_request:
@@ -23,17 +28,17 @@ concurrency:
 jobs:
   review-gate:
     runs-on: ubuntu-latest
+    if: ${{ vars.LLM_RUNTIME_IMAGE != '' }}
     services:
-      ollama:
-        image: ollama/ollama:latest
+      llm-runtime:
+        image: ${{ vars.LLM_RUNTIME_IMAGE }}
         ports:
           - 11434:11434
     env:
-      OLLAMA_HOST: http://localhost:11434
-      # 1.5b for CI speed on a CPU-only runner. Bump to qwen2.5-coder:7b
-      # (matches the local docker-compose default) if you move this to a
+      LLM_HOST: ${LLM_BASE_URL}
+      # Keep this ~1.5B params for a CPU-only runner; go bigger on a
       # self-hosted runner with more RAM/CPU or a GPU.
-      OLLAMA_MODEL: qwen2.5-coder:1.5b
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -44,22 +49,22 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Wait for Ollama
+      - name: Wait for model runtime
         run: |
           for i in $(seq 1 30); do
-            if curl -sf http://localhost:11434/api/tags > /dev/null; then
-              echo "Ollama is up."
+            if curl -sf ${LLM_BASE_URL} > /dev/null; then
+              echo "Model runtime is up."
               exit 0
             fi
             sleep 2
           done
-          echo "Ollama did not become healthy in time." >&2
+          echo "Model runtime did not become healthy in time." >&2
           exit 1
 
       - name: Pull review model
         run: |
-          curl -sf http://localhost:11434/api/pull \
-            -d "{\"name\": \"${OLLAMA_MODEL}\"}"
+          curl -sf ${LLM_BASE_URL} \
+            -d "{\"name\": \"${LLM_MODEL}\"}"
 
       - name: Compute PR diff
         run: |
