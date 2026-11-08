@@ -3,14 +3,17 @@ name: AI Review Gate
 # Review of Java changes by ai-code-reviewers (rules + local model, no external API).
 # Blocks merge on major+ findings; posts a PR comment; uploads SARIF.
 #
-# Repository variables (Settings > Variables > Actions):
-#   LLM_RUNTIME_IMAGE  local model runtime image; empty = deterministic rules only
-#   LLM_MODEL          model runtime ref (e.g. qwen2.5-coder:1.5b); empty = platform default
+# Runs a local small language model (Ollama + qwen2.5-coder:1.5b on the CPU runner) plus the
+# platform's deterministic rules. Optional repository variables (Settings > Variables > Actions):
+#   LLM_RUNTIME_IMAGE  model runtime image (default: pinned Ollama below)
+#   LLM_MODEL          model runtime ref (default: qwen2.5-coder:1.5b)
+#   LLM_PROFILE        platform profile (default: balanced; "offline" = rules only)
 
 on:
   pull_request:
     paths:
       - '**/*.java'
+      - .github/workflows/review-gate.yml
 
 permissions:
   contents: read
@@ -32,13 +35,13 @@ jobs:
 
       - name: AI review
         id: acr
-        uses: munafsheikh/ai-code-reviewers/integrations/github@c26e35601c7f81514ac541e337ff76381dcc9092 # ccr-ce034dee-40i4mu (bump to release tag after merge)
+        uses: munafsheikh/ai-code-reviewers/integrations/github@3c6e9f9d1da9c7009ee108fc447324037d90b436 # main 2026-11-08
         with:
-          profile: ${{ vars.LLM_RUNTIME_IMAGE != '' && 'balanced' || 'offline' }}
+          profile: ${{ vars.LLM_PROFILE || 'balanced' }}
           paths: '*.java'
-          runtime-image: ${{ vars.LLM_RUNTIME_IMAGE }}
+          runtime-image: ${{ vars.LLM_RUNTIME_IMAGE || 'ollama/ollama:0.40.11@sha256:dea72d1e22270fe095b68fdf756d2b489d615643c5a2eaebbc5f569181e322d8' }}
           pull-models: ${{ vars.LLM_MODEL || 'qwen2.5-coder:1.5b' }}
-          model: ${{ vars.LLM_MODEL }}
+          model: ${{ vars.LLM_MODEL || 'qwen2.5-coder:1.5b' }}
           enforce: 'false'
 
       - name: Upload SARIF

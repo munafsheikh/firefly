@@ -1,0 +1,81 @@
+name: Review Gate E2E
+
+# End-to-end test of the AI review gate with a real local SLM. Applies a fixture Java change
+# with known defects as a throwaway local commit, runs the same ai-code-reviewers action the
+# review gate uses with the pinned test configuration (tools/review-gate/e2e/test.env), and
+# asserts: the model ran and its output was used (not degraded to rules-only), the rules caught
+# the known defects, and the gate blocked. The review itself is published to the job summary.
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/review-gate.yml
+      - .github/workflows/review-gate-e2e.yml
+      - tools/review-gate/**
+  schedule:
+    - cron: "43 4 * * 1"
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Model runtime ref to test instead of the test.env default (e.g. qwen2.5-coder:7b)
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: review-gate-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Load test configuration
+        env:
+          MODEL_OVERRIDE: ${{ inputs.model }}
+        run: |
+          grep -E '^[A-Z_]+=' tools/review-gate/e2e/test.env >> "$GITHUB_ENV"
+          [ -z "$MODEL_OVERRIDE" ] || echo "LLM_MODEL=$MODEL_OVERRIDE" >> "$GITHUB_ENV"
+
+      - name: Apply the fixture change (local commit, never pushed)
+        run: |
+          mkdir -p review-e2e
+          cp tools/review-gate/e2e/InvoiceRepository.java.fixture review-e2e/InvoiceRepository.java
+          git add review-e2e
+          git -c user.name=e2e -c user.email=e2e@localhost commit -qm "e2e fixture"
+
+      - name: Review through the SLM
+        id: acr
+        uses: munafsheikh/ai-code-reviewers/integrations/github@3c6e9f9d1da9c7009ee108fc447324037d90b436 # main 2026-11-08
+        with:
+          base-ref: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
+          paths: 'review-e2e/*.java'
+          profile: ${{ env.LLM_PROFILE }}
+          runtime-image: ${{ env.LLM_RUNTIME_IMAGE }}
+          pull-models: ${{ env.LLM_MODEL }}
+          model: ${{ env.LLM_MODEL }}
+          comment: 'false'
+          enforce: 'false'
+
+      - name: Assert the end-to-end outcome
+        env:
+          EXIT_CODE: ${{ steps.acr.outputs.exit-code }}
+        run: |
+          read -r -a rules <<< "$EXPECTED_RULES"
+          docker run --rm -v "$PWD:/w:ro" -w /w \
+            python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90 \
+            python tools/review-gate/e2e/assert_review.py acr-review/review.json "$EXIT_CODE" "$LLM_MODEL" "${rules[@]}" \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: review-gate-e2e
+          path: acr-review/
+          retention-days: 30
