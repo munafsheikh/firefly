@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Docker-first Maven: run any Maven command for any module inside the Firefly build image
-# (.docker/build/Dockerfile: pinned JDK 25 + Maven + Playwright OS libraries), so builds and
+# (.docker/maven/Dockerfile: pinned JDK 25 + Maven + Playwright OS libraries), so builds and
 # tests behave the same on every machine and CI runner. The only host requirement is Docker.
 # The image is built on first use and tagged by a hash of its Dockerfile, so it is rebuilt
 # only when that file changes.
@@ -10,7 +10,7 @@
 #   scripts/mvn.sh -C plugins/cli-plugin -B clean package
 #
 # Environment:
-#   FIREFLY_BUILD_IMAGE   use this image instead of building .docker/build/Dockerfile
+#   FIREFLY_BUILD_IMAGE   use this image instead of building .docker/maven/Dockerfile
 #   FIREFLY_IMAGE_BUILD_ARGS  extra `docker build` flags (e.g. proxy build args, --secret id=ca,...)
 #   FIREFLY_M2_DIR        host Maven repository cache, bind-mounted (default: ~/.m2)
 #   FIREFLY_DOCKER_ARGS   extra `docker run` flags (e.g. proxy env, CA bundle mounts)
@@ -32,11 +32,11 @@ fi
 
 IMAGE="${FIREFLY_BUILD_IMAGE:-}"
 if [[ -z "$IMAGE" ]]; then
-  IMAGE="firefly-build:$(sha256sum "$ROOT_DIR/.docker/build/Dockerfile" | cut -c1-12)"
+  IMAGE="firefly-build:$(sha256sum "$ROOT_DIR/.docker/maven/Dockerfile" | cut -c1-12)"
   if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
     read -r -a build_args <<< "${FIREFLY_IMAGE_BUILD_ARGS:-}"
     echo "[mvn.sh] building $IMAGE" >&2
-    docker build -q "${build_args[@]}" -t "$IMAGE" "$ROOT_DIR/.docker/build" >&2
+    docker build -q "${build_args[@]}" -t "$IMAGE" "$ROOT_DIR/.docker/maven" >&2
   fi
 fi
 

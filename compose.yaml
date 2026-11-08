@@ -84,7 +84,7 @@ services:
   app-build:
     profiles: [build]
     # Same image scripts/mvn.sh and CI use (JDK 25 + Maven + Playwright OS libraries).
-    build: {context: .docker/build}
+    build: {context: .docker/maven}
     image: firefly-build:compose
     working_dir: /app
     volumes:
@@ -123,7 +123,7 @@ services:
   # ------------------------------------------------------------------
   plugin-build:
     profiles: [build, plugin]
-    build: {context: .docker/build}
+    build: {context: .docker/maven}
     image: firefly-build:compose
     working_dir: /app/plugins
     volumes:
