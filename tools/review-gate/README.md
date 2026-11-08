@@ -11,3 +11,12 @@ Reviews are performed by [ai-code-reviewers](https://github.com/munafsheikh/ai-c
   - `ACR_HOME=/path/to/ai-code-reviewers` runs from a local checkout instead of the container image.
 
 Exit codes: 0 pass/warn, 1 blocked, 2 review could not run.
+
+## End-to-end test
+
+`.github/workflows/review-gate-e2e.yml` runs the gate against `e2e/InvoiceRepository.java.fixture`
+with the pinned test configuration in `e2e/test.env` (`LLM_RUNTIME_IMAGE`, `LLM_MODEL`,
+`LLM_PROFILE`, `EXPECTED_RULES`). It asserts the model ran and its output was used, the rules
+caught the fixture's known defects, and the gate blocked. Runs on changes to the gate, weekly,
+and on demand (Actions > Review Gate E2E > Run workflow).
+

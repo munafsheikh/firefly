@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * Demo for the AI review gate: a plausible data-access class with deliberate defects.
- * Not part of any Maven module; reverted after the review is captured.
+ * End-to-end fixture for the AI review gate: a plausible data-access class with known defects
+ * (SQL concatenation, unclosed resources, swallowed exception, String ==, unsynchronised shared
+ * state). Stored as .fixture so no build picks it up; review-gate-e2e.yml applies it as a
+ * throwaway local commit and asserts what the gate reports.
  */
 public class InvoiceRepository {
 
