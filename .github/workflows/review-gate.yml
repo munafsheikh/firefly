@@ -32,7 +32,7 @@ jobs:
 
       - name: AI review
         id: acr
-        uses: munafsheikh/ai-code-reviewers/integrations/github@409e30bc45ae129e22eadf402c33868d6388b487 # ccr-ce034dee-40i4mu (bump to release tag after merge)
+        uses: munafsheikh/ai-code-reviewers/integrations/github@c26e35601c7f81514ac541e337ff76381dcc9092 # ccr-ce034dee-40i4mu (bump to release tag after merge)
         with:
           profile: ${{ vars.LLM_RUNTIME_IMAGE != '' && 'balanced' || 'offline' }}
           paths: '*.java'
