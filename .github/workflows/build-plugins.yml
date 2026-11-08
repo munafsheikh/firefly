@@ -14,48 +14,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
 
       - name: Build CLI Plugin
         working-directory: plugins/cli-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/cli-plugin clean package -B -V
 
       - name: Build Actuator Plugin
         working-directory: plugins/actuator-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/actuator-plugin clean package -B -V
 
       - name: Build ADO Plugin
         working-directory: plugins/ado-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/ado-plugin clean package -B -V
 
       - name: Build MCP Registry Plugin
         working-directory: plugins/mcp-registry-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/mcp-registry-plugin clean package -B -V
 
       - name: Build Midnight Theme Plugin
         working-directory: plugins/midnight-theme-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/midnight-theme-plugin clean package -B -V
 
       - name: Build PlantUML Plugin
         working-directory: plugins/plantuml-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/plantuml-plugin clean package -B -V
 
       - name: Build Markdown Plugin
         working-directory: plugins/markdown-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/markdown-plugin clean package -B -V
 
       - name: Build WebTUI Browser Plugin
         working-directory: plugins/webtui-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/webtui-plugin clean package -B -V
 
       - name: Build Bash Runner Plugin
         working-directory: plugins/bash-runner-plugin
-        run: mvn clean package -B -V
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/bash-runner-plugin clean package -B -V
 
       - name: Upload Plugin artifacts
         uses: actions/upload-artifact@v4

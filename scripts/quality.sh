@@ -2,7 +2,8 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-MAVEN="${MAVEN:-$ROOT_DIR/mvnw}"
+cd "$ROOT_DIR"
+MAVEN="${MAVEN:-$ROOT_DIR/scripts/mvn.sh}"   # docker-first; MAVEN=./mvnw for a host toolchain
 JACOCO_VERSION="${JACOCO_VERSION:-0.8.15}"
 PITEST_VERSION="${PITEST_VERSION:-1.25.9}"
 
@@ -28,7 +29,7 @@ coverage  Run tests for every Maven module with JaCoCo instrumentation and XML/H
 mutation  Run PIT mutation testing for modules that contain Java tests.
 
 Environment overrides:
-  MAVEN=/path/to/mvn
+  MAVEN=/path/to/mvn   (default: scripts/mvn.sh, i.e. Maven in the Firefly build image)
   JACOCO_VERSION=0.8.15
   PITEST_VERSION=1.25.9
 EOF
@@ -44,8 +45,8 @@ module_name() {
 
 run_coverage() {
   for module in "${MODULES[@]}"; do
-    local pom="$ROOT_DIR/$module/pom.xml"
-    [[ -f "$pom" ]] || continue
+    local pom="$module/pom.xml"   # relative: resolves both on the host and in the build container
+    [[ -f "$ROOT_DIR/$pom" ]] || continue
     echo "::group::JaCoCo coverage — $(module_name "$module")"
     "$MAVEN" -f "$pom" -B -V clean \
       "org.jacoco:jacoco-maven-plugin:${JACOCO_VERSION}:prepare-agent" \
@@ -62,8 +63,8 @@ has_java_tests() {
 
 run_mutation() {
   for module in "${MODULES[@]}"; do
-    local pom="$ROOT_DIR/$module/pom.xml"
-    [[ -f "$pom" ]] || continue
+    local pom="$module/pom.xml"   # relative: resolves both on the host and in the build container
+    [[ -f "$ROOT_DIR/$pom" ]] || continue
 
     if ! has_java_tests "$module"; then
       echo "Skipping $(module_name "$module"): no Java tests"

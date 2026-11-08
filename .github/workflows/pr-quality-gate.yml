@@ -42,20 +42,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Make mvnw executable
-        run: chmod +x ./mvnw
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
 
       - name: Build, test, and enforce coverage gate
-        run: ./mvnw -B -V clean verify
+        run: ./scripts/mvn.sh -B -V clean verify
 
       - name: Enforce mutation-testing gate
-        run: ./mvnw -B org.pitest:pitest-maven:mutationCoverage
+        run: ./scripts/mvn.sh -B org.pitest:pitest-maven:mutationCoverage
 
       - name: Upload coverage/mutation reports
         if: always()
@@ -102,27 +100,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
 
       - name: Build, test, and enforce coverage gate (${{ matrix.plugin }})
         working-directory: plugins/${{ matrix.plugin }}
         run: |
           if find src/main/java -name '*.java' 2>/dev/null | grep -q .; then
-            mvn -B -V clean verify
+            $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/${{ matrix.plugin }} -B -V clean verify
           else
             echo "No Java source in ${{ matrix.plugin }} — packaging only, no coverage gate applies."
-            mvn -B -V clean package
+            $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/${{ matrix.plugin }} -B -V clean package
           fi
 
       - name: Enforce mutation-testing gate (${{ matrix.plugin }})
         working-directory: plugins/${{ matrix.plugin }}
         run: |
           if find src/main/java -name '*.java' 2>/dev/null | grep -q .; then
-            mvn -B org.pitest:pitest-maven:mutationCoverage
+            $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/${{ matrix.plugin }} -B org.pitest:pitest-maven:mutationCoverage
           else
             echo "No Java source in ${{ matrix.plugin }} — skipping mutation testing."
           fi

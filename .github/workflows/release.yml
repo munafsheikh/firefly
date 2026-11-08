@@ -25,20 +25,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
 
-      - name: Make mvnw executable
-        run: chmod +x ./mvnw
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: ./mvnw -B deploy -DskipTests
+        run: ./scripts/mvn.sh -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-ado-plugin:
@@ -54,17 +56,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/ado-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-actuator-plugin:
@@ -80,17 +87,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/actuator-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-cli-plugin:
@@ -106,17 +118,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/cli-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-mcp-registry-plugin:
@@ -132,17 +149,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/mcp-registry-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-midnight-theme-plugin:
@@ -158,17 +180,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/midnight-theme-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-plantuml-plugin:
@@ -184,17 +211,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/plantuml-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-markdown-plugin:
@@ -210,17 +242,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/markdown-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-webtui-plugin:
@@ -236,17 +273,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/webtui-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-bash-runner-plugin:
@@ -262,17 +304,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-          server-id: github
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Maven credentials for GitHub Packages (read by the build container)
+        run: |
+          mkdir -p ~/.m2
+          printf '%s' '<settings><servers><server><id>github</id><username>${env.GITHUB_ACTOR}</username><password>${env.GITHUB_TOKEN}</password></server></servers></settings>' > ~/.m2/settings.xml
 
       - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests
+        run: $GITHUB_WORKSPACE/scripts/mvn.sh -C plugins/bash-runner-plugin -B deploy -DskipTests
         env:
+          FIREFLY_DOCKER_ARGS: -e GITHUB_TOKEN -e GITHUB_ACTOR
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-docker-app:
@@ -321,27 +368,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Cache Maven repository
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
       - name: Set version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_ENV"
 
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
-        with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: 'maven'
-
       - name: Build all plugins
         run: |
-          cd plugins/cli-plugin && mvn clean package -B -V -DskipTests && cd ../..
-          cd plugins/actuator-plugin && mvn clean package -B -V -DskipTests && cd ../..
-          cd plugins/ado-plugin && mvn clean package -B -V -DskipTests && cd ../..
-          cd plugins/mcp-registry-plugin && mvn clean package -B -V -DskipTests && cd ../..
-          cd plugins/midnight-theme-plugin && mvn clean package -B -V -DskipTests && cd ../..
-          cd plugins/plantuml-plugin && mvn clean package -B -V -DskipTests && cd ../..
-          cd plugins/markdown-plugin && mvn clean package -B -V -DskipTests && cd ../..
-          cd plugins/webtui-plugin && mvn clean package -B -V -DskipTests && cd ../..
-          cd plugins/bash-runner-plugin && mvn clean package -B -V -DskipTests && cd ../..
+          ./scripts/mvn.sh -C plugins/cli-plugin clean package -B -V -DskipTests
+          ./scripts/mvn.sh -C plugins/actuator-plugin clean package -B -V -DskipTests
+          ./scripts/mvn.sh -C plugins/ado-plugin clean package -B -V -DskipTests
+          ./scripts/mvn.sh -C plugins/mcp-registry-plugin clean package -B -V -DskipTests
+          ./scripts/mvn.sh -C plugins/midnight-theme-plugin clean package -B -V -DskipTests
+          ./scripts/mvn.sh -C plugins/plantuml-plugin clean package -B -V -DskipTests
+          ./scripts/mvn.sh -C plugins/markdown-plugin clean package -B -V -DskipTests
+          ./scripts/mvn.sh -C plugins/webtui-plugin clean package -B -V -DskipTests
+          ./scripts/mvn.sh -C plugins/bash-runner-plugin clean package -B -V -DskipTests
 
       - name: Flatten plugin jars into build context
         run: |

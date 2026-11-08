@@ -41,7 +41,17 @@ The project supports both JVM execution and GraalVM native-image compilation.
 
 ## Build Commands
 
-**Docker Compose is the supported way to build, run, and test this project.** Use it rather than a bare local `mvnw`/`java` — the host toolchain isn't guaranteed to match the Java 25 / GraalVM 25.0.2 versions this project requires; Compose pins those via `maven:3-eclipse-temurin-25` (build) and `eclipse-temurin:25-jre` (runtime).
+**Every build and test runs in Docker — locally and in CI.** The host needs only Docker; never call a bare `mvnw`/`mvn`/`java`. The build image is `.docker/build/Dockerfile` (JDK 25 + Maven + the OS libraries Playwright's Chromium needs, on Ubuntu 24.04), pinned by digest and tagged by a hash of its Dockerfile. `scripts/mvn.sh` builds it on first use and runs Maven inside it; the GitHub workflows, `scripts/quality.sh` and the Compose `build` profile all use the same image. The runtime image is `eclipse-temurin:25-jre` (pinned).
+
+### Docker-first Maven — `scripts/mvn.sh`
+```bash
+scripts/mvn.sh -B -V clean verify                         # core app: build, tests, coverage gate
+scripts/mvn.sh -C plugins/cli-plugin -B clean verify      # any plugin
+scripts/mvn.sh -B test -Dtest=FireflyApplicationTests#contextLoads
+scripts/quality.sh coverage                               # JaCoCo across all modules (uses mvn.sh)
+scripts/run-app.sh start --plugins && scripts/run-app.sh stop   # run the built jar in the JRE image
+```
+The Maven repository and Playwright browsers are cached in `~/.m2` (override with `FIREFLY_M2_DIR`). Behind a TLS-intercepting proxy, set `FIREFLY_IMAGE_BUILD_ARGS="--build-arg https_proxy=... --secret id=ca,src=ca.crt"` (the CA is removed again within the same layer) and `FIREFLY_DOCKER_ARGS` for runtime proxy variables. `FIREFLY_LOCAL=1` runs the host's `mvn` instead (unsupported escape hatch).
 
 ### Docker Compose — build / run / test
 ```bash
@@ -60,7 +70,7 @@ docker compose up app --build
 
 See [Local Pipeline Stages](#local-pipeline-stages-docker-compose) below for the full profile table.
 
-### Maven (JVM) — local alternative, requires matching JDK 25 on the host
+### Maven (JVM) — host toolchain, unsupported (use `scripts/mvn.sh`)
 ```bash
 ./mvnw clean install
 java -jar target/firefly-*.jar
