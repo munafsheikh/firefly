@@ -41,7 +41,7 @@ jobs:
           paths: '*.java'
           runtime-image: ${{ vars.LLM_RUNTIME_IMAGE || 'ollama/ollama:0.40.11@sha256:dea72d1e22270fe095b68fdf756d2b489d615643c5a2eaebbc5f569181e322d8' }}
           pull-models: ${{ vars.LLM_MODEL || 'qwen2.5-coder:1.5b' }}
-          model: ${{ vars.LLM_MODEL }}
+          model: ${{ vars.LLM_MODEL || 'qwen2.5-coder:1.5b' }}
           enforce: 'false'
 
       - name: Upload SARIF
