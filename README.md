@@ -95,7 +95,7 @@ Plugin-powered Spring Boot platform with web dashboard, terminal UI, REST API, O
 scripts/mvn.sh -B -V clean verify                      # core app: build + tests + coverage gate
 scripts/mvn.sh -C plugins/<name> -B clean verify       # a plugin
 ```
-`scripts/mvn.sh` runs Maven in the pinned build image (`.docker/build/Dockerfile`), building it on first use. CI uses exactly this.
+`scripts/mvn.sh` runs Maven in the pinned build image (`.docker/maven/Dockerfile`), building it on first use. CI uses exactly this.
 
 Docker Compose:
 

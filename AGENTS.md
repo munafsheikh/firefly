@@ -41,7 +41,7 @@ The project supports both JVM execution and GraalVM native-image compilation.
 
 ## Build Commands
 
-**Every build and test runs in Docker — locally and in CI.** The host needs only Docker; never call a bare `mvnw`/`mvn`/`java`. The build image is `.docker/build/Dockerfile` (JDK 25 + Maven + the OS libraries Playwright's Chromium needs, on Ubuntu 24.04), pinned by digest and tagged by a hash of its Dockerfile. `scripts/mvn.sh` builds it on first use and runs Maven inside it; the GitHub workflows, `scripts/quality.sh` and the Compose `build` profile all use the same image. The runtime image is `eclipse-temurin:25-jre` (pinned).
+**Every build and test runs in Docker — locally and in CI.** The host needs only Docker; never call a bare `mvnw`/`mvn`/`java`. The build image is `.docker/maven/Dockerfile` (JDK 25 + Maven + the OS libraries Playwright's Chromium needs, on Ubuntu 24.04), pinned by digest and tagged by a hash of its Dockerfile. `scripts/mvn.sh` builds it on first use and runs Maven inside it; the GitHub workflows, `scripts/quality.sh` and the Compose `build` profile all use the same image. The runtime image is `eclipse-temurin:25-jre` (pinned).
 
 ### Docker-first Maven — `scripts/mvn.sh`
 ```bash
