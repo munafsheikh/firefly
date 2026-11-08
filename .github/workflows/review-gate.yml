@@ -1,26 +1,22 @@
-name: Local SLM Review Gate
+name: AI Review Gate
 
-# First-pass code review on every PR touching Java, run entirely inside the
-# runner (no external API calls, no cost). Blocks merge on BLOCK-severity
-# findings; posts results as a PR comment either way.
+# Review of Java changes by ai-code-reviewers (rules + local model, no external API).
+# Blocks merge on major+ findings; posts a PR comment; uploads SARIF.
 #
-# Runtime and model are repository variables (Settings > Variables > Actions):
-#   LLM_RUNTIME_IMAGE  local model runtime container image (serves /api/* on 11434)
-#   LLM_MODEL          review model id (small, CPU-friendly)
-# The job is skipped until LLM_RUNTIME_IMAGE is set.
+# Repository variables (Settings > Variables > Actions):
+#   LLM_RUNTIME_IMAGE  local model runtime image; empty = deterministic rules only
+#   LLM_MODEL          model runtime ref (e.g. qwen2.5-coder:1.5b); empty = platform default
 
 on:
   pull_request:
     paths:
       - '**/*.java'
 
-# actions/github-script needs write access to list/create/update PR comments;
-# the default GITHUB_TOKEN is read-only unless declared here.
 permissions:
   contents: read
   pull-requests: write
+  security-events: write
 
-# Cancel superseded runs when new commits land on the same PR.
 concurrency:
   group: review-gate-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -28,93 +24,32 @@ concurrency:
 jobs:
   review-gate:
     runs-on: ubuntu-latest
-    if: ${{ vars.LLM_RUNTIME_IMAGE != '' }}
-    services:
-      llm-runtime:
-        image: ${{ vars.LLM_RUNTIME_IMAGE }}
-        ports:
-          - 11434:11434
-    env:
-      LLM_HOST: ${LLM_BASE_URL}
-      # Keep this ~1.5B params for a CPU-only runner; go bigger on a
-      # self-hosted runner with more RAM/CPU or a GPU.
-      LLM_MODEL: ${{ vars.LLM_MODEL }}
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-java@v4
+      - name: AI review
+        id: acr
+        uses: munafsheikh/ai-code-reviewers/integrations/github@c26e35601c7f81514ac541e337ff76381dcc9092 # ccr-ce034dee-40i4mu (bump to release tag after merge)
         with:
-          distribution: temurin
-          java-version: '21'
+          profile: ${{ vars.LLM_RUNTIME_IMAGE != '' && 'balanced' || 'offline' }}
+          paths: '*.java'
+          runtime-image: ${{ vars.LLM_RUNTIME_IMAGE }}
+          pull-models: ${{ vars.LLM_MODEL || 'qwen2.5-coder:1.5b' }}
+          model: ${{ vars.LLM_MODEL }}
+          enforce: 'false'
 
-      - name: Wait for model runtime
-        run: |
-          for i in $(seq 1 30); do
-            if curl -sf ${LLM_BASE_URL} > /dev/null; then
-              echo "Model runtime is up."
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Model runtime did not become healthy in time." >&2
-          exit 1
-
-      - name: Pull review model
-        run: |
-          curl -sf ${LLM_BASE_URL} \
-            -d "{\"name\": \"${LLM_MODEL}\"}"
-
-      - name: Compute PR diff
-        run: |
-          git fetch origin "${{ github.base_ref }}" --depth=1
-          git diff "origin/${{ github.base_ref }}"...HEAD -- '*.java' > pr.diff
-          echo "Diff lines: $(wc -l < pr.diff)"
-
-      - name: Run ReviewGate
-        id: review
-        continue-on-error: true
-        run: |
-          java tools/review-gate/ReviewGate.java < pr.diff > review-output.txt 2>&1
-          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
-          cat review-output.txt
-
-      - name: Post review as PR comment
-        if: always()
-        uses: actions/github-script@v7
+      - name: Upload SARIF
+        if: always() && hashFiles('acr-review/review.sarif') != ''
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
-          script: |
-            const fs = require('fs');
-            const body = fs.readFileSync('review-output.txt', 'utf8');
-            const marker = '<!-- review-gate -->';
-            const commentBody = `${marker}\n### 🔍 Local SLM Review Gate\n\n\`\`\`\n${body}\n\`\`\`\n`;
-
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            const existing = comments.find(c => c.body.includes(marker));
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body: commentBody,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody,
-              });
-            }
+          sarif_file: acr-review/review.sarif
+          category: ai-review-gate
 
       - name: Enforce gate
-        if: steps.review.outputs.exit_code == '1'
+        if: steps.acr.outputs.exit-code == '1'
         run: |
-          echo "Blocked by ReviewGate — see PR comment for details." >&2
+          echo "Blocked by AI review gate — see PR comment for details." >&2
           exit 1
