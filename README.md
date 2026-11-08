@@ -84,12 +84,20 @@ Plugin-powered Spring Boot platform with web dashboard, terminal UI, REST API, O
 
 ### Prerequisites
 
-- Docker & Docker Compose — the supported way to build, run, and test this project
-- (Optional, local-only alternative) Java 25 + Maven 3.9+ / `./mvnw`, GraalVM CE 25.0.2 for native builds — only if your host JDK matches the project's toolchain
+- Docker & Docker Compose — the only requirement. Every build and test (locally and in CI) runs in the pinned build image via `scripts/mvn.sh`.
+- (Unsupported escape hatch) Java 25 + Maven 3.9+ / `./mvnw`, GraalVM CE 25.0.2 for native builds — only if your host JDK matches the project's toolchain
 
 ## Building, Running, and Testing
 
-### Option 1: Docker Compose (recommended)
+### Option 1: Docker (recommended)
+
+```bash
+scripts/mvn.sh -B -V clean verify                      # core app: build + tests + coverage gate
+scripts/mvn.sh -C plugins/<name> -B clean verify       # a plugin
+```
+`scripts/mvn.sh` runs Maven in the pinned build image (`.docker/build/Dockerfile`), building it on first use. CI uses exactly this.
+
+Docker Compose:
 
 ```bash
 # Build everything
@@ -115,7 +123,7 @@ docker compose up app --build
 
 The application is exposed on **port 17922**. See `AGENTS.md` for full Compose profile reference (build/verify/plugin/showcase/native).
 
-### Option 2: Maven (JVM) — local alternative
+### Option 2: Maven (JVM) — host toolchain (unsupported; prefer `scripts/mvn.sh`)
 
 ```bash
 ./mvnw clean package
