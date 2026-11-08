@@ -15,6 +15,10 @@ on:
   schedule:
     - cron: "43 4 * * 1"
   workflow_dispatch:
+    inputs:
+      model:
+        description: Model runtime ref to test instead of the test.env default (e.g. qwen2.5-coder:7b)
+        default: ''
 
 permissions:
   contents: read
@@ -33,7 +37,11 @@ jobs:
           fetch-depth: 0
 
       - name: Load test configuration
-        run: grep -E '^[A-Z_]+=' tools/review-gate/e2e/test.env >> "$GITHUB_ENV"
+        env:
+          MODEL_OVERRIDE: ${{ inputs.model }}
+        run: |
+          grep -E '^[A-Z_]+=' tools/review-gate/e2e/test.env >> "$GITHUB_ENV"
+          [ -z "$MODEL_OVERRIDE" ] || echo "LLM_MODEL=$MODEL_OVERRIDE" >> "$GITHUB_ENV"
 
       - name: Apply the fixture change (local commit, never pushed)
         run: |

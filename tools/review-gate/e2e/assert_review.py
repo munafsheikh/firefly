@@ -30,10 +30,15 @@ def main(path, exit_code, model_ref, *rules):
     check("gate blocked the change", r["gate"]["status"] == "block" and exit_code == "1",
           f"status={r['gate']['status']} exit={exit_code}")
 
+    parse = run.get("parse") or []
+    returned = sum(p["raw"] for p in parse)
+    accepted = sum(p["accepted"] for p in parse)
+    discarded = sum(p["discarded"] for p in parse)
     model_findings = [f for f in findings if f["source"] == "model"]
     corroborated = [f for f in findings if f["corroborated_by"]]
     print(f"### Review gate end-to-end\n\nModel `{model_ref}` · {len(findings)} findings "
-          f"({len(model_findings)} from the model, {len(corroborated)} rule findings corroborated by it)\n")
+          f"({len(model_findings)} from the model, {len(corroborated)} rule findings corroborated by it)\n\n"
+          f"Model output: {returned} findings returned, {accepted} accepted, {discarded} discarded\n")
     print("| Check | Result | Detail |\n|---|---|---|")
     for name, ok, detail in checks:
         print(f"| {name} | {'pass' if ok else 'FAIL'} | {detail} |")
