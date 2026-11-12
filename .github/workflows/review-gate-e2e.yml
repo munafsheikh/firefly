@@ -52,10 +52,11 @@ jobs:
 
       - name: Review through the SLM
         id: acr
-        uses: munafsheikh/ai-code-reviewers/integrations/github@3c6e9f9d1da9c7009ee108fc447324037d90b436 # main 2026-11-08
+        uses: munafsheikh/ai-code-reviewers/integrations/github@86afbf7d68c2fc2ac642aa0c85d33d3eebbceb4e # v0.2.0
         with:
           base-ref: ${{ github.event.pull_request.base.ref || github.event.repository.default_branch }}
           paths: 'review-e2e/*.java'
+          head-ref: HEAD  # include the fixture commit made earlier in this job
           profile: ${{ env.LLM_PROFILE }}
           runtime-image: ${{ env.LLM_RUNTIME_IMAGE }}
           pull-models: ${{ env.LLM_MODEL }}

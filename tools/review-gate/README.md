@@ -1,7 +1,8 @@
 # Review gate
 
 Reviews are performed by [ai-code-reviewers](https://github.com/munafsheikh/ai-code-reviewers)
-(rules + local model, no external API). This directory holds only the local wrapper.
+(rules + local model, no external API), pinned to
+[v0.2.0](https://github.com/munafsheikh/ai-code-reviewers/tree/v0.2.0) by commit SHA. This directory holds only the local wrapper.
 
 - CI: `.github/workflows/review-gate.yml` (uses the platform's GitHub action): deterministic rules plus a
   local SLM (Ollama + `qwen2.5-coder:1.5b` on the CPU runner). Override with repository variables
