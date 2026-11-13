@@ -35,7 +35,7 @@ jobs:
 
       - name: AI review
         id: acr
-        uses: munafsheikh/ai-code-reviewers/integrations/github@3c6e9f9d1da9c7009ee108fc447324037d90b436 # main 2026-11-08
+        uses: munafsheikh/ai-code-reviewers/integrations/github@86afbf7d68c2fc2ac642aa0c85d33d3eebbceb4e # v0.2.0
         with:
           profile: ${{ vars.LLM_PROFILE || 'balanced' }}
           paths: '*.java'
